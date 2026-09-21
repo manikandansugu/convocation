@@ -45,7 +45,7 @@ export function GuestAdditionPage({ initialGuests, onBack, onContinue }: GuestAd
             {guests.map((guest, index) => <section className="guest-person-card" key={index}><div className="guest-number">{index + 1}</div><div className="guest-fields two-fields"><label><span>Guest name <b>*</b></span><input value={guest.name} onChange={(event) => updateGuest(index, 'name', event.target.value)} placeholder="Enter full name" required/></label><label><span>Relationship <b>*</b></span><select value={guest.relationship} onChange={(event) => updateGuest(index, 'relationship', event.target.value)} required><option value="">Select relationship</option><option>Father</option><option>Mother</option><option>Spouse</option><option>Sibling</option><option>Guardian</option><option>Other</option></select></label></div></section>)}
           </div>
         }
-        <div className="screen-actions"><button type="button" className="secondary-button" onClick={onBack}>Back</button><button className="flow-primary" type="submit">Generate {guests.length + 1} pass{guests.length ? 'es' : ''} <Icon name="arrow" size={18}/></button></div>
+        <div className="screen-actions"><button type="button" className="secondary-button" onClick={onBack}>Back</button><button className="flow-primary" type="submit">Generate Passes <Icon name="arrow" size={18}/></button></div>
       </form>
     </div>
   )

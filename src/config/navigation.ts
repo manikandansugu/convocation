@@ -10,7 +10,7 @@ export interface NavigationItem {
 export const navigationItems: NavigationItem[] = [
   { label: 'Student Information', icon: 'user' },
   { label: 'ID Verification', icon: 'camera' },
-  { label: 'Payment', icon: 'card' },
+  { label: 'Payment', icon: 'wallet' },
   { label: 'Guest Addition', icon: 'user' },
   { label: 'Convocation Pass', icon: 'ticket' },
 ]

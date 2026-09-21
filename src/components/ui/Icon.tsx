@@ -4,7 +4,7 @@ export type IconName =
   | 'grid' | 'user' | 'file' | 'cap' | 'ticket' | 'help' | 'logout'
   | 'menu' | 'bell' | 'arrow' | 'calendar' | 'clock' | 'location'
   | 'check' | 'chevron' | 'download' | 'card' | 'bank' | 'phone'
-  | 'camera' | 'mail'
+  | 'camera' | 'mail' | 'wallet'
 
 const iconPaths: Record<IconName, ReactNode> = {
   grid: <><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></>,
@@ -28,6 +28,7 @@ const iconPaths: Record<IconName, ReactNode> = {
   phone: <><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></>,
   camera: <><path d="M4 7h3l2-3h6l2 3h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Z"/><circle cx="12" cy="13" r="4"/></>,
   mail: <><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></>,
+  wallet: <><path d="M4 6h14a2 2 0 0 1 2 2v11H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h12"/><path d="M16 11h6v5h-6a2.5 2.5 0 0 1 0-5Z"/><path d="M16 13.5h.01"/></>,
 }
 
 interface IconProps {

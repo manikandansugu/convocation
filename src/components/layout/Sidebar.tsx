@@ -13,7 +13,7 @@ export function Sidebar({ activePage, isOpen, onClose, onNavigate }: SidebarProp
     <button className={`sidebar-scrim ${isOpen ? 'visible' : ''}`} aria-label="Close navigation" onClick={onClose} />
     <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
       <div className="brand">
-        <div className="brand-mark"><img src="/campus-trust-logo.png" alt="Campus Trust" /></div>
+        <div className="brand-mark"><img src={import.meta.env.BASE_URL + 'campus-trust-logo.png'} alt="Campus Trust" /></div>
         <div className="brand-copy">
           <strong>Campus<span className="brand-highlight">Trust</span></strong>
           <small className="brand-subtitle">Convocation</small>

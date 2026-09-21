@@ -969,3 +969,113 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
   .person-pass { break-inside: avoid; margin-bottom: 20px; box-shadow: none; }
   .five-step-progress, .prototype-heading, .pass-success { display: none !important; }
 }
+
+/* Pass grouping, real QR codes, and download controls */
+.pass-group {
+  margin-top: 18px;
+  padding: 20px;
+  border: 1px solid #dfe5ec;
+  border-radius: 12px;
+  background: #f9fafc;
+}
+.pass-group-heading {
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.pass-group-heading .eyebrow { margin-bottom: 3px; }
+.pass-group-heading h2 { margin: 0; color: #182230; font: 700 17px var(--display); }
+.pass-group-heading > span {
+  padding: 6px 10px;
+  border: 1px solid #dce4ee;
+  border-radius: 99px;
+  color: #627084;
+  background: #fff;
+  font-size: 9px;
+  font-weight: 700;
+}
+.passes-row { display: grid; gap: 16px; }
+.student-pass-row { grid-template-columns: minmax(0, 720px); }
+.guest-pass-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.pass-card-wrapper { min-width: 0; }
+.person-pass-qr a {
+  display: block;
+  padding: 4px;
+  border: 1px solid #dbe3ed;
+  border-radius: 7px;
+  background: #fff;
+  line-height: 0;
+}
+.person-pass-qr a svg { width: 100px; height: 100px; display: block; }
+.single-pass-download {
+  min-height: 37px;
+  margin: 9px 0 0 auto;
+  padding: 0 13px;
+  border: 1px solid #ced9e7;
+  border-radius: 7px;
+  color: #174f91;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 700;
+}
+.single-pass-download:hover { border-color: #1769e8; background: #f3f8ff; }
+.no-guest-passes {
+  min-height: 105px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  color: #7c899a;
+  background: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+}
+.pass-download-options {
+  margin-top: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.pass-download-options .download-pass-button { margin: 0; }
+.pass-download-options .download-pass-button:disabled { opacity: .65; cursor: wait; }
+.print-pass-button {
+  min-width: 170px;
+  min-height: 45px;
+  padding: 0 16px;
+  border: 1px solid #cbd6e4;
+  border-radius: 7px;
+  color: #31445b;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+}
+.download-error { margin: 10px 0 0; color: #c43f3f; text-align: center; font-size: 9px; font-weight: 600; }
+
+@media (max-width: 1180px) {
+  .guest-pass-row { grid-template-columns: 1fr; }
+  .student-pass-row { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  .pass-group { padding: 14px; }
+  .pass-download-options { align-items: stretch; flex-direction: column; }
+  .pass-download-options button { width: 100%; }
+  .single-pass-download { width: 100%; }
+}
+@media print {
+  .pass-group { padding: 0; border: 0; background: transparent; }
+  .pass-group-heading, .single-pass-download, .pass-download-options { display: none !important; }
+  .passes-row { display: block; }
+  .pass-card-wrapper { break-inside: avoid; margin-bottom: 20px; }
+}

@@ -22,7 +22,7 @@ export function PaymentPage({ onBack, onSuccess }: PaymentPageProps) {
   return (
     <div className="page payment-page prototype-page">
       <div className="prototype-heading">
-        <div className="college-title"><div className="college-logo"><Icon name="cap" size={29}/></div><div><p className="eyebrow">SECURE CHECKOUT</p><h1>Payment Gateway</h1><p className="page-subtitle">Complete your payment to confirm your convocation registration.</p></div></div>
+        <div className="college-title"><div className="college-logo"><Icon name="wallet" size={29}/></div><div><p className="eyebrow">SECURE CHECKOUT</p><h1>Payment Gateway</h1><p className="page-subtitle">Complete your payment to confirm your convocation registration.</p></div></div>
         <div className="step-badge">Step 3 of 5</div>
       </div>
       <div className="five-step-progress"><span className="done"><Icon name="check" size={13}/></span><i className="done"/><span className="done"><Icon name="check" size={13}/></span><i className="done"/><span className="active">3</span><i/><span>4</span><i/><span>5</span></div>
