@@ -41,7 +41,7 @@ function PersonPass({ name, label, relationship, index, onDownload }: PersonPass
           </div>
           <div className="pass-event-info"><div><span>DATE & TIME</span><strong>07 October 2026 · 09:30 AM</strong></div><div><span>VENUE</span><strong>Dr. T. P. Ganesan Auditorium</strong></div></div>
           {index === 0 && <div className="pass-contact-info"><span><Icon name="mail" size={14}/>{STUDENT.email}</span><span><Icon name="phone" size={14}/>{STUDENT.mobile}</span></div>}
-          <div className="person-seat"><div><span>BLOCK</span><strong>B</strong></div><div><span>ROW</span><strong>R12</strong></div><div><span>SEAT</span><strong>{25 + index}</strong></div><div><span>GATE</span><strong>02</strong></div></div>
+          <div className="person-seat"><div><span>BLOCK</span><strong>{index === 0 ? 'A' : 'B'}</strong></div><div><span>ROW</span><strong>{index === 0 ? 'A12' : 'R12'}</strong></div><div><span>SEAT</span><strong>{25 + index}</strong></div><div><span>GATE</span><strong>02</strong></div></div>
           <div className="pass-confirmation"><span><Icon name="check" size={14}/> Confirmed</span><span><Icon name="check" size={14}/> Paid</span><span><Icon name="check" size={14}/> IDVS verified</span></div>
           <div className="refreshment-pass-note"><strong>REFRESHMENT</strong><span>Please use this for refreshment.</span></div>
         </div>

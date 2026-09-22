@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Icon } from '../components/ui/Icon'
-import studentPhoto from '../assets/student.avif'
+import studentPhoto from '../assets/student-verification.png'
 
 interface IdentityVerificationPageProps {
   onBack: () => void
