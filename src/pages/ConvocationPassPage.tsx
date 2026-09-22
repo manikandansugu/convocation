@@ -139,14 +139,14 @@ export function ConvocationPassPage({ guests }: ConvocationPassPageProps) {
       <div className="pass-success"><span><Icon name="check" size={22}/></span><div><strong>Registration and payment confirmed</strong><p>₹{REGISTRATION_AMOUNT} paid successfully. Each attendee has a unique pass with a scannable QR code.</p></div></div>
 
       <section className="pass-group student-pass-group">
-        <div className="pass-group-heading"><div><p className="eyebrow">ROW 01</p><h2>Student Pass</h2></div><span>Primary attendee</span></div>
+        <div className="pass-group-heading"><div><p className="eyebrow">STUDENT ROW</p><h2>Student Pass</h2></div><span>Primary attendee</span></div>
         <div className="passes-row student-pass-row">
           <PersonPass name={STUDENT.name} label="STUDENT PASS" index={0} onDownload={downloadPass}/>
         </div>
       </section>
 
       <section className="pass-group guest-pass-group">
-        <div className="pass-group-heading"><div><p className="eyebrow">ROW 02</p><h2>Guest Passes</h2></div><span>{guests.length} guest{guests.length === 1 ? '' : 's'}</span></div>
+        <div className="pass-group-heading"><div><p className="eyebrow">GUEST ROW</p><h2>Guest Passes</h2></div><span>{guests.length} guest{guests.length === 1 ? '' : 's'}</span></div>
         {guests.length ? <div className="passes-row guest-pass-row">
           {guests.map((guest, index) => <PersonPass key={index} name={guest.name} relationship={guest.relationship} label={'GUEST ' + (index + 1)} index={index + 1} onDownload={downloadPass}/>)}
         </div> : <div className="no-guest-passes">No guest passes were requested.</div>}

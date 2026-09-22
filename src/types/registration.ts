@@ -1,6 +1,7 @@
 export interface Guest {
   name: string
   relationship: string
+  aadhaarNumber: string
 }
 
 export interface Student {

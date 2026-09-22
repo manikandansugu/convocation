@@ -11,8 +11,8 @@ import type { Guest } from './types/registration'
 import './App.css'
 
 const DEFAULT_GUESTS: Guest[] = [
-  { name: 'Ramesh Menon', relationship: 'Father' },
-  { name: 'Meera Menon', relationship: 'Mother' },
+  { name: '', relationship: '', aadhaarNumber: '' },
+  { name: '', relationship: '', aadhaarNumber: '' },
 ]
 
 function App() {

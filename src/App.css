@@ -826,15 +826,18 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
   color: #557493;
   position: relative;
   z-index: 1;
+  overflow: hidden;
 }
+.face-guide > img { width: 100%; height: 100%; display: block; object-fit: cover; object-position: center top; opacity: .82; filter: saturate(.9); }
 .captured .face-guide {
-  width: 76px;
-  height: 76px;
-  border: 0;
-  border-radius: 50%;
-  color: white;
-  background: #36a06f;
+  width: 170px;
+  height: 215px;
+  border: 3px solid #36a06f;
+  border-radius: 50% 50% 44% 44%;
+  box-shadow: 0 0 0 7px rgba(54,160,111,.14);
 }
+.captured .face-guide > img { opacity: 1; filter: none; }
+.capture-success-mark { position: absolute; right: 10px; bottom: 12px; width: 42px; height: 42px; border: 3px solid #eaf8f1; border-radius: 50%; display: grid; place-items: center; color: white; background: #36a06f; box-shadow: 0 5px 14px rgba(29,105,70,.25); }
 .camera-status {
   margin-top: 24px;
   display: flex;
@@ -1074,8 +1077,232 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
   .single-pass-download { width: 100%; }
 }
 @media print {
-  .pass-group { padding: 0; border: 0; background: transparent; }
-  .pass-group-heading, .single-pass-download, .pass-download-options { display: none !important; }
-  .passes-row { display: block; }
-  .pass-card-wrapper { break-inside: avoid; margin-bottom: 20px; }
+  @page { size: A4 portrait; margin: 10mm; }
+  .passes-page { max-width: none; padding: 0; }
+  .pass-group {
+    margin-top: 14px;
+    padding: 14px;
+    border: 1px solid #dfe5ec;
+    border-radius: 12px;
+    background: #f9fafc;
+  }
+  .pass-group-heading { display: flex !important; break-after: avoid; }
+  .single-pass-download, .pass-download-options { display: none !important; }
+  .passes-row { display: grid; gap: 14px; }
+  .student-pass-row, .guest-pass-row { grid-template-columns: 1fr; }
+  .pass-card-wrapper { break-inside: avoid; margin-bottom: 0; }
+  .person-pass { width: 100%; box-shadow: none; }
+}
+
+/* Global typography scale */
+.main-nav button { font-size: 16px; }
+.nav-label { font-size: 12px; }
+.brand-copy strong { font-size: 23px; }
+.brand-copy .brand-subtitle { font-size: 11px; }
+.student-card strong { font-size: 15px; }
+.student-card span { font-size: 11px; }
+.topbar-title { font-size: 24px; }
+.status-pill { font-size: 13px; }
+.college-title .eyebrow, .eyebrow { font-size: 12px; }
+.college-title h1 { font-size: clamp(30px, 3vw, 38px); }
+.page-subtitle { font-size: 15px; }
+.step-badge { font-size: 12px; }
+.section-title h2,
+.student-information-card h2,
+.guest-addition-card h2,
+.identity-card h2,
+.payment-card h2,
+.order-summary h2 { font-size: 20px; }
+.section-title p { font-size: 12px; }
+.verified-label { font-size: 12px; }
+.form-grid label > span,
+.guest-fields label > span,
+.payment-fields label > span { font-size: 13px; }
+.readonly-field,
+.form-grid input,
+.form-grid textarea,
+.guest-fields input,
+.guest-fields select,
+.payment-fields input,
+.payment-fields select { font-size: 14px; }
+.phone-input > span { font-size: 13px; }
+.guest-selection > span { font-size: 14px; }
+.guest-options button { font-size: 14px; }
+.fee-summary h2 { font-size: 21px; }
+.fee-lines span, .fee-lines strong { font-size: 14px; }
+.fee-lines small { font-size: 12px; }
+.fee-total { font-size: 15px; }
+.fee-total strong { font-size: 28px; }
+.attendee-summary strong { font-size: 13px; }
+.attendee-summary small { font-size: 11px; }
+.payment-button,
+.flow-primary,
+.secondary-button,
+.pay-now-button,
+.capture-button,
+.download-pass-button,
+.print-pass-button { font-size: 13px; }
+.secure-note, .download-hint, .download-error { font-size: 11px; }
+.five-step-progress > span { font-size: 12px; }
+.student-record-banner h3 { font-size: 19px; }
+.student-record-banner span { font-size: 13px; }
+.registration-reference small { font-size: 10px; }
+.registration-reference strong { font-size: 13px; }
+.student-info-grid > div > span { font-size: 12px; }
+.student-info-grid > div > strong { font-size: 14px; }
+.readable-contact > strong { font-size: 15px !important; }
+.readable-contact > small { font-size: 10px; }
+.information-note { font-size: 11px; }
+.camera-status { font-size: 12px; }
+.capture-instructions li { font-size: 12px; }
+.privacy-note { font-size: 10px; }
+.guest-payment-note strong { font-size: 13px; }
+.guest-payment-note span { font-size: 11px; }
+.empty-guest-state strong { font-size: 14px; }
+.empty-guest-state span { font-size: 11px; }
+.payment-methods strong { font-size: 14px; }
+.payment-methods small { font-size: 11px; }
+.payment-fields label > small { font-size: 10px; }
+.student-summary strong { font-size: 14px; }
+.student-summary span,
+.order-summary dt,
+.order-summary dd { font-size: 12px; }
+.payment-note { font-size: 11px; }
+.refreshment-note span { font-size: 12px; }
+.pass-group-heading h2 { font-size: 20px; }
+.pass-group-heading > span { font-size: 11px; }
+.pass-mini-brand strong { font-size: 16px; }
+.pass-mini-brand small { font-size: 9px; }
+.pass-type { font-size: 10px; }
+.pass-person span { font-size: 9px; }
+.pass-person h2 { font-size: 20px; }
+.pass-person p { font-size: 10px; }
+.pass-event-info span, .person-seat span { font-size: 8px; }
+.pass-event-info strong { font-size: 10px; }
+.pass-contact-info span { font-size: 10px; }
+.person-seat strong { font-size: 16px; }
+.pass-confirmation span { font-size: 9px; }
+.refreshment-pass-note strong { font-size: 9px; }
+.refreshment-pass-note span { font-size: 10px; }
+.person-pass-qr strong, .person-pass-qr span { font-size: 9px; }
+.single-pass-download { font-size: 11px; }
+
+/* Guest Aadhaar upload and prototype OCR */
+.guest-person-content { min-width: 0; }
+.aadhaar-section {
+  margin-top: 17px;
+  padding-top: 17px;
+  border-top: 1px solid #e0e6ee;
+}
+.aadhaar-heading {
+  margin-bottom: 13px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.aadhaar-heading > div { display: flex; flex-direction: column; gap: 3px; }
+.aadhaar-heading strong { color: #263244; font-size: 14px; }
+.aadhaar-heading > div > span { color: #7d8999; font-size: 11px; }
+.prototype-ocr {
+  padding: 5px 8px;
+  border: 1px solid #cde0f7;
+  border-radius: 99px;
+  color: #1769e8;
+  background: #edf5ff;
+  font-size: 9px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+.aadhaar-upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.aadhaar-upload {
+  padding: 10px;
+  border: 1px dashed #bfcbd9;
+  border-radius: 9px;
+  background: #fff;
+  position: relative;
+  transition: border-color .2s, background .2s;
+}
+.aadhaar-upload-trigger {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+.aadhaar-upload:hover { border-color: #1769e8; background: #f7fbff; }
+.aadhaar-upload > input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.aadhaar-preview {
+  width: 100%;
+  height: 115px;
+  border-radius: 6px;
+  background: #edf1f5;
+  display: block;
+  overflow: hidden;
+}
+.aadhaar-preview img { width: 100%; height: 100%; display: block; object-fit: contain; background: #fff; }
+.aadhaar-empty-preview {
+  width: 100%;
+  height: 115px;
+  border: 1px dashed #c8d2df;
+  border-radius: 6px;
+  color: #8b97a7;
+  background: #f5f7fa;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+.aadhaar-empty-preview small { font-size: 10px; }
+.aadhaar-upload-trigger > strong { margin-top: 10px; color: #175b9e; display: flex; align-items: center; gap: 6px; font-size: 12px; }
+.aadhaar-upload-trigger > small { margin-top: 4px; color: #8b96a6; font-size: 10px; }
+.remove-aadhaar {
+  margin: 9px auto 0;
+  padding: 5px 11px;
+  border: 1px solid #f0c5c5;
+  border-radius: 6px;
+  color: #b53c3c;
+  background: #fff5f5;
+  display: block;
+  font: 700 10px var(--sans);
+  cursor: pointer;
+}
+.remove-aadhaar:hover { border-color: #dc7777; background: #ffeaea; }
+.aadhaar-number-field { margin-top: 14px; display: flex; flex-direction: column; gap: 7px; }
+.aadhaar-number-field > span { color: #606a78; font-size: 13px; font-weight: 600; }
+.aadhaar-number-field > span b { color: #df5252; }
+.aadhaar-number-field > div { position: relative; }
+.aadhaar-number-field input {
+  width: 100%;
+  min-height: 45px;
+  padding: 11px 110px 11px 13px;
+  border: 1px solid #d8dee8;
+  border-radius: 7px;
+  color: #202938;
+  background: #fff;
+  outline: 0;
+  font: 600 14px var(--sans);
+  letter-spacing: 1.2px;
+}
+.aadhaar-number-field input:focus { border-color: #77a7e9; box-shadow: 0 0 0 3px rgba(21,91,195,.09); }
+.aadhaar-number-field > div > span {
+  position: absolute;
+  right: 10px;
+  top: 11px;
+  padding: 4px 7px;
+  border-radius: 5px;
+  color: #27855b;
+  background: #effaf4;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9px;
+  font-weight: 750;
+}
+.aadhaar-number-field > div > span.extracting { color: #98651a; background: #fff6e6; }
+.aadhaar-number-field > small { color: #8490a0; font-size: 10px; }
+.aadhaar-privacy { margin: 10px 0 0; color: #8792a2; font-size: 10px; }
+
+@media (max-width: 700px) {
+  .aadhaar-upload-grid { grid-template-columns: 1fr; }
 }
