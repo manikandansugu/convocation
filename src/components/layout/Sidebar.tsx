@@ -20,7 +20,7 @@ export function Sidebar({ activePage, isOpen, onClose, onNavigate }: SidebarProp
         </div>
       </div>
       <nav className="main-nav" aria-label="Main navigation">
-        <p className="nav-label">MAIN MENU</p>
+        {/* <p className="nav-label">MAIN MENU</p> */}
         {navigationItems.map((item) => <button key={item.label} className={activePage === item.label ? 'active' : ''} onClick={() => onNavigate(item.label)}><Icon name={item.icon} /><span>{item.label}</span>{activePage === item.label && <span className="active-dot" />}</button>)}
       </nav>
       <div className="sidebar-footer">
