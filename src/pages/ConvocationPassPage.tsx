@@ -136,7 +136,7 @@ export function ConvocationPassPage({ guests }: ConvocationPassPageProps) {
         <div className="step-badge">Step 5 of 5</div>
       </div>
       <div className="five-step-progress"><span className="done"><Icon name="check" size={13}/></span><i className="done"/><span className="done"><Icon name="check" size={13}/></span><i className="done"/><span className="done"><Icon name="check" size={13}/></span><i className="done"/><span className="done"><Icon name="check" size={13}/></span><i className="done"/><span className="active">5</span></div>
-      <div className="pass-success"><span><Icon name="check" size={22}/></span><div><strong>Registration and payment confirmed</strong><p>₹{REGISTRATION_AMOUNT} paid successfully. Each attendee has a unique pass with a scannable QR code.</p></div></div>
+      <div className="pass-success"><span><Icon name="check" size={22}/></span><div><strong>Registration and payment confirmed</strong><p>₹{REGISTRATION_AMOUNT.toLocaleString('en-IN')} paid successfully. Each attendee has a unique pass with a scannable QR code.</p></div></div>
 
       <section className="pass-group student-pass-group">
         <div className="pass-group-heading"><div><h2>Student Pass</h2></div><span>Primary attendee</span></div>

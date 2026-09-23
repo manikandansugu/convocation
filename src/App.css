@@ -750,6 +750,20 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
 .readable-contact > span .icon { color: #1769e8; }
 .readable-contact > strong { color: #0b4e9d !important; font-size: 13px !important; }
 .readable-contact > small { color: #8691a0; font-size: 8px; }
+.student-address-grid { margin-top: 13px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 13px; }
+.student-address-grid > div {
+  min-height: 92px;
+  padding: 15px;
+  border: 1px solid #dce4ee;
+  border-radius: 8px;
+  background: #fbfcfe;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.student-address-grid > div > span { color: #778292; font-size: 10px; display: flex; align-items: center; gap: 6px; }
+.student-address-grid > div > span .icon { color: #1769e8; }
+.student-address-grid > div > strong { color: #202938; font-size: 12px; line-height: 1.55; }
 .information-note {
   margin-top: 20px;
   padding: 13px 15px;
@@ -956,6 +970,7 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
   .student-information-card, .guest-addition-card { padding: 0 17px 20px; }
   .student-information-card > header, .guest-addition-card > header { margin: 0 -17px 20px; padding: 15px 17px; align-items: flex-start; }
   .student-info-grid { grid-template-columns: 1fr; }
+  .student-address-grid { grid-template-columns: 1fr; }
   .student-record-banner { align-items: flex-start; }
   .registration-reference { display: none; }
   .guest-addition-card > header { flex-direction: column; }
@@ -1150,6 +1165,8 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
 .registration-reference strong { font-size: 13px; }
 .student-info-grid > div > span { font-size: 12px; }
 .student-info-grid > div > strong { font-size: 14px; }
+.student-address-grid > div > span { font-size: 12px; }
+.student-address-grid > div > strong { font-size: 14px; }
 .readable-contact > strong { font-size: 15px !important; }
 .readable-contact > small { font-size: 10px; }
 .information-note { font-size: 11px; }

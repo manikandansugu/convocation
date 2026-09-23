@@ -32,6 +32,10 @@ export function StudentInformationPage({ onContinue }: StudentInformationPagePro
           <div className="readable-contact"><span><Icon name="mail" size={16}/> Email address</span><strong>{STUDENT.email}</strong><small>Visible for confirmation communication</small></div>
           <div className="readable-contact"><span><Icon name="phone" size={16}/> Mobile number</span><strong>{STUDENT.mobile}</strong><small>Visible for event updates</small></div>
         </div>
+        <div className="student-address-grid">
+          <div><span><Icon name="location" size={16}/> Postal address</span><strong>{STUDENT.postalAddress}</strong></div>
+          <div><span><Icon name="location" size={16}/> Communication address</span><strong>{STUDENT.communicationAddress}</strong></div>
+        </div>
         <div className="information-note"><Icon name="check" size={17}/><span>These details are prefilled from the college database. Please contact the administration if any information is incorrect.</span></div>
         <div className="screen-actions"><span/><button className="flow-primary" onClick={onContinue}>Continue to ID verification <Icon name="arrow" size={18}/></button></div>
       </section>

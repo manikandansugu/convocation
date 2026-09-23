@@ -1,6 +1,12 @@
 import { useState, type FormEvent } from 'react'
 import { Icon } from '../components/ui/Icon'
-import { REGISTRATION_AMOUNT, REGISTRATION_ID, STUDENT } from '../config/student'
+import {
+  CERTIFICATE_REGISTRATION_AMOUNT,
+  GRADUATION_REGALIA_AMOUNT,
+  REGISTRATION_AMOUNT,
+  REGISTRATION_ID,
+  STUDENT,
+} from '../config/student'
 
 type PaymentMethod = 'upi' | 'card' | 'bank'
 
@@ -42,14 +48,14 @@ export function PaymentPage({ onBack, onSuccess }: PaymentPageProps) {
             {method === 'bank' && <label><span>Select your bank <b>*</b></span><select required defaultValue=""><option value="" disabled>Choose a bank</option><option>State Bank of India</option><option>HDFC Bank</option><option>ICICI Bank</option><option>Axis Bank</option><option>Indian Bank</option></select><small>You will be redirected to your bank’s secure page.</small></label>}
           </div>
 
-          <div className="payment-actions"><button type="button" className="secondary-button" onClick={onBack}>Back</button><button className="pay-now-button" type="submit" disabled={isProcessing}>{isProcessing ? <><span className="spinner"/> Processing payment…</> : <>Pay ₹{REGISTRATION_AMOUNT} now <Icon name="arrow" size={18}/></>}</button></div>
+          <div className="payment-actions"><button type="button" className="secondary-button" onClick={onBack}>Back</button><button className="pay-now-button" type="submit" disabled={isProcessing}>{isProcessing ? <><span className="spinner"/> Processing payment…</> : <>Pay ₹{REGISTRATION_AMOUNT.toLocaleString('en-IN')} now <Icon name="arrow" size={18}/></>}</button></div>
         </form>
 
         <aside className="panel order-summary">
-          <p className="eyebrow">ORDER SUMMARY</p><h2>Convocation registration</h2>
+          <p className="eyebrow">ORDER SUMMARY</p><h2>Certificate Registration</h2>
           <div className="student-summary"><div className="mini-avatar">AM</div><div><strong>{STUDENT.name}</strong><span>{STUDENT.registerNumber}</span></div></div>
-          <dl><div><dt>Registration ID</dt><dd>{REGISTRATION_ID}</dd></div><div><dt>Convocation registration</dt><dd>₹{REGISTRATION_AMOUNT}</dd></div></dl>
-          <div className="order-total"><span>Total amount</span><strong>₹{REGISTRATION_AMOUNT}</strong></div>
+          <dl><div><dt>Registration ID</dt><dd>{REGISTRATION_ID}</dd></div><div><dt>Certificate Registration</dt><dd>₹{CERTIFICATE_REGISTRATION_AMOUNT.toLocaleString('en-IN')}</dd></div><div><dt>Graduation Regalia</dt><dd>₹{GRADUATION_REGALIA_AMOUNT.toLocaleString('en-IN')}</dd></div></dl>
+          <div className="order-total"><span>Total amount</span><strong>₹{REGISTRATION_AMOUNT.toLocaleString('en-IN')}</strong></div>
           <div className="refreshment-note"><strong>Note</strong><span>Please use this for refreshment.</span></div>
           <p className="payment-note"><Icon name="check" size={16}/> Payment is simulated for this prototype. No real transaction will occur.</p>
         </aside>

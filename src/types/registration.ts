@@ -12,4 +12,6 @@ export interface Student {
   graduationYear: string
   email: string
   mobile: string
+  postalAddress: string
+  communicationAddress: string
 }

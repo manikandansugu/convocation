@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { Icon } from '../components/ui/Icon'
+import { REGISTRATION_AMOUNT } from '../config/student'
 import type { Guest } from '../types/registration'
 
 const MAX_GUESTS = 3
@@ -77,7 +78,7 @@ export function GuestAdditionPage({ initialGuests, onBack, onContinue }: GuestAd
 
       <form className="panel guest-addition-card" onSubmit={(event) => { event.preventDefault(); onContinue(guests) }}>
         <header><div><p className="eyebrow">GUEST INFORMATION</p><h2>Who is joining you?</h2></div><div className="guest-options">{Array.from({ length: MAX_GUESTS + 1 }, (_, count) => <button type="button" className={guests.length === count ? 'selected' : ''} key={count} onClick={() => updateGuestCount(count)}>{count}</button>)}</div></header>
-        <div className="guest-payment-note"><Icon name="check" size={17}/><div><strong>Payment completed — ₹1,000</strong><span>Guest passes are included in your registration. No additional payment is required.</span></div></div>
+        <div className="guest-payment-note"><Icon name="check" size={17}/><div><strong>Payment completed — ₹{REGISTRATION_AMOUNT.toLocaleString('en-IN')}</strong><span>Guest passes are included in your registration. No additional payment is required.</span></div></div>
         {guests.length === 0 ? <div className="empty-guest-state"><Icon name="user" size={32}/><strong>No guests added</strong><span>You can continue and generate only your student pass.</span></div> :
           <div className="guest-form-list">
             {guests.map((guest, index) => <section className="guest-person-card" key={index}>
