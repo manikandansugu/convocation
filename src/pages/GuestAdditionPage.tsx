@@ -88,7 +88,7 @@ export function GuestAdditionPage({ initialGuests, onBack, onContinue }: GuestAd
                   <label><span>Relationship <b>*</b></span><select value={guest.relationship} onChange={(event) => updateGuest(index, 'relationship', event.target.value)} required><option value="">Select relationship</option><option>Father</option><option>Mother</option><option>Spouse</option><option>Sibling</option><option>Guardian</option><option>Other</option></select></label>
                 </div>
                 <div className="aadhaar-section">
-                  <div className="aadhaar-heading"><div><strong>Aadhaar verification</strong><span>Upload the front and back of the guest’s Aadhaar card</span></div><span className="prototype-ocr">Prototype OCR</span></div>
+                  <div className="aadhaar-heading"><div><strong>Aadhaar upload</strong><span>Upload the front and back of the guest’s Aadhaar card</span></div><span className="prototype-ocr">Prototype OCR</span></div>
                   <div className="aadhaar-upload-grid">
                     <div className="aadhaar-upload">
                       <input id={`aadhaar-front-${index}`} type="file" accept="image/png,image/jpeg,image/webp,image/avif" onChange={(event) => uploadAadhaar(index, 'front', event.target.files?.[0])}/>
