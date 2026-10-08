@@ -19,9 +19,11 @@ export function IdentityVerificationPage({ onBack, onContinue }: IdentityVerific
       <div className="five-step-progress"><span className="done"><Icon name="check" size={13}/></span><i className="done"/><span className="active">2</span><i/><span>3</span><i/><span>4</span><i/><span>5</span></div>
       <section className="panel identity-card">
         <div className={'camera-preview ' + (captured ? 'captured' : '')}>
-          <div className="face-guide">
-            <img src={studentPhoto} alt="Student face captured for identity verification" />
-            {captured && <span className="capture-success-mark"><Icon name="check" size={25}/></span>}
+          <div className="face-guide-wrap">
+            <div className="face-guide">
+              <img src={studentPhoto} alt="Student face captured for identity verification" />
+            </div>
+            {captured && <span className="capture-success-mark"><Icon name="check" size={24}/></span>}
           </div>
           <div className="camera-status"><span className={captured ? 'success' : ''}/>{captured ? 'Photo captured successfully' : 'Position your face inside the guide'}</div>
         </div>
