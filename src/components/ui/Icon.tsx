@@ -4,7 +4,7 @@ export type IconName =
   | 'grid' | 'user' | 'file' | 'cap' | 'ticket' | 'help' | 'logout'
   | 'menu' | 'bell' | 'arrow' | 'calendar' | 'clock' | 'location'
   | 'check' | 'chevron' | 'download' | 'card' | 'bank' | 'phone'
-  | 'camera' | 'mail' | 'wallet'
+  | 'camera' | 'mail' | 'wallet' | 'tag' | 'award'
 
 const iconPaths: Record<IconName, ReactNode> = {
   grid: <><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></>,
@@ -29,6 +29,8 @@ const iconPaths: Record<IconName, ReactNode> = {
   camera: <><path d="M4 7h3l2-3h6l2 3h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Z"/><circle cx="12" cy="13" r="4"/></>,
   mail: <><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></>,
   wallet: <><path d="M4 6h14a2 2 0 0 1 2 2v11H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h12"/><path d="M16 11h6v5h-6a2.5 2.5 0 0 1 0-5Z"/><path d="M16 13.5h.01"/></>,
+  tag: <><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l5.58-5.58c.94-.94.94-2.48 0-3.42L12 2Z"/><circle cx="7" cy="7" r="1.5"/></>,
+  award: <><circle cx="12" cy="8" r="6"/><path d="M15.48 13.91 18 22l-6-3.5L6 22l2.52-8.09"/></>,
 }
 
 interface IconProps {

@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { Icon } from '../components/ui/Icon'
 import {
-  CERTIFICATE_REGISTRATION_AMOUNT,
   GRADUATION_REGALIA_AMOUNT,
   REGISTRATION_AMOUNT,
   REGISTRATION_ID,
@@ -52,9 +51,9 @@ export function PaymentPage({ onBack, onSuccess }: PaymentPageProps) {
         </form>
 
         <aside className="panel order-summary">
-          <p className="eyebrow">ORDER SUMMARY</p><h2>Certificate Registration</h2>
+          <p className="eyebrow">ORDER SUMMARY</p><h2>Graduation Regalia</h2>
           <div className="student-summary"><div className="mini-avatar">AM</div><div><strong>{STUDENT.name}</strong><span>{STUDENT.registerNumber}</span></div></div>
-          <dl><div><dt>Registration ID</dt><dd>{REGISTRATION_ID}</dd></div><div><dt>Certificate Registration</dt><dd>₹{CERTIFICATE_REGISTRATION_AMOUNT.toLocaleString('en-IN')}</dd></div><div><dt>Graduation Regalia</dt><dd>₹{GRADUATION_REGALIA_AMOUNT.toLocaleString('en-IN')}</dd></div></dl>
+          <dl><div><dt>Registration ID</dt><dd>{REGISTRATION_ID}</dd></div><div><dt>Graduation Regalia</dt><dd>₹{GRADUATION_REGALIA_AMOUNT.toLocaleString('en-IN')}</dd></div></dl>
           <div className="order-total"><span>Total amount</span><strong>₹{REGISTRATION_AMOUNT.toLocaleString('en-IN')}</strong></div>
           <div className="refreshment-note"><strong>Note</strong><span>Please use this for refreshment.</span></div>
           <p className="payment-note"><Icon name="check" size={16}/> Payment is simulated for this prototype. No real transaction will occur.</p>
