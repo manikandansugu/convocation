@@ -57,6 +57,168 @@ function PersonPass({ name, label, relationship, index, onDownload }: PersonPass
   )
 }
 
+interface KitItemConfig {
+  id: string
+  title: string
+  subtitle: string
+  pendingPill: string
+  completedPill: string
+}
+
+const KIT_ITEMS: KitItemConfig[] = [
+  {
+    id: 'tag',
+    title: 'Tag issued',
+    subtitle: 'RFID entry badge #TAG-2026-10245 · Gate 02 clearance',
+    pendingPill: 'Pending',
+    completedPill: 'Issued',
+  },
+  {
+    id: 'gown',
+    title: 'Gown received',
+    subtitle: 'Academic regalia robe (Size 40 / L) & Computing Tech discipline stole',
+    pendingPill: 'Pending',
+    completedPill: 'Received',
+  },
+  {
+    id: 'cap',
+    title: 'Graduation cap & mortarboard',
+    subtitle: 'Ceremonial mortarboard with 2026 graduation tassel',
+    pendingPill: 'Pending',
+    completedPill: 'Issued',
+  },
+  {
+    id: 'refreshment',
+    title: 'Refreshment coupons',
+    subtitle: 'Complimentary refreshment & meal pack · Food Court 02',
+    pendingPill: 'Pending',
+    completedPill: 'Ready',
+  },
+  {
+    id: 'kit',
+    title: 'Ceremony kit & degree folder',
+    subtitle: 'Degree portfolio folder, ceremony proceedings guide & pledge card',
+    pendingPill: 'Pending',
+    completedPill: 'Issued',
+  },
+]
+
+function KitClearancePanel() {
+  const [completedSteps, setCompletedSteps] = useState<Record<string, boolean>>({})
+
+  const toggleStep = (id: string) => {
+    setCompletedSteps((prev) => ({ ...prev, [id]: !prev[id] }))
+  }
+
+  const completedCount = KIT_ITEMS.filter((item) => completedSteps[item.id]).length
+  const allCompleted = completedCount === KIT_ITEMS.length
+
+  const toggleAll = () => {
+    if (allCompleted) {
+      setCompletedSteps({})
+    } else {
+      const all: Record<string, boolean> = {}
+      KIT_ITEMS.forEach((item) => {
+        all[item.id] = true
+      })
+      setCompletedSteps(all)
+    }
+  }
+
+  return (
+    <div className="kit-status-wrapper">
+      <aside className="kit-status-card">
+        <header className="kit-card-header">
+          <div className="kit-header-info">
+            <span className="eyebrow">CONVOCATION DAY CLEARANCE</span>
+            <h3>Kit & Regalia Status</h3>
+          </div>
+          <div className="kit-header-badges">
+            <span className={`kit-verified-badge ${allCompleted ? 'success' : 'pending'}`}>
+              <Icon name={allCompleted ? 'check' : 'x'} size={13} />
+              {allCompleted ? 'All Cleared' : `Pending (${completedCount}/${KIT_ITEMS.length})`}
+            </span>
+            <button type="button" className="kit-header-action-btn" onClick={toggleAll}>
+              {allCompleted ? 'Reset' : 'Finish all steps'}
+            </button>
+          </div>
+        </header>
+
+        <div className="kit-items-grid">
+          {KIT_ITEMS.map((item) => {
+            const isDone = Boolean(completedSteps[item.id])
+            return (
+              <div
+                key={item.id}
+                className={`kit-item-row ${isDone ? 'success' : 'pending'}`}
+                onClick={() => toggleStep(item.id)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    toggleStep(item.id)
+                  }
+                }}
+              >
+                <div className={`kit-item-icon ${isDone ? 'success' : 'pending'}`}>
+                  <Icon name={isDone ? 'check' : 'x'} size={14} />
+                </div>
+                <div className="kit-item-details">
+                  <div className="kit-item-title-row">
+                    <strong>{item.title}</strong>
+                    <div className="kit-item-action-area">
+                      <span className={`kit-pill ${isDone ? 'success' : 'pending'}`}>
+                        {isDone ? item.completedPill : item.pendingPill}
+                      </span>
+                      <button
+                        type="button"
+                        className={`kit-step-action-btn ${isDone ? 'completed' : ''}`}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          toggleStep(item.id)
+                        }}
+                      >
+                        {isDone ? <><Icon name="check" size={11} /> Done</> : 'Finish step'}
+                      </button>
+                    </div>
+                  </div>
+                  <p>{item.subtitle}</p>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        <div className="kit-desk-summary">
+          <div>
+            <span>DISTRIBUTION COUNTER</span>
+            <strong>Counter 04 · Ground Floor</strong>
+          </div>
+          <div>
+            <span>REPORTING TIME</span>
+            <strong>08:30 AM – 09:15 AM</strong>
+          </div>
+          <div>
+            <span>HALL SEATING</span>
+            <strong>Auditorium Block A</strong>
+          </div>
+        </div>
+
+        <div className="kit-return-guideline">
+          <Icon name="clock" size={14} />
+          <div>
+            <strong>Gown Return Guideline:</strong> Return academic gown at Counter 04 by 04:00 PM for clearance acknowledgment.
+          </div>
+        </div>
+      </aside>
+      <button className="single-pass-download" onClick={() => window.print()}>
+        <Icon name="file" size={16} /> Print / Save clearance slip
+      </button>
+    </div>
+  )
+}
+
 export function ConvocationPassPage({ guests }: ConvocationPassPageProps) {
   const [downloadStatus, setDownloadStatus] = useState<'idle' | 'working' | 'error'>('idle')
 
@@ -142,111 +304,7 @@ export function ConvocationPassPage({ guests }: ConvocationPassPageProps) {
         <div className="pass-group-heading"><div><h2>Student Pass</h2></div><span>Primary attendee</span></div>
         <div className="passes-row student-pass-row">
           <PersonPass name={STUDENT.name} label="STUDENT PASS" index={0} onDownload={downloadPass}/>
-          <div className="kit-status-wrapper">
-            <aside className="kit-status-card">
-              <header className="kit-card-header">
-                <div className="kit-header-info">
-                  <span className="eyebrow">CONVOCATION DAY CLEARANCE</span>
-                  <h3>Kit & Regalia Status</h3>
-                </div>
-                <span className="kit-verified-badge">
-                  <Icon name="check" size={13}/> All Cleared
-                </span>
-              </header>
-
-              <div className="kit-items-grid">
-                <div className="kit-item-row">
-                  <div className="kit-item-icon success">
-                    <Icon name="check" size={14}/>
-                  </div>
-                  <div className="kit-item-details">
-                    <div className="kit-item-title-row">
-                      <strong>Tag issued successfully</strong>
-                      <span className="kit-pill">Issued</span>
-                    </div>
-                    <p>RFID entry badge #TAG-2026-10245 · Gate 02 clearance active</p>
-                  </div>
-                </div>
-
-                <div className="kit-item-row">
-                  <div className="kit-item-icon success">
-                    <Icon name="check" size={14}/>
-                  </div>
-                  <div className="kit-item-details">
-                    <div className="kit-item-title-row">
-                      <strong>Gown received successfully</strong>
-                      <span className="kit-pill">Received</span>
-                    </div>
-                    <p>Academic regalia robe (Size 40 / L) & Computing Tech discipline stole</p>
-                  </div>
-                </div>
-
-                <div className="kit-item-row">
-                  <div className="kit-item-icon success">
-                    <Icon name="check" size={14}/>
-                  </div>
-                  <div className="kit-item-details">
-                    <div className="kit-item-title-row">
-                      <strong>Graduation cap & mortarboard</strong>
-                      <span className="kit-pill">Issued</span>
-                    </div>
-                    <p>Ceremonial mortarboard with 2026 graduation tassel</p>
-                  </div>
-                </div>
-
-                <div className="kit-item-row">
-                  <div className="kit-item-icon success">
-                    <Icon name="check" size={14}/>
-                  </div>
-                  <div className="kit-item-details">
-                    <div className="kit-item-title-row">
-                      <strong>Refreshment coupons activated</strong>
-                      <span className="kit-pill">Ready</span>
-                    </div>
-                    <p>Complimentary refreshment & meal pack · Food Court 02</p>
-                  </div>
-                </div>
-
-                <div className="kit-item-row">
-                  <div className="kit-item-icon success">
-                    <Icon name="check" size={14}/>
-                  </div>
-                  <div className="kit-item-details">
-                    <div className="kit-item-title-row">
-                      <strong>Ceremony kit & degree folder</strong>
-                      <span className="kit-pill">Issued</span>
-                    </div>
-                    <p>Degree portfolio folder, ceremony proceedings guide & pledge card</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="kit-desk-summary">
-                <div>
-                  <span>DISTRIBUTION COUNTER</span>
-                  <strong>Counter 04 · Ground Floor</strong>
-                </div>
-                <div>
-                  <span>REPORTING TIME</span>
-                  <strong>08:30 AM – 09:15 AM</strong>
-                </div>
-                <div>
-                  <span>HALL SEATING</span>
-                  <strong>Auditorium Block A</strong>
-                </div>
-              </div>
-
-              <div className="kit-return-guideline">
-                <Icon name="clock" size={14}/>
-                <div>
-                  <strong>Gown Return Guideline:</strong> Return academic gown at Counter 04 by 04:00 PM for clearance acknowledgment.
-                </div>
-              </div>
-            </aside>
-            <button className="single-pass-download" onClick={() => window.print()}>
-              <Icon name="file" size={16}/> Print / Save clearance slip
-            </button>
-          </div>
+          <KitClearancePanel />
         </div>
       </section>
 
