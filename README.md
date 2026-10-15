@@ -50,7 +50,29 @@ directly in page components.
 
 ```bash
 npm run dev
+npm run dev:api
+npm run test:payment
 npm run build
 npm run lint
 npm run preview
 ```
+
+## Razorpay test payments
+
+Razorpay Checkout is backed by a small Node payment API in `server/`. The API
+creates the order with a server-owned amount, verifies the checkout signature,
+and confirms that the payment is captured before the registration continues.
+
+1. Copy `.env.example` to `.env.local`.
+2. Add the Razorpay test key ID and secret to `.env.local`. Never add the secret
+   to a `VITE_` variable or commit it to Git.
+3. Run `npm run dev` to start both the payment API and Vite.
+
+Use `npm run dev:web` and `npm run dev:api` only when you want to run the two
+development services in separate terminals.
+
+For production, deploy `server/` to a Node host, configure its environment
+variables there, and set `VITE_API_BASE_URL` to that HTTPS service before
+building the GitHub Pages frontend. The in-memory issued-order store is suitable
+for the current single-instance demo; use a shared database before running more
+than one payment API instance.

@@ -6,8 +6,7 @@ import {
   REGISTRATION_ID,
   STUDENT,
 } from '../config/student'
-
-type PaymentMethod = 'upi' | 'card' | 'bank'
+import { processRazorpayPayment, type PaymentMethod } from '../services/razorpay'
 
 interface PaymentPageProps {
   onBack: () => void
@@ -17,11 +16,19 @@ interface PaymentPageProps {
 export function PaymentPage({ onBack, onSuccess }: PaymentPageProps) {
   const [method, setMethod] = useState<PaymentMethod>('upi')
   const [isProcessing, setIsProcessing] = useState(false)
+  const [paymentError, setPaymentError] = useState('')
 
-  const simulatePayment = (event: FormEvent<HTMLFormElement>) => {
+  const startPayment = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    setPaymentError('')
     setIsProcessing(true)
-    window.setTimeout(onSuccess, 900)
+    try {
+      await processRazorpayPayment(method)
+      onSuccess()
+    } catch (error) {
+      setPaymentError(error instanceof Error ? error.message : 'Payment could not be completed.')
+      setIsProcessing(false)
+    }
   }
 
   return (
@@ -33,7 +40,7 @@ export function PaymentPage({ onBack, onSuccess }: PaymentPageProps) {
       <div className="five-step-progress"><span className="done"><Icon name="check" size={13}/></span><i className="done"/><span className="done"><Icon name="check" size={13}/></span><i className="done"/><span className="active">3</span><i/><span>4</span><i/><span>5</span></div>
 
       <div className="payment-layout">
-        <form className="panel payment-card" onSubmit={simulatePayment}>
+        <form className="panel payment-card" onSubmit={startPayment}>
           <div className="payment-card-header"><div><p className="eyebrow">PAYMENT METHOD</p><h2>Choose how you want to pay</h2></div><span className="secure-payment">Secure payment</span></div>
           <div className="payment-methods">
             <button type="button" className={method === 'upi' ? 'selected' : ''} onClick={() => setMethod('upi')}><span><Icon name="phone"/></span><strong>UPI</strong><small>GPay, PhonePe, Paytm</small></button>
@@ -42,12 +49,14 @@ export function PaymentPage({ onBack, onSuccess }: PaymentPageProps) {
           </div>
 
           <div className="payment-fields">
-            {method === 'upi' && <label><span>UPI ID <b>*</b></span><div className="payment-input"><input placeholder="yourname@bank" defaultValue="arunmenon@okaxis" required/><span>UPI</span></div><small>A payment request will be sent to your UPI app.</small></label>}
-            {method === 'card' && <><label className="full-field"><span>Card number <b>*</b></span><input inputMode="numeric" placeholder="1234 5678 9012 3456" required/></label><label><span>Expiry date <b>*</b></span><input placeholder="MM / YY" required/></label><label><span>CVV <b>*</b></span><input type="password" inputMode="numeric" maxLength={3} placeholder="•••" required/></label><label className="full-field"><span>Name on card <b>*</b></span><input placeholder="Name as shown on card" required/></label></>}
-            {method === 'bank' && <label><span>Select your bank <b>*</b></span><select required defaultValue=""><option value="" disabled>Choose a bank</option><option>State Bank of India</option><option>HDFC Bank</option><option>ICICI Bank</option><option>Axis Bank</option><option>Indian Bank</option></select><small>You will be redirected to your bank’s secure page.</small></label>}
+            <div className="razorpay-method-note">
+              <span><Icon name={method === 'upi' ? 'phone' : method === 'card' ? 'card' : 'bank'} size={22}/></span>
+              <div><strong>{method === 'upi' ? 'Pay with UPI' : method === 'card' ? 'Pay with card' : 'Pay with net banking'}</strong><small>Your payment details will be entered securely in Razorpay Checkout. You can change the method in the checkout window.</small></div>
+            </div>
           </div>
 
-          <div className="payment-actions"><button type="button" className="secondary-button" onClick={onBack}>Back</button><button className="pay-now-button" type="submit" disabled={isProcessing}>{isProcessing ? <><span className="spinner"/> Processing payment…</> : <>Pay ₹{REGISTRATION_AMOUNT.toLocaleString('en-IN')} now <Icon name="arrow" size={18}/></>}</button></div>
+          {paymentError && <p className="payment-error" role="alert">{paymentError}</p>}
+          <div className="payment-actions"><button type="button" className="secondary-button" onClick={onBack} disabled={isProcessing}>Back</button><button className="pay-now-button" type="submit" disabled={isProcessing}>{isProcessing ? <><span className="spinner"/> Opening Razorpay…</> : <>Pay ₹{REGISTRATION_AMOUNT.toLocaleString('en-IN')} now <Icon name="arrow" size={18}/></>}</button></div>
         </form>
 
         <aside className="panel order-summary">
@@ -56,7 +65,7 @@ export function PaymentPage({ onBack, onSuccess }: PaymentPageProps) {
           <dl><div><dt>Registration ID</dt><dd>{REGISTRATION_ID}</dd></div><div><dt>Graduation Regalia</dt><dd>₹{GRADUATION_REGALIA_AMOUNT.toLocaleString('en-IN')}</dd></div></dl>
           <div className="order-total"><span>Total amount</span><strong>₹{REGISTRATION_AMOUNT.toLocaleString('en-IN')}</strong></div>
           <div className="refreshment-note"><strong>Note</strong><span>Please use this for refreshment.</span></div>
-          <p className="payment-note"><Icon name="check" size={16}/> Payment is simulated for this prototype. No real transaction will occur.</p>
+          <p className="payment-note"><Icon name="check" size={16}/> Razorpay test mode is enabled. Payment is completed only after secure server verification.</p>
         </aside>
       </div>
     </div>

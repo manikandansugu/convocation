@@ -266,6 +266,12 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
 .order-total strong { color: var(--navy); font: 800 24px var(--display); }
 .payment-note { margin: 20px 0 0; padding: 12px; border-radius: 8px; display: flex; gap: 8px; color: #697689; background: #f8fafe; font-size: 8px; line-height: 1.5; }
 .payment-note .icon { color: #3a9c6f; }
+.razorpay-method-note { width: 100%; display: flex; align-items: center; gap: 14px; }
+.razorpay-method-note > span { width: 44px; height: 44px; flex: 0 0 auto; border-radius: 10px; display: grid; place-items: center; color: #1769e8; background: #eaf2ff; }
+.razorpay-method-note > div { display: flex; flex-direction: column; gap: 6px; }
+.razorpay-method-note strong { color: #263244; font-size: 13px; }
+.razorpay-method-note small { max-width: 560px; color: #7b8798; font-size: 11px; line-height: 1.5; }
+.payment-error { margin: 14px 0 0; padding: 11px 13px; border: 1px solid #efc3c3; border-radius: 8px; color: #a63d3d; background: #fff4f4; font-size: 11px; line-height: 1.45; }
 .pass-page { max-width: 920px; }
 .pass-success { max-width: 760px; margin: 0 auto 20px; padding: 15px 18px; border: 1px solid #b9e5ce; border-radius: 12px; display: flex; align-items: center; gap: 12px; color: #216e49; background: #effaf4; }
 .pass-success > span { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; color: white; background: #309a66; }
