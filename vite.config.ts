@@ -9,9 +9,4 @@ export default defineConfig({
     babel({ presets: [reactCompilerPreset()] })
   ],
   base: '/convocation/',
-  server: {
-    proxy: {
-      '/api': 'http://127.0.0.1:8787',
-    },
-  },
 })

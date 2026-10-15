@@ -5,10 +5,7 @@
   "type": "module",
   "homepage": "https://github.com/manikandansugu/convocation.git",
   "scripts": {
-    "dev": "node --env-file-if-exists=.env.local server/dev.mjs",
-    "dev:web": "vite",
-    "dev:api": "node --env-file-if-exists=.env.local server/index.mjs",
-    "test:payment": "node --test server/*.test.mjs",
+    "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",

@@ -65,7 +65,7 @@ export function PaymentPage({ onBack, onSuccess }: PaymentPageProps) {
           <dl><div><dt>Registration ID</dt><dd>{REGISTRATION_ID}</dd></div><div><dt>Graduation Regalia</dt><dd>₹{GRADUATION_REGALIA_AMOUNT.toLocaleString('en-IN')}</dd></div></dl>
           <div className="order-total"><span>Total amount</span><strong>₹{REGISTRATION_AMOUNT.toLocaleString('en-IN')}</strong></div>
           <div className="refreshment-note"><strong>Note</strong><span>Please use this for refreshment.</span></div>
-          <p className="payment-note"><Icon name="check" size={16}/> Razorpay test mode is enabled. Payment is completed only after secure server verification.</p>
+          <p className="payment-note"><Icon name="check" size={16}/> Razorpay test checkout is enabled for this frontend-only demonstration.</p>
         </aside>
       </div>
     </div>
