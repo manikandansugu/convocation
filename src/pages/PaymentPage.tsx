@@ -51,12 +51,12 @@ export function PaymentPage({ onBack, onSuccess }: PaymentPageProps) {
           <div className="payment-fields">
             <div className="razorpay-method-note">
               <span><Icon name={method === 'upi' ? 'phone' : method === 'card' ? 'card' : 'bank'} size={22}/></span>
-              <div><strong>{method === 'upi' ? 'Pay with UPI' : method === 'card' ? 'Pay with card' : 'Pay with net banking'}</strong><small>Your payment details will be entered securely in Razorpay Checkout. You can change the method in the checkout window.</small></div>
+              <div><strong>{method === 'upi' ? 'Pay with UPI' : method === 'card' ? 'Pay with card' : 'Pay with net banking'}</strong><small>Razorpay test payment will be completed automatically. No manual success or failure selection is required.</small></div>
             </div>
           </div>
 
           {paymentError && <p className="payment-error" role="alert">{paymentError}</p>}
-          <div className="payment-actions"><button type="button" className="secondary-button" onClick={onBack} disabled={isProcessing}>Back</button><button className="pay-now-button" type="submit" disabled={isProcessing}>{isProcessing ? <><span className="spinner"/> Opening Razorpay…</> : <>Pay ₹{REGISTRATION_AMOUNT.toLocaleString('en-IN')} now <Icon name="arrow" size={18}/></>}</button></div>
+          <div className="payment-actions"><button type="button" className="secondary-button" onClick={onBack} disabled={isProcessing}>Back</button><button className="pay-now-button" type="submit" disabled={isProcessing}>{isProcessing ? <><span className="spinner"/> Processing test payment…</> : <>Pay ₹{REGISTRATION_AMOUNT.toLocaleString('en-IN')} now <Icon name="arrow" size={18}/></>}</button></div>
         </form>
 
         <aside className="panel order-summary">
@@ -65,7 +65,7 @@ export function PaymentPage({ onBack, onSuccess }: PaymentPageProps) {
           <dl><div><dt>Registration ID</dt><dd>{REGISTRATION_ID}</dd></div><div><dt>Graduation Regalia</dt><dd>₹{GRADUATION_REGALIA_AMOUNT.toLocaleString('en-IN')}</dd></div></dl>
           <div className="order-total"><span>Total amount</span><strong>₹{REGISTRATION_AMOUNT.toLocaleString('en-IN')}</strong></div>
           <div className="refreshment-note"><strong>Note</strong><span>Please use this for refreshment.</span></div>
-          <p className="payment-note"><Icon name="check" size={16}/> Razorpay test checkout is enabled for this frontend-only demonstration.</p>
+          <p className="payment-note"><Icon name="check" size={16}/> Razorpay test mode is enabled. Payment succeeds automatically in this frontend-only demonstration.</p>
         </aside>
       </div>
     </div>
