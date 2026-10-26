@@ -1972,177 +1972,122 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
   gap: 8px;
 }
 
-/* Staff Portal Layout */
-.staff-portal-layout {
+/* Staff Portal Shell & Side Menu */
+.staff-app-shell {
   min-height: 100svh;
-  background: #f6f8fb;
+  background: var(--surface);
+}
+
+.staff-sidebar-station-card {
+  margin: 18px 0 8px;
+  padding: 11px 13px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(255, 255, 255, 0.09);
   display: flex;
   flex-direction: column;
+  gap: 3px;
 }
-.staff-header {
-  height: 72px;
-  background: #ffffff;
-  border-bottom: 1px solid #e2e8f0;
-  padding: 0 clamp(18px, 3.5vw, 42px);
-  display: flex;
+.staff-sidebar-station-pill {
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+  gap: 7px;
+  color: #60a5fa;
+  font-size: 12px;
+  font-weight: 700;
 }
-.staff-header-left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-.staff-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.staff-brand-logo {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #123d76, #0b2f60);
-  color: #ffffff;
-  display: grid;
-  place-items: center;
-}
-.staff-brand strong {
-  font-family: var(--display);
-  font-size: 15px;
-  color: #0f172a;
-}
-.staff-brand strong span {
-  color: #2563eb;
-}
-.staff-brand small {
-  display: block;
+.staff-sidebar-station-card small {
+  color: #94a3b8;
   font-size: 10px;
-  color: #64748b;
+  letter-spacing: 0.35px;
+  text-transform: uppercase;
 }
-.staff-badge {
-  padding: 4px 10px;
+
+.main-nav .staff-sidebar-switch-btn {
+  margin-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 14px;
+  color: #93c5fd;
+}
+.main-nav .staff-sidebar-switch-btn:hover {
+  background: rgba(37, 99, 235, 0.16);
+  color: #ffffff;
+}
+
+.staff-topbar-station-pill {
+  padding: 6px 12px;
   border-radius: 99px;
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  color: #166534;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e40af;
   font-size: 11px;
   font-weight: 750;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-}
-.staff-nav-tabs {
-  display: flex;
-  align-items: center;
   gap: 6px;
-  background: #f1f5f9;
-  padding: 4px;
-  border-radius: 10px;
 }
-.staff-nav-tabs button {
-  border: 0;
-  background: transparent;
-  padding: 8px 14px;
-  border-radius: 7px;
-  color: #475569;
-  font-size: 12px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-.staff-nav-tabs button:hover {
-  color: #0f172a;
-}
-.staff-nav-tabs button.active {
-  background: #ffffff;
-  color: #123d76;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-}
-.staff-header-right {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-.staff-switch-btn {
-  padding: 7px 12px;
+
+.staff-topbar-switch-btn {
+  padding: 7px 13px;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
   background: #ffffff;
   color: #334155;
   font-size: 12px;
   font-weight: 700;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
   cursor: pointer;
   transition: all 0.15s ease;
 }
-.staff-switch-btn:hover {
+.staff-topbar-switch-btn:hover {
   border-color: #94a3b8;
   background: #f8fafc;
 }
-.staff-officer-info {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.staff-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: #e2e8f0;
-  color: #1e293b;
-  display: grid;
-  place-items: center;
-  font-size: 12px;
-  font-weight: 800;
-}
-.staff-officer-info strong {
-  display: block;
-  font-size: 13px;
-  color: #0f172a;
-}
-.staff-officer-info small {
-  display: block;
-  font-size: 10px;
-  color: #64748b;
-}
-.staff-signout-btn {
-  padding: 7px 12px;
+
+.staff-topbar-signout-btn {
+  padding: 7px 13px;
   border: 1px solid #fecaca;
   border-radius: 8px;
   background: #fff5f5;
   color: #dc2626;
   font-size: 12px;
   font-weight: 700;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
   cursor: pointer;
   transition: all 0.15s ease;
 }
-.staff-signout-btn:hover {
+.staff-topbar-signout-btn:hover {
   background: #fee2e2;
 }
 
-/* Staff Main Content */
 .staff-main-content {
-  max-width: 1440px;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+.staff-page-content {
   width: 100%;
-  margin: 0 auto;
-  padding: 24px clamp(18px, 3.5vw, 42px) 48px;
+  max-width: 1580px;
+  margin: 0;
+  padding: 28px 36px 60px;
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+@media (max-width: 760px) {
+  .staff-page-content {
+    padding: 20px 16px 40px;
+  }
+  .staff-topbar-station-pill,
+  .staff-topbar-switch-btn {
+    display: none;
+  }
 }
 
 /* Station Banner */

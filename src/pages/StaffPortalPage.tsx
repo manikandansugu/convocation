@@ -13,11 +13,35 @@ type StaffTab = 'counter' | 'scanner' | 'roster' | 'analytics'
 
 export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout, onSwitchToStudent }: StaffPortalPageProps) {
   const [activeTab, setActiveTab] = useState<StaffTab>('counter')
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [profileOpen, setProfileOpen] = useState(false)
   const [roster, setRoster] = useState<StudentRosterRecord[]>(INITIAL_ROSTER)
   const [selectedStudentId, setSelectedStudentId] = useState<string>('student-1')
   const [searchQuery, setSearchQuery] = useState('')
   const [scanResult, setScanResult] = useState<string | null>(null)
   const [scanStatus, setScanStatus] = useState<'idle' | 'success' | 'warning'>('idle')
+
+  const staffInitials = staff.name
+    .split(' ')
+    .filter(Boolean)
+    .map((p) => p[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase()
+
+  const STAFF_NAV_ITEMS = [
+    { id: 'counter' as const, label: 'Kit & Regalia Desk', icon: 'tag' as const },
+    { id: 'scanner' as const, label: 'Gate Scanner', icon: 'camera' as const },
+    { id: 'roster' as const, label: 'Student Roster', icon: 'user' as const },
+    { id: 'analytics' as const, label: 'Operations Overview', icon: 'grid' as const },
+  ]
+
+  const TAB_TITLES: Record<StaffTab, string> = {
+    counter: 'Kit & Regalia Desk',
+    scanner: 'Gate Scanner',
+    roster: 'Student Roster',
+    analytics: 'Operations Overview',
+  }
 
   const selectedStudent = roster.find((s) => s.id === selectedStudentId) || roster[0]
 
@@ -113,84 +137,167 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout, onSwitchToStu
     (selectedStudent.kitIssued ? 1 : 0)
 
   return (
-    <div className="staff-portal-layout">
-      {/* Staff Header */}
-      <header className="staff-header">
-        <div className="staff-header-left">
-          <div className="staff-brand">
-            <div className="staff-brand-logo">
-              <Icon name="shield" size={22} />
-            </div>
-            <div>
-              <strong>Campus<span>Trust</span> Staff Portal</strong>
-              <small>Convocation 2026 · {staff.counter}</small>
-            </div>
+    <div className="app-shell staff-app-shell">
+      {/* Mobile Scrim */}
+      <button
+        className={`sidebar-scrim ${sidebarOpen ? 'visible' : ''}`}
+        aria-label="Close navigation"
+        onClick={() => setSidebarOpen(false)}
+      />
+
+      {/* Side Menu in Student Flow Style */}
+      <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
+        <div className="brand">
+          <div className="brand-mark">
+            <img src={import.meta.env.BASE_URL + 'campus-trust-logo.png'} alt="Campus Trust" />
           </div>
-          <span className="staff-badge">
-            <Icon name="shield" size={13} /> {staff.role}
-          </span>
+          <div className="brand-copy">
+            <strong>Campus<span className="brand-highlight">Trust</span></strong>
+            <small className="brand-subtitle">Staff Portal</small>
+          </div>
         </div>
 
-        <nav className="staff-nav-tabs" aria-label="Staff navigation">
-          <button
-            type="button"
-            className={activeTab === 'counter' ? 'active' : ''}
-            onClick={() => setActiveTab('counter')}
-          >
-            <Icon name="tag" size={16} />
-            <span>Kit & Regalia Desk</span>
-          </button>
-          <button
-            type="button"
-            className={activeTab === 'scanner' ? 'active' : ''}
-            onClick={() => setActiveTab('scanner')}
-          >
-            <Icon name="camera" size={16} />
-            <span>Gate Scanner</span>
-          </button>
-          <button
-            type="button"
-            className={activeTab === 'roster' ? 'active' : ''}
-            onClick={() => setActiveTab('roster')}
-          >
-            <Icon name="user" size={16} />
-            <span>Student Roster</span>
-          </button>
-          <button
-            type="button"
-            className={activeTab === 'analytics' ? 'active' : ''}
-            onClick={() => setActiveTab('analytics')}
-          >
-            <Icon name="grid" size={16} />
-            <span>Operations Overview</span>
-          </button>
-        </nav>
+        <div className="staff-sidebar-station-card">
+          <div className="staff-sidebar-station-pill">
+            <Icon name="shield" size={13} />
+            <span>{staff.counter}</span>
+          </div>
+          <small>{staff.role}</small>
+        </div>
 
-        <div className="staff-header-right">
+        <nav className="main-nav" aria-label="Staff navigation">
+          {STAFF_NAV_ITEMS.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              className={activeTab === item.id ? 'active' : ''}
+              onClick={() => {
+                setActiveTab(item.id)
+                setSidebarOpen(false)
+              }}
+            >
+              <Icon name={item.icon} />
+              <span>{item.label}</span>
+            </button>
+          ))}
+
           {onSwitchToStudent && (
-            <button type="button" className="staff-switch-btn" onClick={onSwitchToStudent} title="Switch to student registration view">
-              <Icon name="cap" size={15} />
+            <button
+              type="button"
+              className="staff-sidebar-switch-btn"
+              onClick={() => {
+                setSidebarOpen(false)
+                onSwitchToStudent()
+              }}
+              title="Open student registration flow"
+            >
+              <Icon name="cap" />
               <span>Student View</span>
             </button>
           )}
-          <div className="staff-officer-info">
-            <div className="staff-avatar">{staff.name.split(' ').map(p => p[0]).join('').slice(0, 2)}</div>
+        </nav>
+
+        <div className="sidebar-footer">
+          {profileOpen && (
+            <div className="profile-popup" role="dialog" aria-label="Staff profile">
+              <div className="profile-popup-heading">
+                <span>Staff profile</span>
+                <button
+                  type="button"
+                  onClick={() => setProfileOpen(false)}
+                  aria-label="Close profile"
+                >
+                  <Icon name="x" size={16} />
+                </button>
+              </div>
+              <div className="profile-popup-user">
+                <div className="avatar">{staffInitials}</div>
+                <div>
+                  <strong>{staff.name}</strong>
+                  <span>{staff.employeeId}</span>
+                </div>
+              </div>
+              <div className="profile-popup-detail">
+                <span>Assigned Station</span>
+                <strong>{staff.counter}</strong>
+              </div>
+              <div className="profile-popup-detail">
+                <span>Designation</span>
+                <strong>{staff.role}</strong>
+              </div>
+              <button
+                type="button"
+                className="profile-signout"
+                onClick={() => {
+                  setProfileOpen(false)
+                  onLogout()
+                }}
+              >
+                <Icon name="logout" size={17} />
+                <span>Sign out</span>
+              </button>
+            </div>
+          )}
+
+          <button
+            type="button"
+            className="student-card profile-trigger"
+            onClick={() => setProfileOpen((open) => !open)}
+            aria-expanded={profileOpen}
+            aria-haspopup="dialog"
+          >
+            <div className="avatar">{staffInitials}</div>
             <div>
               <strong>{staff.name}</strong>
-              <small>{staff.employeeId}</small>
+              <span>{staff.employeeId}</span>
             </div>
-          </div>
-          <button type="button" className="staff-signout-btn" onClick={onLogout} title="Sign out of staff portal">
-            <Icon name="logout" size={16} />
-            <span>Sign out</span>
+            <Icon name="chevron" size={17} />
           </button>
         </div>
-      </header>
+      </aside>
 
       {/* Main Staff Content */}
-      <main className="staff-main-content">
-        {/* Counter Info Banner */}
-        <section className="staff-station-banner">
+      <main className="main-content staff-main-content">
+        <header className="topbar">
+          <button
+            className="mobile-menu"
+            onClick={() => setSidebarOpen(true)}
+            aria-label="Open navigation"
+          >
+            <Icon name="menu" />
+          </button>
+          <div className="topbar-title">{TAB_TITLES[activeTab]}</div>
+          <div className="topbar-actions">
+            <div className="status-pill"><span /> Convocation 2026</div>
+            <span className="staff-topbar-station-pill">
+              <Icon name="shield" size={13} /> {staff.counter}
+            </span>
+            {onSwitchToStudent && (
+              <button
+                type="button"
+                className="staff-topbar-switch-btn"
+                onClick={onSwitchToStudent}
+                title="Switch to student registration view"
+              >
+                <Icon name="cap" size={15} />
+                <span>Student View</span>
+              </button>
+            )}
+            <button
+              type="button"
+              className="staff-topbar-signout-btn"
+              onClick={onLogout}
+              title="Sign out of staff portal"
+            >
+              <Icon name="logout" size={15} />
+              <span>Sign out</span>
+            </button>
+          </div>
+        </header>
+
+        <div className="staff-page-content">
+          {/* Counter Info Banner */}
+          <section className="staff-station-banner">
           <div className="station-meta-block">
             <span className="station-label">ASSIGNED STATION</span>
             <strong>{staff.counter}</strong>
@@ -720,6 +827,7 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout, onSwitchToStu
             </div>
           </div>
         )}
+        </div>
       </main>
     </div>
   )
