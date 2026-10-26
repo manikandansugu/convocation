@@ -4,7 +4,8 @@ export type IconName =
   | 'grid' | 'user' | 'file' | 'cap' | 'ticket' | 'help' | 'logout'
   | 'menu' | 'bell' | 'arrow' | 'calendar' | 'clock' | 'location'
   | 'check' | 'chevron' | 'download' | 'card' | 'bank' | 'phone'
-  | 'camera' | 'mail' | 'wallet' | 'tag' | 'award' | 'x'
+  | 'camera' | 'mail' | 'wallet' | 'tag' | 'award' | 'x' | 'lock'
+  | 'eye' | 'eye-off' | 'shield' | 'search'
 
 const iconPaths: Record<IconName, ReactNode> = {
   grid: <><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></>,
@@ -32,6 +33,11 @@ const iconPaths: Record<IconName, ReactNode> = {
   tag: <><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l5.58-5.58c.94-.94.94-2.48 0-3.42L12 2Z"/><circle cx="7" cy="7" r="1.5"/></>,
   award: <><circle cx="12" cy="8" r="6"/><path d="M15.48 13.91 18 22l-6-3.5L6 22l2.52-8.09"/></>,
   x: <path d="M18 6 6 18M6 6l12 12"/>,
+  lock: <><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></>,
+  eye: <><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/></>,
+  'eye-off': <><path d="m3 3 18 18M10.6 6.2A10.8 10.8 0 0 1 12 6c6.5 0 10 6 10 6a17.6 17.6 0 0 1-2.1 2.8M6.7 6.7C3.7 8.5 2 12 2 12s3.5 6 10 6c1.6 0 3-.4 4.2-1M9.9 9.9a3 3 0 0 0 4.2 4.2"/></>,
+  shield: <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>,
+  search: <><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></>,
 }
 
 interface IconProps {

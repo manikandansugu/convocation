@@ -303,8 +303,8 @@ export function ConvocationPassPage({ guests }: ConvocationPassPageProps) {
       <section className="pass-group student-pass-group">
         <div className="pass-group-heading"><div><h2>Student Pass</h2></div><span>Primary attendee</span></div>
         <div className="passes-row student-pass-row">
-          <PersonPass name={STUDENT.name} label="STUDENT PASS" index={0} onDownload={downloadPass}/>
           <KitClearancePanel />
+          <PersonPass name={STUDENT.name} label="STUDENT PASS" index={0} onDownload={downloadPass}/>
         </div>
       </section>
 
