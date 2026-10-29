@@ -2,24 +2,31 @@ import { useState } from 'react'
 import { Icon } from '../components/ui/Icon'
 import { DEFAULT_STAFF, INITIAL_ROSTER, type StaffMember, type StudentRosterRecord } from '../config/staff'
 import studentPhoto from '../assets/student-verification.png'
+import { SeatingLayout, type SeatAllocation } from '../components/seating/SeatingLayout'
+import type { ConvocationNotification, NotificationCategory } from '../types/notifications'
 
 interface StaffPortalPageProps {
   staff?: StaffMember
   onLogout: () => void
-  onSwitchToStudent?: () => void
+  notifications: ConvocationNotification[]
+  onSendNotification: (notification: ConvocationNotification) => void
 }
 
-type StaffTab = 'counter' | 'scanner' | 'roster' | 'analytics'
+type StaffTab = 'counter' | 'roster' | 'seating' | 'notifications'
 
-export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout, onSwitchToStudent }: StaffPortalPageProps) {
+export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout, notifications, onSendNotification }: StaffPortalPageProps) {
   const [activeTab, setActiveTab] = useState<StaffTab>('counter')
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const [roster, setRoster] = useState<StudentRosterRecord[]>(INITIAL_ROSTER)
   const [selectedStudentId, setSelectedStudentId] = useState<string>('student-1')
   const [searchQuery, setSearchQuery] = useState('')
-  const [scanResult, setScanResult] = useState<string | null>(null)
-  const [scanStatus, setScanStatus] = useState<'idle' | 'success' | 'warning'>('idle')
+  const [notificationCategory, setNotificationCategory] = useState<NotificationCategory>('Announcement')
+  const [notificationAudience, setNotificationAudience] = useState('All Students')
+  const [notificationTitle, setNotificationTitle] = useState('')
+  const [notificationMessage, setNotificationMessage] = useState('')
+  const [notificationImportant, setNotificationImportant] = useState(false)
+  const [notificationSent, setNotificationSent] = useState(false)
 
   const staffInitials = staff.name
     .split(' ')
@@ -30,20 +37,48 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout, onSwitchToStu
     .toUpperCase()
 
   const STAFF_NAV_ITEMS = [
-    { id: 'counter' as const, label: 'Kit & Regalia Desk', icon: 'tag' as const },
-    { id: 'scanner' as const, label: 'Gate Scanner', icon: 'camera' as const },
-    { id: 'roster' as const, label: 'Student Roster', icon: 'user' as const },
-    { id: 'analytics' as const, label: 'Operations Overview', icon: 'grid' as const },
+    { id: 'counter' as const, label: 'Kit & Gown Desk', icon: 'tag' as const },
+    { id: 'roster' as const, label: 'Student List', icon: 'user' as const },
+    { id: 'seating' as const, label: 'Seating Layout', icon: 'grid' as const },
+    { id: 'notifications' as const, label: 'Notifications', icon: 'bell' as const },
   ]
 
   const TAB_TITLES: Record<StaffTab, string> = {
-    counter: 'Kit & Regalia Desk',
-    scanner: 'Gate Scanner',
-    roster: 'Student Roster',
-    analytics: 'Operations Overview',
+    counter: 'Kit & Gown Desk',
+    roster: 'Student List',
+    seating: 'Seating Layout',
+    notifications: 'Notifications',
+  }
+
+  const sendNotification = () => {
+    if (!notificationTitle.trim() || !notificationMessage.trim()) return
+    onSendNotification({
+      id: `notice-${Date.now()}`,
+      category: notificationCategory,
+      title: notificationTitle.trim(),
+      message: notificationMessage.trim(),
+      audience: notificationAudience,
+      sentAt: 'Just now',
+      important: notificationImportant,
+      read: false,
+    })
+    setNotificationTitle('')
+    setNotificationMessage('')
+    setNotificationImportant(false)
+    setNotificationSent(true)
+    window.setTimeout(() => setNotificationSent(false), 3000)
   }
 
   const selectedStudent = roster.find((s) => s.id === selectedStudentId) || roster[0]
+  const seatingAllocations: SeatAllocation[] = roster.map((student) => ({
+    id: student.id,
+    name: student.name,
+    registerNumber: student.registerNumber,
+    block: student.block,
+    row: student.row,
+    seat: student.seat,
+    type: 'student',
+  }))
 
   const updateStudentKit = (studentId: string, field: keyof StudentRosterRecord, value: boolean) => {
     setRoster((prev) =>
@@ -98,20 +133,6 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout, onSwitchToStu
     )
   }
 
-  const handleSimulateScan = (record?: StudentRosterRecord) => {
-    const target = record || selectedStudent
-    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    setRoster((prev) =>
-      prev.map((s) =>
-        s.id === target.id
-          ? { ...s, admittedAtGate: true, admittedTime: time }
-          : s
-      )
-    )
-    setScanStatus('success')
-    setScanResult(`Admitted: ${target.name} (${target.registrationId}) at ${staff.gate} — ${time}`)
-  }
-
   const filteredRoster = roster.filter((s) => {
     const q = searchQuery.toLowerCase().trim()
     if (!q) return true
@@ -124,7 +145,6 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout, onSwitchToStu
   })
 
   // Aggregate stats
-  const totalStudents = 1248
   const gownsIssuedCount = roster.filter((s) => s.gownReceived).length + 840
   const gownsReturnedCount = roster.filter((s) => s.gownReturned).length + 122
   const admittedCount = roster.filter((s) => s.admittedAtGate).length + 908
@@ -181,20 +201,6 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout, onSwitchToStu
             </button>
           ))}
 
-          {onSwitchToStudent && (
-            <button
-              type="button"
-              className="staff-sidebar-switch-btn"
-              onClick={() => {
-                setSidebarOpen(false)
-                onSwitchToStudent()
-              }}
-              title="Open student registration flow"
-            >
-              <Icon name="cap" />
-              <span>Student View</span>
-            </button>
-          )}
         </nav>
 
         <div className="sidebar-footer">
@@ -272,17 +278,6 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout, onSwitchToStu
             <span className="staff-topbar-station-pill">
               <Icon name="shield" size={13} /> {staff.counter}
             </span>
-            {onSwitchToStudent && (
-              <button
-                type="button"
-                className="staff-topbar-switch-btn"
-                onClick={onSwitchToStudent}
-                title="Switch to student registration view"
-              >
-                <Icon name="cap" size={15} />
-                <span>Student View</span>
-              </button>
-            )}
             <button
               type="button"
               className="staff-topbar-signout-btn"
@@ -321,7 +316,7 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout, onSwitchToStu
           </div>
         </section>
 
-        {/* TAB 1: KIT & REGALIA COUNTER */}
+        {/* TAB 1: KIT & GOWN COUNTER */}
         {activeTab === 'counter' && (
           <div className="staff-counter-grid">
             {/* Student Search & Selection Column */}
@@ -598,90 +593,14 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout, onSwitchToStu
           </div>
         )}
 
-        {/* TAB 2: GATE ENTRY SCANNER */}
-        {activeTab === 'scanner' && (
-          <div className="staff-scanner-view">
-            <div className="panel scanner-main-panel">
-              <div className="scanner-header">
-                <div>
-                  <p className="eyebrow">SECURITY ADMISSION CONTROL</p>
-                  <h3>{staff.gate} — Live Pass Scanner</h3>
-                </div>
-                <span className="gate-tag">{staff.gate} Scanner</span>
-              </div>
-
-              <div className="scanner-simulation-box">
-                <div className="qr-viewfinder">
-                  <div className="scanner-laser" />
-                  <div className="qr-dummy-code">
-                    <Icon name="ticket" size={64} />
-                    <span>Point QR Code here</span>
-                  </div>
-                </div>
-
-                <div className="scanner-controls">
-                  <h4>Simulate Pass Scan</h4>
-                  <p>Validate graduate or guest digital passes instantly.</p>
-                  <div className="scanner-button-row">
-                    <button
-                      type="button"
-                      className="btn-scan-trigger"
-                      onClick={() => handleSimulateScan(selectedStudent)}
-                    >
-                      <Icon name="camera" size={18} />
-                      <span>Scan Pass for {selectedStudent.name}</span>
-                    </button>
-                    <button
-                      type="button"
-                      className="btn-scan-secondary"
-                      onClick={() => {
-                        const random = roster[Math.floor(Math.random() * roster.length)]
-                        handleSimulateScan(random)
-                      }}
-                    >
-                      <span>Scan Random Queue Pass</span>
-                    </button>
-                  </div>
-
-                  {scanResult && (
-                    <div className={`scan-alert-box ${scanStatus}`}>
-                      <Icon name={scanStatus === 'success' ? 'check' : 'x'} size={20} />
-                      <div>
-                        <strong>{scanStatus === 'success' ? 'ACCESS GRANTED' : 'INVALID PASS'}</strong>
-                        <p>{scanResult}</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="gate-admissions-summary">
-                <h4>Recent Gate Admissions</h4>
-                <div className="recent-admissions-grid">
-                  {roster.filter((s) => s.admittedAtGate).map((student) => (
-                    <div key={student.id} className="admitted-student-chip">
-                      <div className="admit-avatar">{student.name[0]}</div>
-                      <div>
-                        <strong>{student.name}</strong>
-                        <span>{student.registerNumber} · Block {student.block} ({student.seat})</span>
-                      </div>
-                      <span className="admit-time">{student.admittedTime || '08:45 AM'}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* TAB 3: STUDENT ROSTER */}
+        {/* TAB 2: STUDENT LIST */}
         {activeTab === 'roster' && (
           <div className="staff-roster-view">
             <div className="panel roster-table-panel">
               <div className="roster-table-header">
                 <div>
                   <p className="eyebrow">EVENT OPERATIONS</p>
-                  <h3>Master Student Roster</h3>
+                  <h3>Student List</h3>
                 </div>
                 <div className="roster-search">
                   <Icon name="search" size={16} />
@@ -701,22 +620,13 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout, onSwitchToStu
                       <th>Registration ID</th>
                       <th>Seating</th>
                       <th>Gate</th>
-                      <th>Regalia Kit</th>
                       <th>Gown Return</th>
-                      <th>Admission</th>
+                      <th>Entry At</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredRoster.map((student) => {
-                      const doneCount =
-                        (student.tagIssued ? 1 : 0) +
-                        (student.gownReceived ? 1 : 0) +
-                        (student.capIssued ? 1 : 0) +
-                        (student.refreshmentReady ? 1 : 0) +
-                        (student.kitIssued ? 1 : 0)
-
-                      return (
+                    {filteredRoster.map((student) => (
                         <tr key={student.id} className={student.id === selectedStudent.id ? 'highlighted' : ''}>
                           <td>
                             <div className="student-cell">
@@ -731,18 +641,13 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout, onSwitchToStu
                           <td>{student.block}-{student.row}-{student.seat}</td>
                           <td><span className="gate-pill">{student.gate}</span></td>
                           <td>
-                            <span className={`roster-pill ${doneCount === 5 ? 'success' : doneCount > 0 ? 'warning' : 'pending'}`}>
-                              {doneCount}/5 items
-                            </span>
-                          </td>
-                          <td>
                             <span className={`roster-pill ${student.gownReturned ? 'success' : 'pending'}`}>
-                              {student.gownReturned ? 'Returned' : 'With Student'}
+                              {student.gownReturned ? 'Yes' : 'No'}
                             </span>
                           </td>
                           <td>
                             <span className={`roster-pill ${student.admittedAtGate ? 'success' : 'pending'}`}>
-                              {student.admittedAtGate ? `Admitted (${student.admittedTime || '08:45 AM'})` : 'Awaiting Entry'}
+                              {student.admittedAtGate ? (student.admittedTime || '08:45 AM') : '—'}
                             </span>
                           </td>
                           <td>
@@ -760,8 +665,7 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout, onSwitchToStu
                             </div>
                           </td>
                         </tr>
-                      )
-                    })}
+                    ))}
                   </tbody>
                 </table>
               </div>
@@ -769,64 +673,75 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout, onSwitchToStu
           </div>
         )}
 
-        {/* TAB 4: EVENT ANALYTICS */}
-        {activeTab === 'analytics' && (
-          <div className="staff-analytics-view">
-            <div className="panel analytics-panel">
-              <div className="panel-header">
-                <div>
-                  <p className="eyebrow">REAL-TIME DASHBOARD</p>
-                  <h3>Convocation 2026 Operational Totals</h3>
-                </div>
-                <span className="live-badge"><span className="pulse-dot" /> Live Data</span>
-              </div>
-
-              <div className="analytics-metrics-grid">
-                <div className="metric-box">
-                  <span className="metric-title">Total Registrations</span>
-                  <strong>{totalStudents}</strong>
-                  <div className="metric-progress"><div className="bar" style={{ width: '100%' }} /></div>
-                  <small>100% attendance expected</small>
-                </div>
-
-                <div className="metric-box">
-                  <span className="metric-title">IDVS Photo Verified</span>
-                  <strong>1,180</strong>
-                  <div className="metric-progress"><div className="bar" style={{ width: '94.5%' }} /></div>
-                  <small>94.5% identity verified</small>
-                </div>
-
-                <div className="metric-box">
-                  <span className="metric-title">Regalia Kits Issued</span>
-                  <strong>{gownsIssuedCount}</strong>
-                  <div className="metric-progress"><div className="bar" style={{ width: `${(gownsIssuedCount / totalStudents) * 100}%` }} /></div>
-                  <small>{Math.round((gownsIssuedCount / totalStudents) * 100)}% distributed</small>
-                </div>
-
-                <div className="metric-box">
-                  <span className="metric-title">Admitted at Gates</span>
-                  <strong>{admittedCount}</strong>
-                  <div className="metric-progress"><div className="bar" style={{ width: `${(admittedCount / totalStudents) * 100}%` }} /></div>
-                  <small>{Math.round((admittedCount / totalStudents) * 100)}% through security</small>
-                </div>
-
-                <div className="metric-box">
-                  <span className="metric-title">Gowns Returned</span>
-                  <strong>{gownsReturnedCount}</strong>
-                  <div className="metric-progress"><div className="bar" style={{ width: `${(gownsReturnedCount / gownsIssuedCount) * 100}%` }} /></div>
-                  <small>{Math.round((gownsReturnedCount / gownsIssuedCount) * 100)}% of issued returned</small>
-                </div>
-
-                <div className="metric-box">
-                  <span className="metric-title">Refreshments Redeemed</span>
-                  <strong>1,620</strong>
-                  <div className="metric-progress"><div className="bar" style={{ width: '82%' }} /></div>
-                  <small>Food Court 02 throughput</small>
-                </div>
-              </div>
+        {/* TAB 4: SEATING LAYOUT */}
+        {activeTab === 'seating' && (
+          <div className="staff-seating-view">
+            <div className="staff-seating-intro">
+              <div><p className="eyebrow">AUDITORIUM ALLOCATION</p><h2>Student & Staff Seating Locator</h2><p>Select an attendee to highlight their exact block, row and seat.</p></div>
+              <span><Icon name="location" size={16} /> Dr. T. P. Ganesan Auditorium</span>
             </div>
+            <SeatingLayout allocations={seatingAllocations} selectedId={selectedStudentId} onSelect={setSelectedStudentId} showRoster />
           </div>
         )}
+
+        {/* TAB 5: SPECIFIC NOTIFICATIONS */}
+        {activeTab === 'notifications' && (
+          <div className="staff-notifications-view">
+            <section className="panel notification-composer">
+              <div className="panel-header">
+                <div><p className="eyebrow">STUDENT COMMUNICATION</p><h3>Send a specific notification</h3></div>
+                <span className="notification-channel"><span /> Portal notification</span>
+              </div>
+
+              <div className="notification-form-grid">
+                <label>
+                  <span>Notification type</span>
+                  <select value={notificationCategory} onChange={(event) => setNotificationCategory(event.target.value as NotificationCategory)}>
+                    <option>Announcement</option>
+                    <option>Alert</option>
+                    <option>Reminder</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Send to</span>
+                  <select value={notificationAudience} onChange={(event) => setNotificationAudience(event.target.value)}>
+                    <option>All Students</option>
+                    <option>Block A Students</option>
+                    <option>Computing Technologies</option>
+                    {roster.map((student) => <option key={student.id}>{student.name} — {student.registerNumber}</option>)}
+                  </select>
+                </label>
+                <label className="notification-form-full">
+                  <span>Title</span>
+                  <input value={notificationTitle} onChange={(event) => setNotificationTitle(event.target.value)} placeholder="Enter a clear notification title" />
+                </label>
+                <label className="notification-form-full">
+                  <span>Message</span>
+                  <textarea value={notificationMessage} onChange={(event) => setNotificationMessage(event.target.value)} placeholder="Write the announcement, alert or reminder for students…" rows={5} />
+                </label>
+              </div>
+
+              <div className="notification-composer-actions">
+                <label className="notification-important-toggle"><input type="checkbox" checked={notificationImportant} onChange={(event) => setNotificationImportant(event.target.checked)} /><span>Mark as important</span></label>
+                <button type="button" className="notification-send-button" disabled={!notificationTitle.trim() || !notificationMessage.trim()} onClick={sendNotification}><Icon name="bell" size={16} /> Send notification</button>
+              </div>
+              {notificationSent && <div className="notification-sent-confirmation"><Icon name="check" size={17} /><span>Notification sent successfully to {notificationAudience}.</span></div>}
+            </section>
+
+            <section className="panel notification-history">
+              <div className="panel-header"><div><p className="eyebrow">RECENT ACTIVITY</p><h3>Sent notifications</h3></div><span className="badge-count">{notifications.length} messages</span></div>
+              <div className="notification-history-list">
+                {notifications.map((notification) => (
+                  <article key={notification.id}>
+                    <span className={`notification-history-icon ${notification.category.toLowerCase()}`}><Icon name={notification.category === 'Reminder' ? 'clock' : notification.category === 'Alert' ? 'bell' : 'file'} size={17} /></span>
+                    <div><div><strong>{notification.title}</strong><span>{notification.category}</span>{notification.important && <b>Important</b>}</div><p>{notification.message}</p><small>{notification.audience} · {notification.sentAt}</small></div>
+                  </article>
+                ))}
+              </div>
+            </section>
+          </div>
+        )}
+
         </div>
       </main>
     </div>
