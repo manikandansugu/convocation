@@ -2980,6 +2980,44 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
   .staff-seating-intro { align-items: flex-start; flex-direction: column; }
 }
 
+/* Compact SVG seat finder */
+.seat-finder-card { min-width: 0; padding: 24px; }
+.seat-finder-heading { margin-bottom: 18px; display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; }
+.seat-finder-heading h2 { margin: 0; color: #172033; font: 700 21px var(--display); }
+.seat-finder-heading > p { margin: 0; color: #718096; font-size: 10px; text-align: right; }
+.seat-finder-heading > p strong { color: #174f96; }
+.seat-finder-map-wrap { overflow-x: auto; border: 1px solid #e0e6ed; border-radius: 11px; background: #fbfcfe; }
+.seat-finder-map { width: 100%; min-width: 720px; height: auto; display: block; }
+.seat-finder-stage { fill: #173f76; }
+.seat-finder-stage-label { fill: #fff; font-size: 13px; font-weight: 800; letter-spacing: 1.2px; }
+.seat-finder-row-label { fill: #7b8797; font-size: 11px; font-weight: 750; }
+.seat-finder-seat { fill: #d9e5f1; stroke: #c9d6e4; stroke-width: 1; transition: opacity .18s, filter .18s; }
+.seat-finder-seat.taken { fill: #aeb8c4; stroke: #a4afbb; }
+.seat-finder-seat.staff { fill: #e8c786; stroke: #d4ad62; }
+.seat-finder-seat.mine { fill: #e8590c; stroke: #d54e07; animation: seat-finder-pulse 1.2s infinite; }
+.seat-finder-seat[role='button'] { cursor: pointer; }
+.seat-finder-seat[role='button']:hover { filter: brightness(.92); }
+@keyframes seat-finder-pulse { 50% { opacity: .5; } }
+.seat-finder-gate { fill: #79afe9; }
+.seat-finder-gate.active { fill: #1769e8; }
+.seat-finder-gate-label { fill: #fff; font-size: 10px; font-weight: 800; }
+.seat-finder-route { fill: none; stroke: #1769e8; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 10 8; animation: seat-finder-route-flow 1s linear infinite; }
+@keyframes seat-finder-route-flow { to { stroke-dashoffset: -18; } }
+.seat-finder-legend { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 15px; color: #657183; font-size: 9px; }
+.seat-finder-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.seat-finder-legend i { width: 12px; height: 12px; border-radius: 3px; background: #d9e5f1; }
+.seat-finder-legend i.occupied { background: #aeb8c4; }
+.seat-finder-legend i.mine { background: #e8590c; }
+.seat-finder-legend i.route { background: #1769e8; }
+.seat-finder-directions { margin: 17px 0 0; padding: 16px 18px 16px 34px; border: 1px solid #d9e6f6; border-radius: 10px; color: #526176; background: #f5f9ff; display: grid; gap: 7px; font-size: 10px; line-height: 1.5; }
+.seat-finder-directions li::marker { color: #1769e8; font-weight: 800; }
+
+@media (max-width: 700px) {
+  .seat-finder-card { padding: 18px 14px; }
+  .seat-finder-heading { align-items: flex-start; flex-direction: column; gap: 7px; }
+  .seat-finder-heading > p { text-align: left; }
+}
+
 /* Student notifications */
 .notifications-page { padding-bottom: 70px; }
 .notifications-heading { margin-bottom: 24px; }

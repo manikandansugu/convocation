@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import { Icon } from '../ui/Icon'
 
 export interface SeatAllocation {
   id: string
@@ -18,68 +17,109 @@ interface SeatingLayoutProps {
   showRoster?: boolean
 }
 
-const ROW_SEAT_COUNTS: Array<[string, number]> = [
-  ['A', 54], ['B', 52], ['C', 55], ['D', 53], ['E', 54], ['F', 54], ['G', 54], ['H', 52], ['I', 54], ['J', 52], ['K', 51], ['L', 52], ['M', 51],
-  ['N', 51], ['O', 53], ['P', 53], ['Q', 56], ['R', 54], ['S', 56], ['T', 56], ['U', 56], ['V', 56], ['W', 53], ['X', 53], ['Y', 57], ['Z', 57],
-  ['AA', 54], ['BB', 54], ['CC', 55], ['DD', 53], ['EE', 54], ['FF', 57], ['GG', 56], ['HH', 57], ['II', 56], ['JJ', 57], ['KK', 56], ['LL', 53], ['MM', 57],
-  ['NN', 54], ['OO', 57], ['PP', 58], ['QQ', 56], ['RR', 56], ['SS', 56], ['TT', 56], ['UU', 56], ['VV', 56], ['WW', 58], ['XX', 58], ['YY', 58], ['ZZ', 55],
+type GateId = '1' | '2'
+
+const ROWS = 'ABCDEFGHIJKL'.split('')
+const BLOCKS = [
+  { x0: 40, start: 1, count: 10 },
+  { x0: 300, start: 11, count: 12 },
+  { x0: 604, start: 23, count: 10 },
 ]
+const AISLES = [270, 574]
+const PITCH = 22
+const CROSS_AISLE_Y = 458
+const rowY = (index: number) => 120 + index * 28
+const GATES: Record<GateId, { x: number; y: number; label: string }> = {
+  '1': { x: 270, y: 488, label: 'Gate 1' },
+  '2': { x: 574, y: 488, label: 'Gate 2' },
+}
+const OCCUPIED_SEATS = new Set(['A-3', 'B-9', 'C-14', 'D-5', 'F-10', 'F-13', 'G-12', 'H-20', 'E-22', 'J-2', 'K-15', 'L-7'])
 
-const VISIBLE_ROWS_PER_SECTION = 5
-const VISIBLE_SEATS_PER_ROW = 36
-const AISLE_AFTER_SEAT = 18
+interface SeatPosition {
+  row: string
+  number: number
+  rowIndex: number
+  blockIndex: number
+  block: (typeof BLOCKS)[number]
+  x: number
+  y: number
+}
 
-const makeRows = (start: number, end: number) => ROW_SEAT_COUNTS.slice(start, end).map(([label, seatCount]) => ({
-  label,
-  seats: Array.from({ length: Math.min(seatCount, VISIBLE_SEATS_PER_ROW) }, (_, index) => index + 1),
-}))
+const seatIdFor = (allocation?: SeatAllocation) => allocation ? `${allocation.row}-${allocation.seat}` : ''
 
-const AUDITORIUM_SECTIONS: Record<string, Array<{ label: string; seats: number[] }>> = {
-  Front: makeRows(0, VISIBLE_ROWS_PER_SECTION),
-  Middle: makeRows(13, 13 + VISIBLE_ROWS_PER_SECTION),
-  Rear: makeRows(26, 26 + VISIBLE_ROWS_PER_SECTION),
-  Back: makeRows(39, 39 + VISIBLE_ROWS_PER_SECTION),
+function seatPosition(value: string): SeatPosition | null {
+  const [row, numberText] = value.trim().toUpperCase().split('-')
+  const number = Number(numberText)
+  const rowIndex = ROWS.indexOf(row)
+  const blockIndex = BLOCKS.findIndex((block) => number >= block.start && number < block.start + block.count)
+  if (rowIndex < 0 || blockIndex < 0) return null
+  const block = BLOCKS[blockIndex]
+  return {
+    row,
+    number,
+    rowIndex,
+    blockIndex,
+    block,
+    x: block.x0 + (number - block.start) * PITCH + 9,
+    y: rowY(rowIndex),
+  }
+}
+
+function aisleFor(position: SeatPosition) {
+  if (position.blockIndex === 0) return AISLES[0]
+  if (position.blockIndex === 2) return AISLES[1]
+  return Math.abs(position.x - AISLES[0]) <= Math.abs(position.x - AISLES[1]) ? AISLES[0] : AISLES[1]
 }
 
 export function SeatingLayout({ allocations, selectedId, onSelect, showRoster = false }: SeatingLayoutProps) {
-  const selected = allocations.find((item) => item.id === selectedId) || allocations[0]
-  const [activeBlock, setActiveBlock] = useState(selected?.block || 'Front')
-  const [detailAllocationId, setDetailAllocationId] = useState<string | null>(null)
-  const detailAllocation = allocations.find((item) => item.id === detailAllocationId)
+  const [activeId, setActiveId] = useState(selectedId)
+  const currentId = onSelect ? selectedId : activeId
+  const selected = allocations.find((item) => item.id === currentId) || allocations[0]
+  const displayedSeat = seatIdFor(selected)
+  const [gateId, setGateId] = useState<GateId>('1')
 
-  const blockAllocations = useMemo(
-    () => allocations.filter((item) => item.block === activeBlock),
-    [activeBlock, allocations],
+  const position = useMemo(() => seatPosition(displayedSeat), [displayedSeat])
+  const allocationBySeat = useMemo(
+    () => new Map(allocations.map((allocation) => [seatIdFor(allocation), allocation])),
+    [allocations],
   )
 
-  const selectedRoute = useMemo(() => {
-    if (!selected || selected.block !== activeBlock) return null
-    const rows = AUDITORIUM_SECTIONS[activeBlock] || []
-    const rowIndex = rows.findIndex((row) => row.label === selected.row)
-    const seatIndex = rowIndex >= 0 ? rows[rowIndex].seats.indexOf(selected.seat) : -1
-    if (rowIndex < 0 || seatIndex < 0) return null
+  const routePoints = useMemo(() => {
+    if (!position) return ''
+    const gate = GATES[gateId]
+    const aisle = aisleFor(position)
+    const points = [
+      [gate.x, gate.y - 14],
+      [gate.x, CROSS_AISLE_Y],
+      [aisle, CROSS_AISLE_Y],
+      [aisle, position.y],
+      [position.x, position.y],
+    ]
+    return points
+      .filter((point, index) => index === 0 || point[0] !== points[index - 1][0] || point[1] !== points[index - 1][1])
+      .map((point) => point.join(','))
+      .join(' ')
+  }, [gateId, position])
 
-    const seatX = 58 + ((seatIndex + 0.5) / VISIBLE_SEATS_PER_ROW) * 884 + (seatIndex >= AISLE_AFTER_SEAT ? 16 : 0)
-    const seatY = 25 + rowIndex * (450 / Math.max(rows.length - 1, 1))
-    return {
-      path: `M 165 500 L 532 500 L 532 ${seatY} L ${seatX} ${seatY}`,
-      seatX,
-      seatY,
-    }
-  }, [activeBlock, selected])
+  const directions = useMemo(() => {
+    if (!position) return ['Seat not found. Enter a seat between A-1 and L-32.']
+    const gate = GATES[gateId]
+    const aisle = aisleFor(position)
+    const aisleName = aisle === AISLES[0] ? 'left' : 'right'
+    const side = position.x > aisle ? 'right' : 'left'
+    const seatsIn = side === 'right'
+      ? position.number - position.block.start + 1
+      : position.block.start + position.block.count - position.number
+    const steps = [`Enter through ${gate.label}.`]
+    if (gate.x !== aisle) steps.push(`Walk along the cross aisle to the ${aisleName} aisle.`)
+    steps.push(`Walk up the aisle towards the stage to Row ${position.row}.`)
+    steps.push(`Turn ${side} and go ${seatsIn} seat${seatsIn === 1 ? '' : 's'} in. Your seat is ${position.row}${position.number}.`)
+    return steps
+  }, [gateId, position])
 
-  const allocationFor = (row: string, seat: number) =>
-    blockAllocations.find((item) => item.row === row && item.seat === seat)
-
-  const selectAllocation = (id: string) => {
-    const allocation = allocations.find((item) => item.id === id)
-    if (allocation) setActiveBlock(allocation.block)
-    onSelect?.(id)
-  }
-
-  const openAllocationDetails = (id: string) => {
-    selectAllocation(id)
-    setDetailAllocationId(id)
+  const chooseAllocation = (allocation: SeatAllocation) => {
+    setActiveId(allocation.id)
+    onSelect?.(allocation.id)
   }
 
   return (
@@ -92,98 +132,81 @@ export function SeatingLayout({ allocations, selectedId, onSelect, showRoster = 
           </div>
           <div className="seating-roster-list">
             {allocations.map((allocation) => (
-              <button type="button" key={allocation.id} className={allocation.id === selected?.id ? 'active' : ''} onClick={() => { selectAllocation(allocation.id); setDetailAllocationId(null) }}>
+              <button type="button" key={allocation.id} className={allocation.id === selected?.id ? 'active' : ''} onClick={() => chooseAllocation(allocation)}>
                 <span className="seating-roster-avatar">{allocation.name.split(' ').map((part) => part[0]).join('').slice(0, 2)}</span>
                 <span><strong>{allocation.name}</strong><small>{allocation.registerNumber}</small></span>
-                <b>{allocation.block}-{allocation.row}-{allocation.seat}</b>
+                <b>{allocation.row}-{allocation.seat}</b>
               </button>
             ))}
           </div>
         </aside>
       )}
 
-      <section className="panel seating-map-panel">
-        <div className="seating-map-toolbar">
-          <div>
-            <p className="eyebrow">DR. T. P. GANESAN AUDITORIUM</p>
-            <h2>Visual Seating Layout</h2>
-          </div>
-          <div className="seating-block-tabs" aria-label="Auditorium sections">
-            {Object.keys(AUDITORIUM_SECTIONS).map((block) => (
-              <button type="button" key={block} className={activeBlock === block ? 'active' : ''} onClick={() => { setActiveBlock(block); setDetailAllocationId(null) }}>{block}</button>
-            ))}
-          </div>
+      <section className="panel seat-finder-card">
+        <div className="seat-finder-heading">
+          <div><p className="eyebrow">DR. T. P. GANESAN AUDITORIUM</p><h2>Convocation Seat Finder</h2></div>
+          {selected && <p>Welcome, <strong>{selected.name}</strong>. Your allocated seat is <strong>{displayedSeat}</strong>.</p>}
         </div>
 
-        <div className="seating-stage"><span>STAGE</span><strong>Convocation Ceremony</strong></div>
+        <div className="seat-finder-map-wrap">
+          <svg className="seat-finder-map" viewBox="0 0 860 520" role="img" aria-label="Auditorium seating map">
+            <rect className="seat-finder-stage" x="250" y="20" width="360" height="36" rx="8" />
+            <text className="seat-finder-stage-label" x="430" y="43" textAnchor="middle">STAGE</text>
 
-        <div className="seating-map-scroll">
-          <div className="seating-map" aria-label={`${activeBlock} section seating map`}>
-            {selectedRoute && (
-              <svg className="seating-route-map" viewBox="0 0 1000 500" preserveAspectRatio="none" aria-hidden="true">
-                <defs>
-                  <marker id="seating-route-arrow" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
-                    <path d="M0,0 L0,6 L8,3 z" />
-                  </marker>
-                </defs>
-                <circle className="seating-route-origin" cx="165" cy="492" r="9" />
-                <path className="seating-route-path" d={selectedRoute.path} markerEnd="url(#seating-route-arrow)" />
-              </svg>
-            )}
-            <div className="seating-aisle-label">CENTRE AISLE</div>
-            {(AUDITORIUM_SECTIONS[activeBlock] || []).map((row) => (
-              <div className={`seating-row ${row.label === selected?.row ? 'selected-row' : ''}`} key={row.label}>
-                <strong>{row.label}</strong>
-                <div className="seating-row-seats">
-                  {row.seats.map((seatNumber, index) => {
-                    const allocation = allocationFor(row.label, seatNumber)
-                    const isSelected = allocation?.id === selected?.id
-                    return (
-                      <button
-                        type="button"
-                        key={`${row.label}-${seatNumber}`}
-                        className={`${allocation ? 'allocated' : 'available'} ${allocation?.type === 'staff' ? 'staff-seat' : ''} ${isSelected ? 'selected' : ''} ${index >= AISLE_AFTER_SEAT ? 'after-aisle' : ''}`}
-                        title={allocation ? `${allocation.name} · ${row.label} · Seat ${seatNumber}` : `${row.label} · Seat ${seatNumber}`}
-                        aria-label={allocation ? `${allocation.name}, row ${row.label}, seat ${seatNumber}` : `Available seat ${seatNumber}, row ${row.label}`}
-                        onClick={() => allocation && openAllocationDetails(allocation.id)}
-                      >
-                        <span>{seatNumber}</span>
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
+            {ROWS.map((row, rowIndex) => (
+              <g key={row}>
+                <text className="seat-finder-row-label" x="14" y={rowY(rowIndex) + 4}>{row}</text>
+                {BLOCKS.flatMap((block) => Array.from({ length: block.count }, (_, index) => {
+                  const number = block.start + index
+                  const seatId = `${row}-${number}`
+                  const allocation = allocationBySeat.get(seatId)
+                  const isMine = seatId === displayedSeat && Boolean(position)
+                  const isTaken = OCCUPIED_SEATS.has(seatId) || Boolean(allocation)
+                  const className = `seat-finder-seat ${isMine ? 'mine' : isTaken ? 'taken' : ''} ${allocation?.type === 'staff' ? 'staff' : ''}`
+                  return (
+                    <rect
+                      key={seatId}
+                      className={className}
+                      x={block.x0 + index * PITCH}
+                      y={rowY(rowIndex) - 9}
+                      width="18"
+                      height="18"
+                      rx="4"
+                      role={allocation ? 'button' : undefined}
+                      tabIndex={allocation ? 0 : undefined}
+                      aria-label={allocation ? `${allocation.name}, seat ${seatId}` : `Seat ${seatId}`}
+                      onClick={() => allocation && chooseAllocation(allocation)}
+                      onKeyDown={(event) => allocation && (event.key === 'Enter' || event.key === ' ') && chooseAllocation(allocation)}
+                    >
+                      <title>{allocation ? `${seatId} · ${allocation.name}` : seatId}</title>
+                    </rect>
+                  )
+                }))}
+              </g>
             ))}
-          </div>
 
-          <div className="seating-map-footer">
-            <div className="seating-legend">
-              <span><i className="seat-key selected" /> Your / selected seat</span>
-              <span><i className="seat-key allocated" /> Student allocated</span>
-              <span><i className="seat-key staff" /> Staff allocated</span>
-              <span><i className="seat-key available" /> Available</span>
-            </div>
-            <div className="seating-exits"><span className={selectedRoute ? 'main-entry-route' : ''}>{selectedRoute && <Icon name="arrow" size={13} />} MAIN ENTRY</span><span>EXIT A</span><span>EXIT B</span></div>
-          </div>
+            {(Object.entries(GATES) as Array<[GateId, (typeof GATES)[GateId]]>).map(([id, gate]) => (
+              <g key={id} onClick={() => setGateId(id)} style={{ cursor: 'pointer' }} role="button" tabIndex={0} onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setGateId(id)}>
+                <rect className={`seat-finder-gate ${gateId === id ? 'active' : ''}`} x={gate.x - 34} y={gate.y - 14} width="68" height="28" rx="6" />
+                <text className="seat-finder-gate-label" x={gate.x} y={gate.y + 4} textAnchor="middle">{gate.label}</text>
+              </g>
+            ))}
+
+            {routePoints && <polyline className="seat-finder-route" points={routePoints} />}
+          </svg>
         </div>
+
+        <div className="seat-finder-legend" aria-label="Seating legend">
+          <span><i className="available" />Available</span>
+          <span><i className="occupied" />Occupied</span>
+          <span><i className="mine" />Your seat</span>
+          <span><i className="route" />Route</span>
+        </div>
+
+        <ol className="seat-finder-directions">
+          {directions.map((direction) => <li key={direction}>{direction}</li>)}
+        </ol>
       </section>
-
-      {detailAllocation && (
-        <div className="seating-detail-overlay">
-          <button type="button" className="seating-detail-backdrop" onClick={() => setDetailAllocationId(null)} aria-label="Close student seat details" />
-          <section className="seating-selected-card seating-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="seating-detail-title">
-            <div className="seating-selected-icon"><Icon name="location" size={24} /></div>
-            <div><p>SELECTED ALLOCATION</p><h3 id="seating-detail-title">{detailAllocation.name}</h3><span>{detailAllocation.registerNumber}</span></div>
-            <dl>
-              <div><dt>Section</dt><dd>{detailAllocation.block}</dd></div>
-              <div><dt>Row</dt><dd>{detailAllocation.row}</dd></div>
-              <div><dt>Seat</dt><dd>{detailAllocation.seat}</dd></div>
-            </dl>
-            <p className="seating-direction"><Icon name="arrow" size={15} /> Enter through Gate 02, use the centre aisle and follow the row signage.</p>
-            <button type="button" className="seating-detail-close" onClick={() => setDetailAllocationId(null)} aria-label="Close student seat details"><Icon name="x" size={18} /></button>
-          </section>
-        </div>
-      )}
     </div>
   )
 }
