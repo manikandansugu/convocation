@@ -13,7 +13,6 @@ export function LoginPage({ onLogin }: LoginPageProps) {
   const [registerNumber, setRegisterNumber] = useState('C10001')
   const [staffId, setStaffId] = useState('EMP9041')
   const [password, setPassword] = useState('123456')
-  const [counter, setCounter] = useState(DEFAULT_STAFF.counter)
   const [showPassword, setShowPassword] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
@@ -45,7 +44,6 @@ export function LoginPage({ onLogin }: LoginPageProps) {
         const staffDetails: StaffMember = {
           ...DEFAULT_STAFF,
           employeeId: staffId.trim().toUpperCase(),
-          counter: counter,
         }
         onLogin('staff', staffDetails)
       } else {
@@ -143,18 +141,6 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                   />
                 </div>
 
-                <div className="login-input login-select-input">
-                  <Icon name="location" size={21} />
-                  <select
-                    value={counter}
-                    onChange={(e) => setCounter(e.target.value)}
-                    aria-label="Assigned Station / Counter"
-                  >
-                    <option value="Counter 04 (Ground Floor)">Counter 04 — Regalia & Kit Desk</option>
-                    <option value="Gate 02">Gate 02 — Entry Scanner</option>
-                    <option value="Auditorium Helpdesk">Auditorium Helpdesk & Administration</option>
-                  </select>
-                </div>
               </>
             )}
 

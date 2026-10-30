@@ -17,6 +17,7 @@ type StaffTab = 'counter' | 'roster' | 'seating' | 'notifications'
 export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout, notifications, onSendNotification }: StaffPortalPageProps) {
   const [activeTab, setActiveTab] = useState<StaffTab>('counter')
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const [roster, setRoster] = useState<StudentRosterRecord[]>(INITIAL_ROSTER)
   const [selectedStudentId, setSelectedStudentId] = useState<string>('student-1')
@@ -166,7 +167,7 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout, notifications
       />
 
       {/* Side Menu in Student Flow Style */}
-      <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
+      <aside className={`sidebar ${sidebarOpen ? 'open' : ''} ${sidebarCollapsed ? 'collapsed' : ''}`}>
         <div className="brand">
           <div className="brand-mark">
             <img src={import.meta.env.BASE_URL + 'campus-trust-logo.png'} alt="Campus Trust" />
@@ -176,6 +177,19 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout, notifications
             <small className="brand-subtitle">Staff Portal</small>
           </div>
         </div>
+
+        <button
+          type="button"
+          className="sidebar-collapse-button"
+          onClick={() => {
+            setProfileOpen(false)
+            setSidebarCollapsed((collapsed) => !collapsed)
+          }}
+          aria-label={sidebarCollapsed ? 'Expand navigation' : 'Collapse navigation'}
+          title={sidebarCollapsed ? 'Expand navigation' : 'Collapse navigation'}
+        >
+          <Icon name="chevron" size={16} />
+        </button>
 
         <div className="staff-sidebar-station-card">
           <div className="staff-sidebar-station-pill">
@@ -191,6 +205,7 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout, notifications
               key={item.id}
               type="button"
               className={activeTab === item.id ? 'active' : ''}
+              title={sidebarCollapsed ? item.label : undefined}
               onClick={() => {
                 setActiveTab(item.id)
                 setSidebarOpen(false)
@@ -263,7 +278,7 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout, notifications
       </aside>
 
       {/* Main Staff Content */}
-      <main className="main-content staff-main-content">
+      <main className={`main-content staff-main-content ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
         <header className="topbar">
           <button
             className="mobile-menu"

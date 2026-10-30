@@ -30,6 +30,7 @@ function App() {
   const [staffMember, setStaffMember] = useState<StaffMember>(DEFAULT_STAFF)
   const [activePage, setActivePage] = useState<PageId>('Student Information')
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [guests, setGuests] = useState<Guest[]>(DEFAULT_GUESTS)
   const [notifications, setNotifications] = useState<ConvocationNotification[]>(INITIAL_NOTIFICATIONS)
   const [queries, setQueries] = useState<StudentQuery[]>(INITIAL_QUERIES)
@@ -79,6 +80,7 @@ function App() {
     setUserRole('student')
     setActivePage('Student Information')
     setSidebarOpen(false)
+    setSidebarCollapsed(false)
   }
 
   const handleLogin = (role: UserRole, staffDetails?: StaffMember) => {
@@ -106,8 +108,8 @@ function App() {
 
   return (
     <div className="app-shell">
-      <Sidebar activePage={activePage} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} onNavigate={navigateTo} onLogout={logout} />
-      <main className="main-content">
+      <Sidebar activePage={activePage} isOpen={sidebarOpen} isCollapsed={sidebarCollapsed} onClose={() => setSidebarOpen(false)} onToggleCollapse={() => setSidebarCollapsed((collapsed) => !collapsed)} onNavigate={navigateTo} onLogout={logout} />
+      <main className={`main-content ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
         <Header activePage={activePage} onOpenNavigation={() => setSidebarOpen(true)} />
         {renderPage()}
       </main>

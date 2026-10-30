@@ -5,12 +5,14 @@ import { Icon } from '../ui/Icon'
 interface SidebarProps {
   activePage: PageId
   isOpen: boolean
+  isCollapsed: boolean
   onClose: () => void
+  onToggleCollapse: () => void
   onNavigate: (page: PageId) => void
   onLogout: () => void
 }
 
-export function Sidebar({ activePage, isOpen, onClose, onNavigate, onLogout }: SidebarProps) {
+export function Sidebar({ activePage, isOpen, isCollapsed, onClose, onToggleCollapse, onNavigate, onLogout }: SidebarProps) {
   const [profileOpen, setProfileOpen] = useState(false)
 
   const logout = () => {
@@ -20,7 +22,7 @@ export function Sidebar({ activePage, isOpen, onClose, onNavigate, onLogout }: S
 
   return <>
     <button className={`sidebar-scrim ${isOpen ? 'visible' : ''}`} aria-label="Close navigation" onClick={onClose} />
-    <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
+    <aside className={`sidebar ${isOpen ? 'open' : ''} ${isCollapsed ? 'collapsed' : ''}`}>
       <div className="brand">
         <div className="brand-mark"><img src={import.meta.env.BASE_URL + 'campus-trust-logo.png'} alt="Campus Trust" /></div>
         <div className="brand-copy">
@@ -28,9 +30,21 @@ export function Sidebar({ activePage, isOpen, onClose, onNavigate, onLogout }: S
           <small className="brand-subtitle">Convocation</small>
         </div>
       </div>
+      <button
+        type="button"
+        className="sidebar-collapse-button"
+        onClick={() => {
+          setProfileOpen(false)
+          onToggleCollapse()
+        }}
+        aria-label={isCollapsed ? 'Expand navigation' : 'Collapse navigation'}
+        title={isCollapsed ? 'Expand navigation' : 'Collapse navigation'}
+      >
+        <Icon name="chevron" size={16} />
+      </button>
       <nav className="main-nav" aria-label="Main navigation">
         {/* <p className="nav-label">MAIN MENU</p> */}
-        {navigationItems.map((item) => <button key={item.label} className={activePage === item.label ? 'active' : ''} onClick={() => onNavigate(item.label)}><Icon name={item.icon} /><span>{item.label}</span></button>)}
+        {navigationItems.map((item) => <button key={item.label} className={activePage === item.label ? 'active' : ''} onClick={() => onNavigate(item.label)} title={isCollapsed ? item.label : undefined}><Icon name={item.icon} /><span>{item.label}</span></button>)}
       </nav>
       <div className="sidebar-footer">
         {profileOpen && <div className="profile-popup" role="dialog" aria-label="Student profile">

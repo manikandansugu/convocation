@@ -25,16 +25,20 @@ const ROW_SEAT_COUNTS: Array<[string, number]> = [
   ['NN', 54], ['OO', 57], ['PP', 58], ['QQ', 56], ['RR', 56], ['SS', 56], ['TT', 56], ['UU', 56], ['VV', 56], ['WW', 58], ['XX', 58], ['YY', 58], ['ZZ', 55],
 ]
 
+const VISIBLE_ROWS_PER_SECTION = 5
+const VISIBLE_SEATS_PER_ROW = 36
+const AISLE_AFTER_SEAT = 18
+
 const makeRows = (start: number, end: number) => ROW_SEAT_COUNTS.slice(start, end).map(([label, seatCount]) => ({
   label,
-  seats: Array.from({ length: seatCount }, (_, index) => index + 1),
+  seats: Array.from({ length: Math.min(seatCount, VISIBLE_SEATS_PER_ROW) }, (_, index) => index + 1),
 }))
 
 const AUDITORIUM_SECTIONS: Record<string, Array<{ label: string; seats: number[] }>> = {
-  Front: makeRows(0, 13),
-  Middle: makeRows(13, 26),
-  Rear: makeRows(26, 39),
-  Back: makeRows(39, 52),
+  Front: makeRows(0, VISIBLE_ROWS_PER_SECTION),
+  Middle: makeRows(13, 13 + VISIBLE_ROWS_PER_SECTION),
+  Rear: makeRows(26, 26 + VISIBLE_ROWS_PER_SECTION),
+  Back: makeRows(39, 39 + VISIBLE_ROWS_PER_SECTION),
 }
 
 export function SeatingLayout({ allocations, selectedId, onSelect, showRoster = false }: SeatingLayoutProps) {
@@ -55,7 +59,7 @@ export function SeatingLayout({ allocations, selectedId, onSelect, showRoster = 
     const seatIndex = rowIndex >= 0 ? rows[rowIndex].seats.indexOf(selected.seat) : -1
     if (rowIndex < 0 || seatIndex < 0) return null
 
-    const seatX = 58 + ((seatIndex + 0.5) / 58) * 884 + (seatIndex >= 30 ? 16 : 0)
+    const seatX = 58 + ((seatIndex + 0.5) / VISIBLE_SEATS_PER_ROW) * 884 + (seatIndex >= AISLE_AFTER_SEAT ? 16 : 0)
     const seatY = 25 + rowIndex * (450 / Math.max(rows.length - 1, 1))
     return {
       path: `M 165 500 L 532 500 L 532 ${seatY} L ${seatX} ${seatY}`,
@@ -124,7 +128,6 @@ export function SeatingLayout({ allocations, selectedId, onSelect, showRoster = 
                 </defs>
                 <circle className="seating-route-origin" cx="165" cy="492" r="9" />
                 <path className="seating-route-path" d={selectedRoute.path} markerEnd="url(#seating-route-arrow)" />
-                <circle className="seating-route-target" cx={selectedRoute.seatX} cy={selectedRoute.seatY} r="12" />
               </svg>
             )}
             <div className="seating-aisle-label">CENTRE AISLE</div>
@@ -139,12 +142,11 @@ export function SeatingLayout({ allocations, selectedId, onSelect, showRoster = 
                       <button
                         type="button"
                         key={`${row.label}-${seatNumber}`}
-                        className={`${allocation ? 'allocated' : 'available'} ${allocation?.type === 'staff' ? 'staff-seat' : ''} ${isSelected ? 'selected' : ''} ${index >= 30 ? 'after-aisle' : ''}`}
+                        className={`${allocation ? 'allocated' : 'available'} ${allocation?.type === 'staff' ? 'staff-seat' : ''} ${isSelected ? 'selected' : ''} ${index >= AISLE_AFTER_SEAT ? 'after-aisle' : ''}`}
                         title={allocation ? `${allocation.name} · ${row.label} · Seat ${seatNumber}` : `${row.label} · Seat ${seatNumber}`}
                         aria-label={allocation ? `${allocation.name}, row ${row.label}, seat ${seatNumber}` : `Available seat ${seatNumber}, row ${row.label}`}
                         onClick={() => allocation && openAllocationDetails(allocation.id)}
                       >
-                        <Icon name="user" size={12} />
                         <span>{seatNumber}</span>
                       </button>
                     )
@@ -153,16 +155,16 @@ export function SeatingLayout({ allocations, selectedId, onSelect, showRoster = 
               </div>
             ))}
           </div>
-        </div>
 
-        <div className="seating-map-footer">
-          <div className="seating-legend">
-            <span><i className="seat-key selected" /> Your / selected seat</span>
-            <span><i className="seat-key allocated" /> Student allocated</span>
-            <span><i className="seat-key staff" /> Staff allocated</span>
-            <span><i className="seat-key available" /> Available</span>
+          <div className="seating-map-footer">
+            <div className="seating-legend">
+              <span><i className="seat-key selected" /> Your / selected seat</span>
+              <span><i className="seat-key allocated" /> Student allocated</span>
+              <span><i className="seat-key staff" /> Staff allocated</span>
+              <span><i className="seat-key available" /> Available</span>
+            </div>
+            <div className="seating-exits"><span className={selectedRoute ? 'main-entry-route' : ''}>{selectedRoute && <Icon name="arrow" size={13} />} MAIN ENTRY</span><span>EXIT A</span><span>EXIT B</span></div>
           </div>
-          <div className="seating-exits"><span className={selectedRoute ? 'main-entry-route' : ''}>{selectedRoute && <Icon name="arrow" size={13} />} MAIN ENTRY</span><span>EXIT A</span><span>EXIT B</span></div>
         </div>
       </section>
 
