@@ -3,31 +3,26 @@ import { Icon } from '../components/ui/Icon'
 import { DEFAULT_STAFF, INITIAL_ROSTER, type StaffMember, type StudentRosterRecord } from '../config/staff'
 import studentPhoto from '../assets/student-verification.png'
 import { SeatingLayout, type SeatAllocation } from '../components/seating/SeatingLayout'
-import type { ConvocationNotification, NotificationCategory } from '../types/notifications'
+import { InstructionsPage } from './InstructionsPage'
 
 interface StaffPortalPageProps {
   staff?: StaffMember
   onLogout: () => void
-  notifications: ConvocationNotification[]
-  onSendNotification: (notification: ConvocationNotification) => void
 }
 
-type StaffTab = 'counter' | 'roster' | 'seating' | 'notifications'
+type StaffTab = 'counter' | 'roster' | 'seating' | 'instructions'
 
-export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout, notifications, onSendNotification }: StaffPortalPageProps) {
-  const [activeTab, setActiveTab] = useState<StaffTab>('counter')
+export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout }: StaffPortalPageProps) {
+  const [activeTab, setActiveTab] = useState<StaffTab>('roster')
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const [roster, setRoster] = useState<StudentRosterRecord[]>(INITIAL_ROSTER)
   const [selectedStudentId, setSelectedStudentId] = useState<string>('student-1')
+  const [drawerStudentId, setDrawerStudentId] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
-  const [notificationCategory, setNotificationCategory] = useState<NotificationCategory>('Announcement')
-  const [notificationAudience, setNotificationAudience] = useState('All Students')
-  const [notificationTitle, setNotificationTitle] = useState('')
-  const [notificationMessage, setNotificationMessage] = useState('')
-  const [notificationImportant, setNotificationImportant] = useState(false)
-  const [notificationSent, setNotificationSent] = useState(false)
+  const [rosterPage, setRosterPage] = useState(1)
+  const [rosterPageSize, setRosterPageSize] = useState(5)
 
   const staffInitials = staff.name
     .split(' ')
@@ -38,39 +33,20 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout, notifications
     .toUpperCase()
 
   const STAFF_NAV_ITEMS = [
-    { id: 'counter' as const, label: 'Kit & Gown Desk', icon: 'tag' as const },
     { id: 'roster' as const, label: 'Student List', icon: 'user' as const },
     { id: 'seating' as const, label: 'Seating Layout', icon: 'grid' as const },
-    { id: 'notifications' as const, label: 'Notifications', icon: 'bell' as const },
+    { id: 'instructions' as const, label: 'Instructions', icon: 'file' as const },
   ]
 
   const TAB_TITLES: Record<StaffTab, string> = {
     counter: 'Kit & Gown Desk',
     roster: 'Student List',
     seating: 'Seating Layout',
-    notifications: 'Notifications',
-  }
-
-  const sendNotification = () => {
-    if (!notificationTitle.trim() || !notificationMessage.trim()) return
-    onSendNotification({
-      id: `notice-${Date.now()}`,
-      category: notificationCategory,
-      title: notificationTitle.trim(),
-      message: notificationMessage.trim(),
-      audience: notificationAudience,
-      sentAt: 'Just now',
-      important: notificationImportant,
-      read: false,
-    })
-    setNotificationTitle('')
-    setNotificationMessage('')
-    setNotificationImportant(false)
-    setNotificationSent(true)
-    window.setTimeout(() => setNotificationSent(false), 3000)
+    instructions: 'Instructions',
   }
 
   const selectedStudent = roster.find((s) => s.id === selectedStudentId) || roster[0]
+  const drawerStudent = roster.find((s) => s.id === drawerStudentId)
   const seatingAllocations: SeatAllocation[] = roster.map((student) => ({
     id: student.id,
     name: student.name,
@@ -141,14 +117,19 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout, notifications
       s.name.toLowerCase().includes(q) ||
       s.registerNumber.toLowerCase().includes(q) ||
       s.registrationId.toLowerCase().includes(q) ||
+      s.mobileNumber.toLowerCase().includes(q) ||
+      s.personalEmail.toLowerCase().includes(q) ||
+      s.officialEmail.toLowerCase().includes(q) ||
+      s.program.toLowerCase().includes(q) ||
       s.department.toLowerCase().includes(q)
     )
   })
 
-  // Aggregate stats
-  const gownsIssuedCount = roster.filter((s) => s.gownReceived).length + 840
-  const gownsReturnedCount = roster.filter((s) => s.gownReturned).length + 122
-  const admittedCount = roster.filter((s) => s.admittedAtGate).length + 908
+  const rosterPageCount = Math.max(1, Math.ceil(filteredRoster.length / rosterPageSize))
+  const activeRosterPage = Math.min(rosterPage, rosterPageCount)
+  const rosterPageStart = (activeRosterPage - 1) * rosterPageSize
+  const paginatedRoster = filteredRoster.slice(rosterPageStart, rosterPageStart + rosterPageSize)
+  const rosterPageEnd = Math.min(rosterPageStart + rosterPageSize, filteredRoster.length)
 
   const completedStepsCount =
     (selectedStudent.tagIssued ? 1 : 0) +
@@ -306,31 +287,6 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout, notifications
         </header>
 
         <div className="staff-page-content">
-          {/* Counter Info Banner */}
-          <section className="staff-station-banner">
-          <div className="station-meta-block">
-            <span className="station-label">ASSIGNED STATION</span>
-            <strong>{staff.counter}</strong>
-            <small>Dr. T. P. Ganesan Auditorium</small>
-          </div>
-          <div className="station-divider" />
-          <div className="station-stat">
-            <span className="station-stat-num">{gownsIssuedCount}</span>
-            <span className="station-stat-label">Regalia Issued</span>
-          </div>
-          <div className="station-stat">
-            <span className="station-stat-num">{gownsReturnedCount}</span>
-            <span className="station-stat-label">Gowns Returned</span>
-          </div>
-          <div className="station-stat">
-            <span className="station-stat-num">{admittedCount}</span>
-            <span className="station-stat-label">Admitted at Gates</span>
-          </div>
-          <div className="station-status-pill">
-            <span className="pulse-dot" /> Desk Active & Online
-          </div>
-        </section>
-
         {/* TAB 1: KIT & GOWN COUNTER */}
         {activeTab === 'counter' && (
           <div className="staff-counter-grid">
@@ -622,7 +578,10 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout, notifications
                   <input
                     placeholder="Filter students by name, reg id, department…"
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value)
+                      setRosterPage(1)
+                    }}
                   />
                 </div>
               </div>
@@ -631,60 +590,193 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout, notifications
                 <table className="roster-table">
                   <thead>
                     <tr>
-                      <th>Student</th>
-                      <th>Registration ID</th>
-                      <th>Seating</th>
-                      <th>Gate</th>
-                      <th>Gown Return</th>
-                      <th>Entry At</th>
-                      <th>Actions</th>
+                      <th>S No.</th>
+                      <th>Student Name</th>
+                      <th>Register No.</th>
+                      <th>Academic Year</th>
+                      <th>Mobile No.</th>
+                      <th>Personal Email</th>
+                      <th>Official Email</th>
+                      <th>Degree</th>
+                      <th>Program</th>
+                      <th>Graduation Type</th>
+                      <th>Action</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredRoster.map((student) => (
+                    {paginatedRoster.map((student, index) => (
                         <tr key={student.id} className={student.id === selectedStudent.id ? 'highlighted' : ''}>
+                          <td className="roster-serial">{rosterPageStart + index + 1}</td>
                           <td>
                             <div className="student-cell">
                               <div className="cell-avatar">{student.name[0]}</div>
                               <div>
                                 <strong>{student.name}</strong>
-                                <small>{student.registerNumber}</small>
                               </div>
                             </div>
                           </td>
-                          <td><code>{student.registrationId}</code></td>
-                          <td>{student.block}-{student.row}-{student.seat}</td>
-                          <td><span className="gate-pill">{student.gate}</span></td>
+                          <td><code>{student.registerNumber}</code></td>
+                          <td>{student.academicYear}</td>
+                          <td>{student.mobileNumber}</td>
+                          <td>{student.personalEmail}</td>
+                          <td>{student.officialEmail}</td>
+                          <td>{student.degree}</td>
+                          <td>{student.program}</td>
+                          <td><span className="roster-pill success">{student.graduationType}</span></td>
                           <td>
-                            <span className={`roster-pill ${student.gownReturned ? 'success' : 'pending'}`}>
-                              {student.gownReturned ? 'Yes' : 'No'}
-                            </span>
-                          </td>
-                          <td>
-                            <span className={`roster-pill ${student.admittedAtGate ? 'success' : 'pending'}`}>
-                              {student.admittedAtGate ? (student.admittedTime || '08:45 AM') : '—'}
-                            </span>
-                          </td>
-                          <td>
-                            <div className="row-action-btns">
-                              <button
-                                type="button"
-                                className="table-btn"
-                                onClick={() => {
-                                  setSelectedStudentId(student.id)
-                                  setActiveTab('counter')
-                                }}
-                              >
-                                Manage Kit
-                              </button>
-                            </div>
+                            <button
+                              type="button"
+                              className="roster-more-button"
+                              aria-label={`View details for ${student.name}`}
+                              title="View student details"
+                              onClick={() => {
+                                setSelectedStudentId(student.id)
+                                setDrawerStudentId(student.id)
+                              }}
+                            ><span /><span /><span /></button>
                           </td>
                         </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
+
+              <div className="roster-pagination" aria-label="Student list pagination">
+                <div className="roster-page-summary">
+                  <span>
+                    Showing {filteredRoster.length === 0 ? 0 : rosterPageStart + 1}–{rosterPageEnd} of {filteredRoster.length} students
+                  </span>
+                  <label>
+                    Rows per page
+                    <select
+                      value={rosterPageSize}
+                      onChange={(event) => {
+                        setRosterPageSize(Number(event.target.value))
+                        setRosterPage(1)
+                      }}
+                    >
+                      <option value={5}>5</option>
+                      <option value={10}>10</option>
+                      <option value={20}>20</option>
+                    </select>
+                  </label>
+                </div>
+                <div className="roster-page-controls">
+                  <button
+                    type="button"
+                    aria-label="Previous page"
+                    disabled={activeRosterPage === 1}
+                    onClick={() => setRosterPage((page) => Math.max(1, page - 1))}
+                  >
+                    ‹
+                  </button>
+                  {Array.from({ length: rosterPageCount }, (_, index) => index + 1).map((page) => (
+                    <button
+                      type="button"
+                      key={page}
+                      className={page === activeRosterPage ? 'active' : ''}
+                      aria-label={`Page ${page}`}
+                      aria-current={page === activeRosterPage ? 'page' : undefined}
+                      onClick={() => setRosterPage(page)}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    aria-label="Next page"
+                    disabled={activeRosterPage === rosterPageCount}
+                    onClick={() => setRosterPage((page) => Math.min(rosterPageCount, page + 1))}
+                  >
+                    ›
+                  </button>
+                </div>
+              </div>
             </div>
+
+            {drawerStudent && (
+              <div className="roster-drawer-layer">
+                <button type="button" className="roster-drawer-backdrop" onClick={() => setDrawerStudentId(null)} aria-label="Close student details" />
+                <aside className="roster-detail-drawer" role="dialog" aria-modal="true" aria-labelledby="roster-drawer-title">
+                  <div className="roster-drawer-header">
+                    <span className="roster-drawer-header-icon"><Icon name="cap" size={19} /></span>
+                    <div>
+                      <h2 id="roster-drawer-title">Student Record Details</h2>
+                      <span>Registration: <strong>{drawerStudent.registerNumber}</strong></span>
+                    </div>
+                    <button type="button" onClick={() => setDrawerStudentId(null)} aria-label="Close student details"><Icon name="x" size={18} /></button>
+                  </div>
+
+                  <div className="roster-drawer-summary">
+                    <div className="cell-avatar">{drawerStudent.name.split(' ').map((part) => part[0]).join('').slice(0, 2)}</div>
+                    <div>
+                      <div className="roster-drawer-student-name"><strong>{drawerStudent.name}</strong><em>{drawerStudent.degree.startsWith('M') ? 'PG' : 'UG'}</em><b>{drawerStudent.degreeMode}</b></div>
+                      <span>{drawerStudent.degree} — {drawerStudent.program}</span>
+                      <small><Icon name="mail" size={13} /> {drawerStudent.officialEmail}</small>
+                    </div>
+                  </div>
+
+                  <section className="roster-drawer-section">
+                    <h3><Icon name="user" size={15} /> Academic & Personal Information</h3>
+                    <dl>
+                      <div><dt>Registration Number</dt><dd>{drawerStudent.registerNumber}</dd></div>
+                      <div><dt>Program / Course</dt><dd>{drawerStudent.degree} — {drawerStudent.program}</dd></div>
+                      <div><dt>Aadhaar No.</dt><dd>{drawerStudent.aadhaarNumber}</dd></div>
+                      <div><dt>Mobile No.</dt><dd>{drawerStudent.mobileNumber}</dd></div>
+                      <div><dt>Official Email</dt><dd>{drawerStudent.officialEmail}</dd></div>
+                      <div><dt>Personal Email</dt><dd>{drawerStudent.personalEmail}</dd></div>
+                      <div><dt>Degree</dt><dd>{drawerStudent.degree}</dd></div>
+                      <div><dt>Program</dt><dd>{drawerStudent.program}</dd></div>
+                      <div><dt>Graduation Type</dt><dd>{drawerStudent.graduationType}</dd></div>
+                      <div><dt>Degree Mode</dt><dd>{drawerStudent.degreeMode}</dd></div>
+                      <div><dt>Faculty Name</dt><dd>{drawerStudent.facultyName}</dd></div>
+                    </dl>
+                  </section>
+
+                  <section className="roster-drawer-section">
+                    <h3><Icon name="calendar" size={15} /> Convocation Information</h3>
+                    <dl>
+                      <div><dt>Convocation Name</dt><dd>{drawerStudent.convocationName}</dd></div>
+                      <div><dt>Academic Year</dt><dd>{drawerStudent.academicYear}</dd></div>
+                      <div><dt>Convocation Date</dt><dd>{drawerStudent.convocationDate}</dd></div>
+                      <div><dt>Convocation Reg. No.</dt><dd>{drawerStudent.registrationId}</dd></div>
+                      <div><dt>Venue Name</dt><dd>{drawerStudent.venueName}</dd></div>
+                      <div className="drawer-detail-wide"><dt>Venue Address</dt><dd><Icon name="location" size={13} /> {drawerStudent.venueAddress}</dd></div>
+                    </dl>
+                  </section>
+
+                  <section className="roster-drawer-section">
+                    <h3><Icon name="ticket" size={15} /> Convocation Registration & Seating</h3>
+                    <dl>
+                      <div><dt>Degree Registered</dt><dd><span className={`drawer-status ${drawerStudent.registered ? 'yes' : 'no'}`}>{drawerStudent.registered ? 'Yes' : 'No'}</span></dd></div>
+                      <div><dt>Convocation Registered</dt><dd><span className={`drawer-status ${drawerStudent.registered ? 'yes' : 'no'}`}>{drawerStudent.registered ? 'Yes' : 'No'}</span></dd></div>
+                      <div><dt>Allocated Seat No.</dt><dd>{drawerStudent.block}-{drawerStudent.row}-{drawerStudent.seat}</dd></div>
+                      <div><dt>Guest Count</dt><dd>{drawerStudent.guestCount}</dd></div>
+                      <div><dt>Registered At</dt><dd>{drawerStudent.registeredAt || '—'}</dd></div>
+                      <div><dt>Bundle ID</dt><dd>{drawerStudent.bundleId}</dd></div>
+                    </dl>
+                  </section>
+
+                  <section className="roster-drawer-section">
+                    <h3><Icon name="check" size={15} /> Event Fulfilment</h3>
+                    <dl>
+                      <div><dt>Gown Paid</dt><dd>{drawerStudent.paymentStatus === 'Paid' ? 'Yes' : 'No'}</dd></div>
+                      <div><dt>Gown Paid At</dt><dd>{drawerStudent.gownPaidAt || '—'}</dd></div>
+                      <div><dt>Tag Issued</dt><dd>{drawerStudent.tagIssued ? 'Yes' : 'No'}</dd></div>
+                      <div><dt>Tag Issued At</dt><dd>{drawerStudent.tagIssuedAt || '—'}</dd></div>
+                      <div><dt>Gown Received</dt><dd>{drawerStudent.gownReceived ? 'Yes' : 'No'}</dd></div>
+                      <div><dt>Gown Received At</dt><dd>{drawerStudent.gownReceivedAt || '—'}</dd></div>
+                      <div><dt>Gown Returned</dt><dd>{drawerStudent.gownReturned ? 'Yes' : 'No'}</dd></div>
+                      <div><dt>Gown Returned At</dt><dd>{drawerStudent.gownReturnTime || '—'}</dd></div>
+                      <div><dt>Refreshment Received</dt><dd>{drawerStudent.refreshmentReady ? 'Yes' : 'No'}</dd></div>
+                      <div><dt>Refreshment Received At</dt><dd>{drawerStudent.refreshmentReceivedAt || '—'}</dd></div>
+                      <div><dt>Tokens</dt><dd>{drawerStudent.tokens}</dd></div>
+                    </dl>
+                  </section>
+                  <div className="roster-drawer-footer"><button type="button" onClick={() => setDrawerStudentId(null)}>Close</button></div>
+                </aside>
+              </div>
+            )}
           </div>
         )}
 
@@ -699,61 +791,10 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout, notifications
           </div>
         )}
 
-        {/* TAB 5: SPECIFIC NOTIFICATIONS */}
-        {activeTab === 'notifications' && (
-          <div className="staff-notifications-view">
-            <section className="panel notification-composer">
-              <div className="panel-header">
-                <div><p className="eyebrow">STUDENT COMMUNICATION</p><h3>Send a specific notification</h3></div>
-                <span className="notification-channel"><span /> Portal notification</span>
-              </div>
-
-              <div className="notification-form-grid">
-                <label>
-                  <span>Notification type</span>
-                  <select value={notificationCategory} onChange={(event) => setNotificationCategory(event.target.value as NotificationCategory)}>
-                    <option>Announcement</option>
-                    <option>Alert</option>
-                    <option>Reminder</option>
-                  </select>
-                </label>
-                <label>
-                  <span>Send to</span>
-                  <select value={notificationAudience} onChange={(event) => setNotificationAudience(event.target.value)}>
-                    <option>All Students</option>
-                    <option>Block A Students</option>
-                    <option>Computing Technologies</option>
-                    {roster.map((student) => <option key={student.id}>{student.name} — {student.registerNumber}</option>)}
-                  </select>
-                </label>
-                <label className="notification-form-full">
-                  <span>Title</span>
-                  <input value={notificationTitle} onChange={(event) => setNotificationTitle(event.target.value)} placeholder="Enter a clear notification title" />
-                </label>
-                <label className="notification-form-full">
-                  <span>Message</span>
-                  <textarea value={notificationMessage} onChange={(event) => setNotificationMessage(event.target.value)} placeholder="Write the announcement, alert or reminder for students…" rows={5} />
-                </label>
-              </div>
-
-              <div className="notification-composer-actions">
-                <label className="notification-important-toggle"><input type="checkbox" checked={notificationImportant} onChange={(event) => setNotificationImportant(event.target.checked)} /><span>Mark as important</span></label>
-                <button type="button" className="notification-send-button" disabled={!notificationTitle.trim() || !notificationMessage.trim()} onClick={sendNotification}><Icon name="bell" size={16} /> Send notification</button>
-              </div>
-              {notificationSent && <div className="notification-sent-confirmation"><Icon name="check" size={17} /><span>Notification sent successfully to {notificationAudience}.</span></div>}
-            </section>
-
-            <section className="panel notification-history">
-              <div className="panel-header"><div><p className="eyebrow">RECENT ACTIVITY</p><h3>Sent notifications</h3></div><span className="badge-count">{notifications.length} messages</span></div>
-              <div className="notification-history-list">
-                {notifications.map((notification) => (
-                  <article key={notification.id}>
-                    <span className={`notification-history-icon ${notification.category.toLowerCase()}`}><Icon name={notification.category === 'Reminder' ? 'clock' : notification.category === 'Alert' ? 'bell' : 'file'} size={17} /></span>
-                    <div><div><strong>{notification.title}</strong><span>{notification.category}</span>{notification.important && <b>Important</b>}</div><p>{notification.message}</p><small>{notification.audience} · {notification.sentAt}</small></div>
-                  </article>
-                ))}
-              </div>
-            </section>
+        {/* TAB 5: INSTRUCTIONS */}
+        {activeTab === 'instructions' && (
+          <div className="staff-instructions-view">
+            <InstructionsPage />
           </div>
         )}
 

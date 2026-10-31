@@ -5,16 +5,21 @@ import type { StudentQuery } from '../types/queries'
 interface QueriesPageProps {
   queries: StudentQuery[]
   onSubmitQuery: (query: StudentQuery) => void
+  onReplyQuery: (queryId: string, body: string) => void
+  showQueryForm: boolean
+  onCloseQueryForm: () => void
 }
 
 const QUERY_CATEGORIES = ['Registration', 'Payment', 'ID Verification', 'Guest Pass', 'Seating', 'Convocation Pass', 'Other']
 
-export function QueriesPage({ queries, onSubmitQuery }: QueriesPageProps) {
+export function QueriesPage({ queries, onSubmitQuery, onReplyQuery, showQueryForm, onCloseQueryForm }: QueriesPageProps) {
   const [category, setCategory] = useState(QUERY_CATEGORIES[0])
   const [subject, setSubject] = useState('')
   const [message, setMessage] = useState('')
   const [email, setEmail] = useState('arun.menon@gmail.com')
   const [submitted, setSubmitted] = useState(false)
+  const [replyDrafts, setReplyDrafts] = useState<Record<string, string>>({})
+  const [activeReplyId, setActiveReplyId] = useState<string | null>(null)
 
   const submitQuery = () => {
     if (!subject.trim() || !message.trim() || !email.trim()) return
@@ -36,28 +41,25 @@ export function QueriesPage({ queries, onSubmitQuery }: QueriesPageProps) {
     })
     setSubject('')
     setMessage('')
+    onCloseQueryForm()
     setSubmitted(true)
     window.setTimeout(() => setSubmitted(false), 3000)
   }
 
+  const submitReply = (queryId: string) => {
+    const body = replyDrafts[queryId]?.trim()
+    if (!body) return
+    onReplyQuery(queryId, body)
+    setReplyDrafts((drafts) => ({ ...drafts, [queryId]: '' }))
+    setActiveReplyId(null)
+  }
+
   return (
     <div className="page queries-page prototype-page">
-      <div className="prototype-heading queries-heading">
-        <div className="college-title">
-          <div className="college-logo"><Icon name="help" size={27} /></div>
-          <div>
-            <p className="eyebrow">CONVOCATION 2026</p>
-            <h1>Queries & Support</h1>
-            <p className="page-subtitle">Raise an issue and receive the administrator’s response at your registered email address.</p>
-          </div>
-        </div>
-        <span className="query-support-status"><span /> Admin desk online</span>
-      </div>
-
-      <div className="queries-layout">
+      {showQueryForm && (
         <section className="panel query-form-panel">
           <div className="panel-header">
-            <div><p className="eyebrow">RAISE A QUERY</p><h2>How can we help?</h2></div>
+            <div><p className="eyebrow">NEW QUERY</p><h2>Queries & Support</h2></div>
             <span className="query-response-time"><Icon name="clock" size={14} /> Response within 1 working day</span>
           </div>
           <div className="query-form-grid">
@@ -70,20 +72,13 @@ export function QueriesPage({ queries, onSubmitQuery }: QueriesPageProps) {
             <p><Icon name="mail" size={15} /> The administrator’s reply will be recorded here and communicated by email.</p>
             <button type="button" disabled={!subject.trim() || !message.trim() || !email.trim()} onClick={submitQuery}>Submit query <Icon name="arrow" size={16} /></button>
           </div>
-          {submitted && <div className="query-submitted"><Icon name="check" size={17} /> Your query was submitted successfully.</div>}
         </section>
+      )}
 
-        <aside className="panel query-help-card">
-          <span><Icon name="help" size={23} /></span>
-          <p className="eyebrow">SUPPORT INFORMATION</p>
-          <h2>Convocation Help Desk</h2>
-          <p>For urgent ceremony-day assistance, contact the administration counter at the auditorium.</p>
-          <dl><div><dt>Support hours</dt><dd>09:00 AM – 05:00 PM</dd></div><div><dt>Email channel</dt><dd>convocation@srm.edu.in</dd></div></dl>
-        </aside>
-      </div>
+      {submitted && <div className="query-submitted"><Icon name="check" size={17} /> Your query was submitted successfully.</div>}
 
-      <section className="query-history-section">
-        <div className="query-history-heading"><div><p className="eyebrow">MY QUERIES</p><h2>Support history</h2></div><span>{queries.length} tickets</span></div>
+      <section className={`query-history-section ${showQueryForm ? '' : 'standalone'}`}>
+        <div className="query-history-heading"><div><p className="eyebrow">MY QUERIES</p><h2>Support History</h2></div><span>{queries.length} tickets</span></div>
         <div className="query-ticket-list">
           {queries.map((query) => (
             <article className="panel query-ticket" key={query.id}>
@@ -94,12 +89,35 @@ export function QueriesPage({ queries, onSubmitQuery }: QueriesPageProps) {
               <h3>{query.subject}</h3>
               <small>Raised {query.createdAt} · Responses sent to {query.email}</small>
               <div className="query-conversation">
+                <div className="query-comment-count">{query.messages.length} {query.messages.length === 1 ? 'comment' : 'comments'}</div>
                 {query.messages.map((item) => (
                   <div className={`query-message ${item.sender === 'Administrator' ? 'admin' : 'student'}`} key={item.id}>
                     <span className="query-message-avatar"><Icon name={item.sender === 'Administrator' ? 'shield' : 'user'} size={15} /></span>
                     <div><div><strong>{item.sender}</strong><span>{item.channel === 'Email' && <Icon name="mail" size={12} />} {item.channel} · {item.sentAt}</span></div><p>{item.body}</p></div>
                   </div>
                 ))}
+                <div className={`query-reply-composer ${activeReplyId === query.id ? 'active' : ''}`}>
+                  <span className="query-reply-avatar">AM</span>
+                  <div>
+                    <textarea
+                      rows={1}
+                      value={replyDrafts[query.id] || ''}
+                      placeholder="Add a reply…"
+                      aria-label={`Reply to ${query.subject}`}
+                      onFocus={() => setActiveReplyId(query.id)}
+                      onChange={(event) => setReplyDrafts((drafts) => ({ ...drafts, [query.id]: event.target.value }))}
+                    />
+                    {activeReplyId === query.id && (
+                      <div className="query-reply-actions">
+                        <button type="button" className="query-reply-cancel" onClick={() => {
+                          setReplyDrafts((drafts) => ({ ...drafts, [query.id]: '' }))
+                          setActiveReplyId(null)
+                        }}>Cancel</button>
+                        <button type="button" className="query-reply-submit" disabled={!replyDrafts[query.id]?.trim()} onClick={() => submitReply(query.id)}>Reply</button>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </article>
           ))}

@@ -70,10 +70,6 @@ export function GuestAdditionPage({ initialGuests, onBack, onContinue }: GuestAd
 
   return (
     <div className="page prototype-page guest-addition-page">
-      <div className="prototype-heading">
-        <div className="college-title"><div className="college-logo"><Icon name="user" size={26}/></div><div><p className="eyebrow">ACCOMPANYING GUESTS</p><h1>Guest Addition</h1><p className="page-subtitle">Add up to three people attending the convocation with you.</p></div></div>
-        <div className="step-badge">Step 4 of 5</div>
-      </div>
       <div className="five-step-progress"><span className="done"><Icon name="check" size={13}/></span><i className="done"/><span className="done"><Icon name="check" size={13}/></span><i className="done"/><span className="done"><Icon name="check" size={13}/></span><i className="done"/><span className="active">4</span><i/><span>5</span></div>
 
       <form className="panel guest-addition-card" onSubmit={(event) => { event.preventDefault(); onContinue(guests) }}>

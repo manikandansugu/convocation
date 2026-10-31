@@ -293,10 +293,6 @@ export function ConvocationPassPage({ guests }: ConvocationPassPageProps) {
 
   return (
     <div className="page passes-page prototype-page">
-      <div className="prototype-heading">
-        <div className="college-title"><div className="college-logo"><Icon name="ticket" size={26}/></div><div><p className="eyebrow">REGISTRATION COMPLETE</p><h1>Convocation Passes</h1><p className="page-subtitle">{guests.length + 1} individual QR pass{guests.length ? 'es' : ''} generated successfully.</p></div></div>
-        <div className="step-badge">Step 5 of 5</div>
-      </div>
       <div className="five-step-progress"><span className="done"><Icon name="check" size={13}/></span><i className="done"/><span className="done"><Icon name="check" size={13}/></span><i className="done"/><span className="done"><Icon name="check" size={13}/></span><i className="done"/><span className="done"><Icon name="check" size={13}/></span><i className="done"/><span className="active">5</span></div>
       <div className="pass-success"><span><Icon name="check" size={22}/></span><div><strong>Registration and payment confirmed</strong><p>₹{REGISTRATION_AMOUNT.toLocaleString('en-IN')} paid successfully. Each attendee has a unique pass with a scannable QR code.</p></div></div>
 

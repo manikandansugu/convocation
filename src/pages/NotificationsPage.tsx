@@ -21,18 +21,6 @@ export function NotificationsPage({ notifications, onMarkRead, onMarkAllRead }: 
 
   return (
     <div className="page notifications-page prototype-page">
-      <div className="prototype-heading notifications-heading">
-        <div className="college-title">
-          <div className="college-logo"><Icon name="bell" size={27} /></div>
-          <div>
-            <p className="eyebrow">CONVOCATION 2026</p>
-            <h1>Notifications</h1>
-            <p className="page-subtitle">Announcements, alerts and reminders specifically shared for your convocation journey.</p>
-          </div>
-        </div>
-        <span className="notifications-unread"><i /> {unreadCount} unread</span>
-      </div>
-
       <section className="notifications-summary panel">
         <div className="notifications-summary-icon"><Icon name="bell" size={23} /></div>
         <div>

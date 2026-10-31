@@ -8,13 +8,6 @@ interface StudentInformationPageProps {
 export function StudentInformationPage({ onContinue }: StudentInformationPageProps) {
   return (
     <div className="page prototype-page student-info-page">
-      <div className="prototype-heading">
-        <div className="college-title">
-          <div className="college-logo"><Icon name="user" size={26}/></div>
-          <div><p className="eyebrow">CAMPUS TRUST · CONVOCATION 2026</p><h1>Student Information</h1><p className="page-subtitle">Review the prefilled details provided by your college.</p></div>
-        </div>
-        <div className="step-badge">Step 1 of 5</div>
-      </div>
       <div className="five-step-progress" aria-label="Registration progress">
         <span className="active">1</span><i/><span>2</span><i/><span>3</span><i/><span>4</span><i/><span>5</span>
       </div>

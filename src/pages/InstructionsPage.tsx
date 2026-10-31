@@ -1,7 +1,7 @@
 import { Icon, type IconName } from '../components/ui/Icon'
 
 interface InstructionsPageProps {
-  onStartRegistration: () => void
+  onStartRegistration?: () => void
 }
 
 interface InstructionSection {
@@ -50,18 +50,6 @@ const INSTRUCTION_SECTIONS: InstructionSection[] = [
 export function InstructionsPage({ onStartRegistration }: InstructionsPageProps) {
   return (
     <div className="page instructions-page prototype-page">
-      <div className="prototype-heading instructions-heading">
-        <div className="college-title">
-          <div className="college-logo"><Icon name="file" size={27} /></div>
-          <div>
-            <p className="eyebrow">CONVOCATION 2026</p>
-            <h1>Instructions & Guidelines</h1>
-            <p className="page-subtitle">Read the essential procedures and important information before completing your registration.</p>
-          </div>
-        </div>
-        <span className="instructions-updated"><Icon name="check" size={15} /> Important information</span>
-      </div>
-
       <section className="instructions-event-banner">
         <div className="instructions-event-lead">
           <span><Icon name="calendar" size={22} /></span>
@@ -104,7 +92,7 @@ export function InstructionsPage({ onStartRegistration }: InstructionsPageProps)
 
       <div className="instructions-actions">
         <p><Icon name="help" size={17} /> Need assistance? Contact the student administration office before the ceremony date.</p>
-        <button type="button" className="flow-primary" onClick={onStartRegistration}>Start registration <Icon name="arrow" size={18} /></button>
+        {onStartRegistration && <button type="button" className="flow-primary" onClick={onStartRegistration}>Start registration <Icon name="arrow" size={18} /></button>}
       </div>
     </div>
   )

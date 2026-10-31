@@ -12,10 +12,6 @@ export function IdentityVerificationPage({ onBack, onContinue }: IdentityVerific
 
   return (
     <div className="page prototype-page identity-page">
-      <div className="prototype-heading">
-        <div className="college-title"><div className="college-logo"><Icon name="camera" size={26}/></div><div><p className="eyebrow">IDENTITY VERIFICATION SERVICE</p><h1>IDVS Photo Capture</h1><p className="page-subtitle">Capture a clear photo for secure entry verification.</p></div></div>
-        <div className="step-badge">Step 2 of 5</div>
-      </div>
       <div className="five-step-progress"><span className="done"><Icon name="check" size={13}/></span><i className="done"/><span className="active">2</span><i/><span>3</span><i/><span>4</span><i/><span>5</span></div>
       <section className="panel identity-card">
         <div className={'camera-preview ' + (captured ? 'captured' : '')}>

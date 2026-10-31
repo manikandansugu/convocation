@@ -5,7 +5,7 @@ export type IconName =
   | 'menu' | 'bell' | 'arrow' | 'calendar' | 'clock' | 'location'
   | 'check' | 'chevron' | 'download' | 'card' | 'bank' | 'phone'
   | 'camera' | 'mail' | 'wallet' | 'tag' | 'award' | 'x' | 'lock'
-  | 'eye' | 'eye-off' | 'shield' | 'search'
+  | 'eye' | 'eye-off' | 'shield' | 'search' | 'plus'
 
 const iconPaths: Record<IconName, ReactNode> = {
   grid: <><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></>,
@@ -38,6 +38,7 @@ const iconPaths: Record<IconName, ReactNode> = {
   'eye-off': <><path d="m3 3 18 18M10.6 6.2A10.8 10.8 0 0 1 12 6c6.5 0 10 6 10 6a17.6 17.6 0 0 1-2.1 2.8M6.7 6.7C3.7 8.5 2 12 2 12s3.5 6 10 6c1.6 0 3-.4 4.2-1M9.9 9.9a3 3 0 0 0 4.2 4.2"/></>,
   shield: <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>,
   search: <><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></>,
+  plus: <path d="M12 5v14M5 12h14"/>,
 }
 
 interface IconProps {

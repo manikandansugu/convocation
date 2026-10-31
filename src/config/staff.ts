@@ -22,6 +22,28 @@ export interface StudentRosterRecord {
   registerNumber: string
   name: string
   degree: string
+  program: string
+  academicYear: string
+  aadhaarNumber: string
+  mobileNumber: string
+  officialEmail: string
+  personalEmail: string
+  graduationType: string
+  degreeMode: string
+  convocationName: string
+  convocationDate: string
+  venueName: string
+  venueAddress: string
+  guestCount: number
+  registered: boolean
+  registeredAt?: string
+  gownPaidAt?: string
+  tagIssuedAt?: string
+  gownReceivedAt?: string
+  refreshmentReceivedAt?: string
+  tokens: number
+  bundleId: string
+  facultyName: string
   department: string
   block: string
   row: string
@@ -40,13 +62,39 @@ export interface StudentRosterRecord {
   gownReturnTime?: string
 }
 
+const CONVOCATION_DETAILS = {
+  academicYear: '2025–2026',
+  graduationType: 'Regular',
+  degreeMode: 'Full Time',
+  convocationName: 'Annual Convocation 2026',
+  convocationDate: '07 October 2026',
+  venueName: 'Dr. T. P. Ganesan Auditorium',
+  venueAddress: 'SRM Institute of Science and Technology, Kattankulathur, Chennai — 603203',
+  registered: true,
+  registeredAt: '18 September 2026, 10:30 AM',
+  gownPaidAt: '18 September 2026, 10:34 AM',
+} as const
+
 export const INITIAL_ROSTER: StudentRosterRecord[] = [
   {
     id: 'student-1',
     registrationId: 'CONV-2026-10245',
     registerNumber: 'RA2011003010245',
     name: 'Arun Menon',
-    degree: 'B.Tech — Computer Science',
+    degree: 'B.Tech',
+    program: 'Computer Science and Engineering',
+    aadhaarNumber: 'XXXX XXXX 4242',
+    mobileNumber: '+91 98765 43210',
+    officialEmail: 'arun.menon@srmist.edu.in',
+    personalEmail: 'arun.menon@gmail.com',
+    guestCount: 2,
+    tagIssuedAt: '07 October 2026, 08:18 AM',
+    gownReceivedAt: '07 October 2026, 08:25 AM',
+    refreshmentReceivedAt: '07 October 2026, 11:45 AM',
+    tokens: 2,
+    bundleId: 'BND-2026-10245',
+    facultyName: 'Dr. Meena Krishnan',
+    ...CONVOCATION_DETAILS,
     department: 'Computing Technologies',
     block: 'Front',
     row: 'A',
@@ -68,7 +116,20 @@ export const INITIAL_ROSTER: StudentRosterRecord[] = [
     registrationId: 'CONV-2026-10112',
     registerNumber: 'RA2011003010112',
     name: 'Priya Sharma',
-    degree: 'B.Tech — Electronics & Comm.',
+    degree: 'B.Tech',
+    program: 'Electronics and Communication Engineering',
+    aadhaarNumber: 'XXXX XXXX 6118',
+    mobileNumber: '+91 98401 22334',
+    officialEmail: 'priya.sharma@srmist.edu.in',
+    personalEmail: 'priyasharma@gmail.com',
+    guestCount: 1,
+    tagIssuedAt: '07 October 2026, 08:22 AM',
+    gownReceivedAt: '07 October 2026, 08:31 AM',
+    refreshmentReceivedAt: '07 October 2026, 11:52 AM',
+    tokens: 2,
+    bundleId: 'BND-2026-10112',
+    facultyName: 'Dr. S. Prakash',
+    ...CONVOCATION_DETAILS,
     department: 'Electronics & Communication',
     block: 'Front',
     row: 'B',
@@ -91,7 +152,17 @@ export const INITIAL_ROSTER: StudentRosterRecord[] = [
     registrationId: 'CONV-2026-10489',
     registerNumber: 'RA2011003010489',
     name: 'Rohan Verma',
-    degree: 'B.Tech — Mechanical Eng.',
+    degree: 'B.Tech',
+    program: 'Mechanical Engineering',
+    aadhaarNumber: 'XXXX XXXX 9087',
+    mobileNumber: '+91 98842 77109',
+    officialEmail: 'rohan.verma@srmist.edu.in',
+    personalEmail: 'rohanv@gmail.com',
+    guestCount: 2,
+    tokens: 0,
+    bundleId: 'BND-2026-10489',
+    facultyName: 'Dr. Vivek Nair',
+    ...CONVOCATION_DETAILS,
     department: 'Mechanical Engineering',
     block: 'Front',
     row: 'C',
@@ -112,7 +183,19 @@ export const INITIAL_ROSTER: StudentRosterRecord[] = [
     registrationId: 'CONV-2026-10733',
     registerNumber: 'RA2011003010733',
     name: 'Ananya Iyer',
-    degree: 'B.Tech — Biotechnology',
+    degree: 'B.Tech',
+    program: 'Biotechnology',
+    aadhaarNumber: 'XXXX XXXX 1733',
+    mobileNumber: '+91 97910 88221',
+    officialEmail: 'ananya.iyer@srmist.edu.in',
+    personalEmail: 'ananya.iyer@gmail.com',
+    guestCount: 1,
+    tagIssuedAt: '07 October 2026, 08:28 AM',
+    refreshmentReceivedAt: '07 October 2026, 12:05 PM',
+    tokens: 1,
+    bundleId: 'BND-2026-10733',
+    facultyName: 'Dr. Lakshmi Rao',
+    ...CONVOCATION_DETAILS,
     department: 'Biotechnology',
     block: 'Front',
     row: 'D',
@@ -133,7 +216,20 @@ export const INITIAL_ROSTER: StudentRosterRecord[] = [
     registrationId: 'CONV-2026-10901',
     registerNumber: 'RA2011003010901',
     name: 'Karthik Raman',
-    degree: 'M.Tech — Artificial Intelligence',
+    degree: 'M.Tech',
+    program: 'Artificial Intelligence',
+    aadhaarNumber: 'XXXX XXXX 3901',
+    mobileNumber: '+91 99620 11448',
+    officialEmail: 'karthik.raman@srmist.edu.in',
+    personalEmail: 'karthik.raman@gmail.com',
+    guestCount: 2,
+    tagIssuedAt: '07 October 2026, 08:12 AM',
+    gownReceivedAt: '07 October 2026, 08:19 AM',
+    refreshmentReceivedAt: '07 October 2026, 11:38 AM',
+    tokens: 2,
+    bundleId: 'BND-2026-10901',
+    facultyName: 'Dr. Meena Krishnan',
+    ...CONVOCATION_DETAILS,
     department: 'Computing Technologies',
     block: 'Front',
     row: 'E',
