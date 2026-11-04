@@ -3331,11 +3331,19 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
   border: 1px solid #e9ecef;
   border-radius: 8px;
   padding: 10px;
+  min-width: 0;
 }
 .mobile-header-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
+}
+.mobile-header-row > span {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 .mobile-header-row > span,
 .mobile-confirm-box > small,
@@ -3345,8 +3353,11 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
 }
 .mobile-confirmed-row > strong {
   font-size: 13px;
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 .inline-edit-btn {
+  flex: 0 0 auto;
   background: none;
   border: 1px solid #ced4da;
   border-radius: 4px;
@@ -3379,6 +3390,8 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
 .mobile-confirmed-row {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
   gap: 10px;
 }
 .confirmed-pill {
@@ -3390,7 +3403,9 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
   padding: 2px 6px;
   border-radius: 4px;
   font-weight: 600;
+  line-height: 1.35;
 }
+.mobile-confirm-box > small { line-height: 1.45; }
 
 /* Graduation Pass Updates */
 .pass-photo-frame {
