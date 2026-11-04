@@ -11,8 +11,13 @@ import { QueriesPage } from './pages/QueriesPage'
 import { SeatingLayoutPage } from './pages/SeatingLayoutPage'
 import { PaymentPage } from './pages/PaymentPage'
 import { StudentInformationPage } from './pages/StudentInformationPage'
-import { LoginPage } from './pages/LoginPage'
-import type { Guest } from './types/registration'
+import { LoginPage, type UserRole, type StaffTab } from './pages/LoginPage'
+import { StaffPortalPage } from './pages/StaffPortalPage'
+import type { Guest, Student } from './types/registration'
+import { STUDENT } from './config/student'
+import { DEFAULT_STAFF, type StaffMember } from './config/staff'
+import { DEFAULT_FACULTY } from './config/faculty'
+import type { FacultyMember } from './types/faculty'
 import { INITIAL_NOTIFICATIONS, type ConvocationNotification } from './types/notifications'
 import { INITIAL_QUERIES, type StudentQuery } from './types/queries'
 import './App.css'
@@ -24,6 +29,13 @@ const DEFAULT_GUESTS: Guest[] = [
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [userRole, setUserRole] = useState<UserRole>('student')
+  const [studentInfo, setStudentInfo] = useState<Student>(STUDENT)
+  const [currentFaculty, setCurrentFaculty] = useState<FacultyMember>(DEFAULT_FACULTY)
+  const [currentStaff, setCurrentStaff] = useState<StaffMember>(DEFAULT_STAFF)
+  const [staffInitialTab, setStaffInitialTab] = useState<StaffTab>('counter')
+  const [capturedPhotoUrl, setCapturedPhotoUrl] = useState<string>('')
+
   const [activePage, setActivePage] = useState<PageId>('Student Information')
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -80,10 +92,22 @@ function App() {
       )
     }
     if (activePage === 'Student Information') {
-      return <StudentInformationPage onContinue={() => navigateTo('ID Verification')} />
+      return (
+        <StudentInformationPage
+          student={studentInfo}
+          onUpdateMobile={(mobile) => setStudentInfo((prev) => ({ ...prev, mobile }))}
+          onContinue={() => navigateTo('ID Verification')}
+        />
+      )
     }
     if (activePage === 'ID Verification') {
-      return <IdentityVerificationPage onBack={() => navigateTo('Student Information')} onContinue={() => navigateTo('Payment')} />
+      return (
+        <IdentityVerificationPage
+          onPhotoCaptured={(url) => setCapturedPhotoUrl(url)}
+          onBack={() => navigateTo('Student Information')}
+          onContinue={() => navigateTo('Payment')}
+        />
+      )
     }
     if (activePage === 'Payment') {
       return <PaymentPage onBack={() => navigateTo('ID Verification')} onSuccess={() => navigateTo('Guest Addition')} />
@@ -91,11 +115,19 @@ function App() {
     if (activePage === 'Guest Addition') {
       return <GuestAdditionPage initialGuests={guests} onBack={() => navigateTo('Payment')} onContinue={(updatedGuests) => { setGuests(updatedGuests); navigateTo('Convocation Pass') }} />
     }
-    return <ConvocationPassPage guests={guests} />
+    return (
+      <ConvocationPassPage
+        guests={guests}
+        photoUrl={capturedPhotoUrl}
+        student={studentInfo}
+        onNavigateToSeating={() => navigateTo('Seating Layout')}
+      />
+    )
   }
 
   const logout = () => {
     setIsAuthenticated(false)
+    setUserRole('student')
     setActivePage('Student Information')
     setSidebarOpen(false)
     setSidebarCollapsed(false)
@@ -150,9 +182,9 @@ function App() {
         }
       case 'ID Verification':
         return {
-          title: 'IDVS Photo Capture',
-          subtitle: 'Capture a clear photo for secure entry verification.',
-          eyebrow: 'IDENTITY VERIFICATION SERVICE',
+          title: 'Live Photo Capture',
+          subtitle: 'Capture a clear live photo for secure campus and auditorium face recognition entry.',
+          eyebrow: 'FACIAL RECOGNITION SERVICE',
           icon: 'camera',
           status: { label: 'Step 2 of 5', tone: 'neutral' },
         }
@@ -174,8 +206,8 @@ function App() {
         }
       case 'Convocation Pass':
         return {
-          title: 'Convocation Passes',
-          subtitle: `${guests.length + 1} individual QR pass${guests.length ? 'es' : ''} generated successfully.`,
+          title: 'Graduation Day Passes',
+          subtitle: `${guests.length + 1} individual QR pass${guests.length ? 'es' : ''} generated with complete event day milestones.`,
           eyebrow: 'REGISTRATION COMPLETE',
           icon: 'ticket',
           status: { label: 'Step 5 of 5', icon: 'check', tone: 'success' },
@@ -184,16 +216,60 @@ function App() {
   })()
 
   if (!isAuthenticated) {
-    return <LoginPage onLogin={() => setIsAuthenticated(true)} />
+    return (
+      <LoginPage
+        onLogin={(role, payload) => {
+          setUserRole(role)
+          if (payload?.faculty) setCurrentFaculty(payload.faculty)
+          if (payload?.staff) setCurrentStaff(payload.staff)
+          if (payload?.initialTab) setStaffInitialTab(payload.initialTab)
+          if (payload?.student) {
+            setStudentInfo((prev) => ({
+              ...prev,
+              name: payload.student!.name,
+              registerNumber: payload.student!.registerNumber,
+              netId: payload.student!.netId,
+              degree: payload.student!.degree,
+              program: payload.student!.program,
+              department: payload.student!.department,
+              email: payload.student!.email,
+              mobile: payload.student!.mobile,
+            }))
+          }
+          setIsAuthenticated(true)
+        }}
+      />
+    )
+  }
+
+  if (userRole === 'staff') {
+    return (
+      <StaffPortalPage
+        staff={currentStaff}
+        faculty={currentFaculty}
+        initialTab={staffInitialTab}
+        onLogout={logout}
+        onSwitchToStudentView={() => setUserRole('student')}
+      />
+    )
   }
 
   return (
     <div className="app-shell">
-      <Sidebar activePage={activePage} isOpen={sidebarOpen} isCollapsed={sidebarCollapsed} onClose={() => setSidebarOpen(false)} onToggleCollapse={() => setSidebarCollapsed((collapsed) => !collapsed)} onNavigate={navigateTo} onLogout={logout} />
+      <Sidebar
+        activePage={activePage}
+        isOpen={sidebarOpen}
+        isCollapsed={sidebarCollapsed}
+        onClose={() => setSidebarOpen(false)}
+        onToggleCollapse={() => setSidebarCollapsed((collapsed) => !collapsed)}
+        onNavigate={navigateTo}
+        onLogout={logout}
+      />
       <main className={`main-content ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
         <Header
           activePage={activePage}
           onOpenNavigation={() => setSidebarOpen(true)}
+          onSwitchRole={(newRole) => setUserRole(newRole)}
           {...pageHeaderDetails}
         />
         {renderPage()}

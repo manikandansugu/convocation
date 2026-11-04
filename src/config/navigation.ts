@@ -8,13 +8,13 @@ export interface NavigationItem {
 }
 
 export const navigationItems: NavigationItem[] = [
+  { label: 'Instructions', icon: 'file' },
+  { label: 'Notifications', icon: 'bell' },
   { label: 'Student Information', icon: 'user' },
   { label: 'ID Verification', icon: 'camera' },
   { label: 'Payment', icon: 'wallet' },
   { label: 'Guest Addition', icon: 'user' },
   { label: 'Convocation Pass', icon: 'ticket' },
-  { label: 'Instructions', icon: 'file' },
-  { label: 'Notifications', icon: 'bell' },
-  { label: 'Queries & Support', icon: 'help' },
   { label: 'Seating Layout', icon: 'grid' },
+  { label: 'Queries & Support', icon: 'help' },
 ]

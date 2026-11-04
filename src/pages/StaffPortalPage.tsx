@@ -1,19 +1,30 @@
 import { useState } from 'react'
 import { Icon } from '../components/ui/Icon'
 import { DEFAULT_STAFF, INITIAL_ROSTER, type StaffMember, type StudentRosterRecord } from '../config/staff'
+import { DEFAULT_FACULTY } from '../config/faculty'
+import type { FacultyMember } from '../types/faculty'
 import studentPhoto from '../assets/student-verification.png'
 import { SeatingLayout, type SeatAllocation } from '../components/seating/SeatingLayout'
-import { InstructionsPage } from './InstructionsPage'
+import { StaffInstructionsPage } from './StaffInstructionsPage'
+
+export type StaffTab = 'counter' | 'tokens' | 'auditorium-entry' | 'seating' | 'faculty-distribution' | 'roster' | 'instructions'
 
 interface StaffPortalPageProps {
   staff?: StaffMember
+  faculty?: FacultyMember
+  initialTab?: StaffTab
   onLogout: () => void
+  onSwitchToStudentView?: () => void
 }
 
-type StaffTab = 'counter' | 'roster' | 'seating' | 'instructions'
-
-export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout }: StaffPortalPageProps) {
-  const [activeTab, setActiveTab] = useState<StaffTab>('roster')
+export function StaffPortalPage({
+  staff = DEFAULT_STAFF,
+  faculty = DEFAULT_FACULTY,
+  initialTab = 'counter',
+  onLogout,
+  onSwitchToStudentView,
+}: StaffPortalPageProps) {
+  const [activeTab, setActiveTab] = useState<StaffTab>(initialTab)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
@@ -24,6 +35,13 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout }: StaffPortal
   const [rosterPage, setRosterPage] = useState(1)
   const [rosterPageSize, setRosterPageSize] = useState(5)
 
+  // Faculty Certificate Distribution State
+  const [currentFaculty, setCurrentFaculty] = useState<FacultyMember>(faculty)
+  const [isEditingFacultyProfile, setIsEditingFacultyProfile] = useState(false)
+  const [facultySearchQuery, setFacultySearchQuery] = useState('')
+  const [facultyFilterStatus, setFacultyFilterStatus] = useState<'all' | 'pending' | 'distributed'>('all')
+  const [facultySuccessToast, setFacultySuccessToast] = useState('')
+
   const staffInitials = staff.name
     .split(' ')
     .filter(Boolean)
@@ -33,16 +51,76 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout }: StaffPortal
     .toUpperCase()
 
   const STAFF_NAV_ITEMS = [
-    { id: 'roster' as const, label: 'Student List', icon: 'user' as const },
-    { id: 'seating' as const, label: 'Seating Layout', icon: 'grid' as const },
     { id: 'instructions' as const, label: 'Instructions', icon: 'file' as const },
+    { id: 'roster' as const, label: 'Graduate List', icon: 'user' as const },
+    { id: 'counter' as const, label: 'In-Person Check & Kit Desk', icon: 'tag' as const },
+    { id: 'tokens' as const, label: 'Breakfast & Lunch Tokens', icon: 'ticket' as const },
+    { id: 'auditorium-entry' as const, label: 'Auditorium Entry', icon: 'shield' as const },
+    { id: 'seating' as const, label: 'Seating & Faculty Allocation', icon: 'grid' as const },
   ]
 
   const TAB_TITLES: Record<StaffTab, string> = {
-    counter: 'Kit & Gown Desk',
-    roster: 'Student List',
-    seating: 'Seating Layout',
-    instructions: 'Instructions',
+    counter: 'In-Person Check & Graduation Kit',
+    tokens: 'Breakfast & Lunch Token Validation',
+    'auditorium-entry': 'Auditorium Face Recognition Entry',
+    seating: 'Seating & Faculty Allocation',
+    'faculty-distribution': 'Degree Certificate Distribution',
+    roster: 'COE-Approved Graduate List',
+    instructions: 'Staff Instructions',
+  }
+
+  // Filter students assigned to this faculty member (by faculty ID, name, or assigned rows)
+  const assignedStudents = roster.filter((student) => {
+    return (
+      student.assignedFacultyId === currentFaculty.id ||
+      student.facultyName.toLowerCase().includes(currentFaculty.name.toLowerCase()) ||
+      currentFaculty.assignedRows.includes(student.row)
+    )
+  })
+
+  const displayedFacultyStudents = assignedStudents.filter((student) => {
+    const matchesSearch =
+      student.name.toLowerCase().includes(facultySearchQuery.toLowerCase()) ||
+      student.registerNumber.toLowerCase().includes(facultySearchQuery.toLowerCase()) ||
+      `${student.row}-${student.seat}`.toLowerCase().includes(facultySearchQuery.toLowerCase()) ||
+      student.program.toLowerCase().includes(facultySearchQuery.toLowerCase())
+
+    if (!matchesSearch) return false
+
+    if (facultyFilterStatus === 'pending') return !student.degreeDistributed
+    if (facultyFilterStatus === 'distributed') return Boolean(student.degreeDistributed)
+    return true
+  })
+
+  const distributedCount = assignedStudents.filter((s) => s.degreeDistributed).length
+  const pendingCount = assignedStudents.length - distributedCount
+
+  const handleFacultyDistribute = (studentId: string) => {
+    const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    setRoster((prev) =>
+      prev.map((s) =>
+        s.id === studentId
+          ? {
+              ...s,
+              degreeDistributed: true,
+              degreeDistributedAt: nowTime,
+              photoSessionCompleted: false, // Proceed to next milestone: photo session
+            }
+          : s,
+      ),
+    )
+    const st = assignedStudents.find((s) => s.id === studentId)
+    setFacultySuccessToast(
+      `Degree Certificate successfully handed over to ${st?.name || 'graduate'} (Seat ${st?.row}-${st?.seat})! Student can proceed to Photo Session.`,
+    )
+    window.setTimeout(() => setFacultySuccessToast(''), 4000)
+  }
+
+  const handleSaveFacultyProfile = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setIsEditingFacultyProfile(false)
+    setFacultySuccessToast('Faculty registration profile updated successfully.')
+    window.setTimeout(() => setFacultySuccessToast(''), 3000)
   }
 
   const selectedStudent = roster.find((s) => s.id === selectedStudentId) || roster[0]
@@ -57,18 +135,45 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout }: StaffPortal
     type: 'student',
   }))
 
-  const updateStudentKit = (studentId: string, field: keyof StudentRosterRecord, value: boolean) => {
-    setRoster((prev) =>
-      prev.map((s) => (s.id === studentId ? { ...s, [field]: value } : s))
-    )
+  const updateTimedStep = (
+    studentId: string,
+    field: keyof StudentRosterRecord,
+    value: boolean,
+    timeField?: keyof StudentRosterRecord,
+  ) => {
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    setRoster((prev) => prev.map((student) => (
+      student.id === studentId
+        ? { ...student, [field]: value, ...(timeField ? { [timeField]: value ? time : undefined } : {}) }
+        : student
+    )))
+  }
+
+  const recordAttendance = (studentId: string, value: boolean) => {
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    setRoster((prev) => prev.map((student) => student.id === studentId ? {
+      ...student,
+      attendanceRecorded: value,
+      faceVerifiedAtCheckin: value,
+      checkinTime: value ? time : undefined,
+      tagIssued: value,
+    } : student))
   }
 
   const issueAllKit = (studentId: string) => {
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     setRoster((prev) =>
       prev.map((s) =>
         s.id === studentId
           ? {
               ...s,
+              attendanceRecorded: true,
+              faceVerifiedAtCheckin: true,
+              checkinTime: s.checkinTime || time,
+              gownIssued: true,
+              robeIssued: true,
+              breakfastTokenIssued: true,
+              lunchTokenIssued: true,
               tagIssued: true,
               gownReceived: true,
               capIssued: true,
@@ -86,6 +191,13 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout }: StaffPortal
         s.id === studentId
           ? {
               ...s,
+              attendanceRecorded: false,
+              faceVerifiedAtCheckin: false,
+              checkinTime: undefined,
+              gownIssued: false,
+              robeIssued: false,
+              breakfastTokenIssued: false,
+              lunchTokenIssued: false,
               tagIssued: false,
               gownReceived: false,
               capIssued: false,
@@ -99,15 +211,15 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout }: StaffPortal
     )
   }
 
-  const recordGownReturn = (studentId: string) => {
+  const handleAuditoriumAdmission = (studentId: string) => {
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    setRoster((prev) =>
-      prev.map((s) =>
-        s.id === studentId
-          ? { ...s, gownReturned: true, gownReturnTime: time }
-          : s
-      )
-    )
+    setRoster((prev) => prev.map((student) => student.id === studentId ? {
+      ...student,
+      auditoriumFaceVerified: true,
+      admittedAtGate: true,
+      auditoriumEntryTime: time,
+      admittedTime: time,
+    } : student))
   }
 
   const filteredRoster = roster.filter((s) => {
@@ -132,11 +244,11 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout }: StaffPortal
   const rosterPageEnd = Math.min(rosterPageStart + rosterPageSize, filteredRoster.length)
 
   const completedStepsCount =
-    (selectedStudent.tagIssued ? 1 : 0) +
-    (selectedStudent.gownReceived ? 1 : 0) +
-    (selectedStudent.capIssued ? 1 : 0) +
-    (selectedStudent.refreshmentReady ? 1 : 0) +
-    (selectedStudent.kitIssued ? 1 : 0)
+    (selectedStudent.attendanceRecorded ? 1 : 0) +
+    (selectedStudent.gownIssued ? 1 : 0) +
+    (selectedStudent.robeIssued ? 1 : 0) +
+    (selectedStudent.breakfastTokenIssued ? 1 : 0) +
+    (selectedStudent.lunchTokenIssued ? 1 : 0)
 
   return (
     <div className="app-shell staff-app-shell">
@@ -155,7 +267,7 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout }: StaffPortal
           </div>
           <div className="brand-copy">
             <strong>Campus<span className="brand-highlight">Trust</span></strong>
-            <small className="brand-subtitle">Staff Portal</small>
+            <small className="brand-subtitle">Faculty & Staff Desk</small>
           </div>
         </div>
 
@@ -177,7 +289,7 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout }: StaffPortal
             <Icon name="shield" size={13} />
             <span>{staff.counter}</span>
           </div>
-          <small>{staff.role}</small>
+          <small>{staff.name} · {currentFaculty.name.split(' ').slice(0, 2).join(' ')}</small>
         </div>
 
         <nav className="main-nav" aria-label="Staff navigation">
@@ -201,9 +313,9 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout }: StaffPortal
 
         <div className="sidebar-footer">
           {profileOpen && (
-            <div className="profile-popup" role="dialog" aria-label="Staff profile">
+            <div className="profile-popup" role="dialog" aria-label="Operations profile">
               <div className="profile-popup-heading">
-                <span>Staff profile</span>
+                <span>Operations Desk Profile</span>
                 <button
                   type="button"
                   onClick={() => setProfileOpen(false)}
@@ -216,7 +328,7 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout }: StaffPortal
                 <div className="avatar">{staffInitials}</div>
                 <div>
                   <strong>{staff.name}</strong>
-                  <span>{staff.employeeId}</span>
+                  <span>{staff.employeeId} · Operations Staff</span>
                 </div>
               </div>
               <div className="profile-popup-detail">
@@ -224,8 +336,12 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout }: StaffPortal
                 <strong>{staff.counter}</strong>
               </div>
               <div className="profile-popup-detail">
-                <span>Designation</span>
-                <strong>{staff.role}</strong>
+                <span>Faculty Representative</span>
+                <strong>{currentFaculty.name} ({currentFaculty.assignedRows.join(', ')})</strong>
+              </div>
+              <div className="profile-popup-detail">
+                <span>Department</span>
+                <strong>{currentFaculty.department}</strong>
               </div>
               <button
                 type="button"
@@ -274,11 +390,21 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout }: StaffPortal
             <span className="staff-topbar-station-pill">
               <Icon name="shield" size={13} /> {staff.counter}
             </span>
+            {onSwitchToStudentView && (
+              <button
+                type="button"
+                className="role-switch-btn"
+                onClick={onSwitchToStudentView}
+                title="Switch to student portal view"
+              >
+                <Icon name="cap" size={15} /> View Student Pass
+              </button>
+            )}
             <button
               type="button"
               className="staff-topbar-signout-btn"
               onClick={onLogout}
-              title="Sign out of staff portal"
+              title="Sign out of operations desk"
             >
               <Icon name="logout" size={15} />
               <span>Sign out</span>
@@ -319,11 +445,11 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout }: StaffPortal
                 {filteredRoster.map((student) => {
                   const isSelected = student.id === selectedStudent.id
                   const doneCount =
-                    (student.tagIssued ? 1 : 0) +
-                    (student.gownReceived ? 1 : 0) +
-                    (student.capIssued ? 1 : 0) +
-                    (student.refreshmentReady ? 1 : 0) +
-                    (student.kitIssued ? 1 : 0)
+                    (student.attendanceRecorded ? 1 : 0) +
+                    (student.gownIssued ? 1 : 0) +
+                    (student.robeIssued ? 1 : 0) +
+                    (student.breakfastTokenIssued ? 1 : 0) +
+                    (student.lunchTokenIssued ? 1 : 0)
                   return (
                     <button
                       key={student.id}
@@ -371,7 +497,7 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout }: StaffPortal
                     <span className="seat-chip"><strong>ROW</strong> {selectedStudent.row}</span>
                     <span className="seat-chip"><strong>SEAT</strong> {selectedStudent.seat}</span>
                     <span className="seat-chip"><strong>GATE</strong> {selectedStudent.gate}</span>
-                    <span className="seat-chip success"><strong>FEE</strong> ₹100 {selectedStudent.paymentStatus}</span>
+                    <span className="seat-chip success"><strong>COE</strong> Approved Presentee</span>
                   </div>
                 </div>
 
@@ -387,184 +513,577 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout }: StaffPortal
                 </div>
               </div>
 
-              {/* Kit Items Checklist */}
+              {/* Graduation Day Step 8: In-person check and graduation kit */}
               <div className="staff-kit-checklist">
                 <div className="checklist-kicker">
-                  <h4>Regalia & Kit Issuance Status ({completedStepsCount}/5 Completed)</h4>
+                  <h4>Attendance & Graduation Kit Status ({completedStepsCount}/5 Completed)</h4>
                   <span className={`overall-status-pill ${completedStepsCount === 5 ? 'success' : 'pending'}`}>
                     {completedStepsCount === 5 ? 'Clearance Complete' : 'Pending Items'}
                   </span>
                 </div>
 
                 <div className="staff-checklist-grid">
-                  {/* Item 1: Tag */}
-                  <div className={`staff-kit-card ${selectedStudent.tagIssued ? 'issued' : 'pending'}`}>
+                  {/* Item 1: In-Person Check & Face ID */}
+                  <div className={`staff-kit-card ${selectedStudent.attendanceRecorded ? 'issued' : 'pending'}`}>
                     <div className="kit-card-icon">
-                      <Icon name={selectedStudent.tagIssued ? 'check' : 'x'} size={18} />
+                      <Icon name={selectedStudent.attendanceRecorded ? 'check' : 'shield'} size={18} />
                     </div>
                     <div className="kit-card-content">
                       <div className="kit-card-top">
-                        <strong>Tag issued</strong>
-                        <span className={`kit-pill ${selectedStudent.tagIssued ? 'success' : 'pending'}`}>
-                          {selectedStudent.tagIssued ? 'Issued' : 'Pending'}
+                        <strong>In-Person Face ID & Attendance</strong>
+                        <span className={`kit-pill ${selectedStudent.attendanceRecorded ? 'success' : 'pending'}`}>
+                          {selectedStudent.attendanceRecorded ? `Recorded ${selectedStudent.checkinTime || ''}` : 'Pending Arrival'}
                         </span>
                       </div>
-                      <p>RFID entry badge #TAG-2026-10245 · Gate {selectedStudent.gate} clearance active</p>
+                      <p>Campus entrance facial recognition check · No paper registration needed</p>
                     </div>
                     <button
                       type="button"
-                      className={`btn-toggle-step ${selectedStudent.tagIssued ? 'done' : ''}`}
-                      onClick={() => updateStudentKit(selectedStudent.id, 'tagIssued', !selectedStudent.tagIssued)}
+                      className={`btn-toggle-step ${selectedStudent.attendanceRecorded ? 'done' : ''}`}
+                      onClick={() => recordAttendance(selectedStudent.id, !selectedStudent.attendanceRecorded)}
                     >
-                      {selectedStudent.tagIssued ? 'Mark Pending' : 'Issue Tag'}
+                      {selectedStudent.attendanceRecorded ? 'Undo Check-in' : 'Scan Face & Record'}
                     </button>
                   </div>
 
                   {/* Item 2: Gown */}
-                  <div className={`staff-kit-card ${selectedStudent.gownReceived ? 'issued' : 'pending'}`}>
+                  <div className={`staff-kit-card ${selectedStudent.gownIssued ? 'issued' : 'pending'}`}>
                     <div className="kit-card-icon">
-                      <Icon name={selectedStudent.gownReceived ? 'check' : 'x'} size={18} />
+                      <Icon name={selectedStudent.gownIssued ? 'check' : 'cap'} size={18} />
                     </div>
                     <div className="kit-card-content">
                       <div className="kit-card-top">
-                        <strong>Gown received</strong>
-                        <span className={`kit-pill ${selectedStudent.gownReceived ? 'success' : 'pending'}`}>
-                          {selectedStudent.gownReceived ? 'Received' : 'Pending'}
+                        <strong>Academic Gown</strong>
+                        <span className={`kit-pill ${selectedStudent.gownIssued ? 'success' : 'pending'}`}>
+                          {selectedStudent.gownIssued ? 'Gown Issued' : 'Pending'}
                         </span>
                       </div>
-                      <p>Academic regalia robe (Size 40 / L) & Department discipline stole</p>
+                      <p>Academic regalia gown (Size 40 / L) for ceremony procession</p>
                     </div>
                     <button
                       type="button"
-                      className={`btn-toggle-step ${selectedStudent.gownReceived ? 'done' : ''}`}
-                      onClick={() => updateStudentKit(selectedStudent.id, 'gownReceived', !selectedStudent.gownReceived)}
+                      className={`btn-toggle-step ${selectedStudent.gownIssued ? 'done' : ''}`}
+                      onClick={() => updateTimedStep(selectedStudent.id, 'gownIssued', !selectedStudent.gownIssued, 'gownReceivedAt')}
                     >
-                      {selectedStudent.gownReceived ? 'Mark Pending' : 'Issue Gown'}
+                      {selectedStudent.gownIssued ? 'Mark Pending' : 'Issue Gown'}
                     </button>
                   </div>
 
-                  {/* Item 3: Cap */}
-                  <div className={`staff-kit-card ${selectedStudent.capIssued ? 'issued' : 'pending'}`}>
+                  {/* Item 3: Robe */}
+                  <div className={`staff-kit-card ${selectedStudent.robeIssued ? 'issued' : 'pending'}`}>
                     <div className="kit-card-icon">
-                      <Icon name={selectedStudent.capIssued ? 'check' : 'x'} size={18} />
+                      <Icon name={selectedStudent.robeIssued ? 'check' : 'award'} size={18} />
                     </div>
                     <div className="kit-card-content">
                       <div className="kit-card-top">
-                        <strong>Graduation cap & mortarboard</strong>
-                        <span className={`kit-pill ${selectedStudent.capIssued ? 'success' : 'pending'}`}>
-                          {selectedStudent.capIssued ? 'Issued' : 'Pending'}
+                        <strong>Ceremony Robe & Stole</strong>
+                        <span className={`kit-pill ${selectedStudent.robeIssued ? 'success' : 'pending'}`}>
+                          {selectedStudent.robeIssued ? 'Robe Issued' : 'Pending'}
                         </span>
                       </div>
-                      <p>Ceremonial mortarboard with 2026 graduation tassel</p>
+                      <p>Computing Technologies discipline stole & ceremonial hood</p>
                     </div>
                     <button
                       type="button"
-                      className={`btn-toggle-step ${selectedStudent.capIssued ? 'done' : ''}`}
-                      onClick={() => updateStudentKit(selectedStudent.id, 'capIssued', !selectedStudent.capIssued)}
+                      className={`btn-toggle-step ${selectedStudent.robeIssued ? 'done' : ''}`}
+                      onClick={() => updateTimedStep(selectedStudent.id, 'robeIssued', !selectedStudent.robeIssued)}
                     >
-                      {selectedStudent.capIssued ? 'Mark Pending' : 'Issue Cap'}
+                      {selectedStudent.robeIssued ? 'Mark Pending' : 'Issue Robe'}
                     </button>
                   </div>
 
-                  {/* Item 4: Refreshment */}
-                  <div className={`staff-kit-card ${selectedStudent.refreshmentReady ? 'issued' : 'pending'}`}>
+                  {/* Item 4: Breakfast Token */}
+                  <div className={`staff-kit-card ${selectedStudent.breakfastTokenIssued ? 'issued' : 'pending'}`}>
                     <div className="kit-card-icon">
-                      <Icon name={selectedStudent.refreshmentReady ? 'check' : 'x'} size={18} />
+                      <Icon name={selectedStudent.breakfastTokenIssued ? 'check' : 'clock'} size={18} />
                     </div>
                     <div className="kit-card-content">
                       <div className="kit-card-top">
-                        <strong>Refreshment coupons</strong>
-                        <span className={`kit-pill ${selectedStudent.refreshmentReady ? 'success' : 'pending'}`}>
-                          {selectedStudent.refreshmentReady ? 'Ready' : 'Pending'}
+                        <strong>Breakfast Token</strong>
+                        <span className={`kit-pill ${selectedStudent.breakfastTokenIssued ? 'success' : 'pending'}`}>
+                          {selectedStudent.breakfastTokenIssued ? 'Token Issued' : 'Pending'}
                         </span>
                       </div>
-                      <p>Student meal pack & guest high-tea passes · Food Court 02</p>
+                      <p>Token #BF-10245 · Valid for student & guests at Food Court 02</p>
                     </div>
                     <button
                       type="button"
-                      className={`btn-toggle-step ${selectedStudent.refreshmentReady ? 'done' : ''}`}
-                      onClick={() => updateStudentKit(selectedStudent.id, 'refreshmentReady', !selectedStudent.refreshmentReady)}
+                      className={`btn-toggle-step ${selectedStudent.breakfastTokenIssued ? 'done' : ''}`}
+                      onClick={() => updateTimedStep(selectedStudent.id, 'breakfastTokenIssued', !selectedStudent.breakfastTokenIssued)}
                     >
-                      {selectedStudent.refreshmentReady ? 'Mark Pending' : 'Issue Coupons'}
+                      {selectedStudent.breakfastTokenIssued ? 'Mark Pending' : 'Issue Breakfast Token'}
                     </button>
                   </div>
 
-                  {/* Item 5: Ceremony Kit */}
-                  <div className={`staff-kit-card ${selectedStudent.kitIssued ? 'issued' : 'pending'}`}>
+                  {/* Item 5: Lunch Token */}
+                  <div className={`staff-kit-card ${selectedStudent.lunchTokenIssued ? 'issued' : 'pending'}`}>
                     <div className="kit-card-icon">
-                      <Icon name={selectedStudent.kitIssued ? 'check' : 'x'} size={18} />
+                      <Icon name={selectedStudent.lunchTokenIssued ? 'check' : 'ticket'} size={18} />
                     </div>
                     <div className="kit-card-content">
                       <div className="kit-card-top">
-                        <strong>Ceremony kit & degree folder</strong>
-                        <span className={`kit-pill ${selectedStudent.kitIssued ? 'success' : 'pending'}`}>
-                          {selectedStudent.kitIssued ? 'Issued' : 'Pending'}
+                        <strong>Lunch Token</strong>
+                        <span className={`kit-pill ${selectedStudent.lunchTokenIssued ? 'success' : 'pending'}`}>
+                          {selectedStudent.lunchTokenIssued ? 'Token Issued' : 'Pending'}
                         </span>
                       </div>
-                      <p>Degree portfolio folder, ceremony proceedings guide & pledge card</p>
+                      <p>Token #LN-10245 · Valid post-ceremony & photo session at Food Court 02</p>
                     </div>
                     <button
                       type="button"
-                      className={`btn-toggle-step ${selectedStudent.kitIssued ? 'done' : ''}`}
-                      onClick={() => updateStudentKit(selectedStudent.id, 'kitIssued', !selectedStudent.kitIssued)}
+                      className={`btn-toggle-step ${selectedStudent.lunchTokenIssued ? 'done' : ''}`}
+                      onClick={() => updateTimedStep(selectedStudent.id, 'lunchTokenIssued', !selectedStudent.lunchTokenIssued)}
                     >
-                      {selectedStudent.kitIssued ? 'Mark Pending' : 'Issue Kit'}
+                      {selectedStudent.lunchTokenIssued ? 'Mark Pending' : 'Issue Lunch Token'}
+                    </button>
+                  </div>
+
+                  {/* Degree Certificate Status */}
+                  <div className={`staff-kit-card ${selectedStudent.degreeDistributed ? 'issued' : 'pending'}`}>
+                    <div className="kit-card-icon">
+                      <Icon name={selectedStudent.degreeDistributed ? 'check' : 'award'} size={18} />
+                    </div>
+                    <div className="kit-card-content">
+                      <div className="kit-card-top">
+                        <strong>Degree Certificate</strong>
+                        <span className={`kit-pill ${selectedStudent.degreeDistributed ? 'success' : 'pending'}`}>
+                          {selectedStudent.degreeDistributed
+                            ? `Handed Over ${selectedStudent.degreeDistributedAt || ''}`
+                            : 'Pending Handover'}
+                        </span>
+                      </div>
+                      <p>Degree certificate distribution status for the selected graduate</p>
+                    </div>
+                    <button
+                      type="button"
+                      className={`btn-toggle-step ${selectedStudent.degreeDistributed ? 'done' : ''}`}
+                      onClick={() => updateTimedStep(
+                        selectedStudent.id,
+                        'degreeDistributed',
+                        !selectedStudent.degreeDistributed,
+                        'degreeDistributedAt',
+                      )}
+                    >
+                      {selectedStudent.degreeDistributed ? 'Mark Pending' : 'Confirm Handover'}
                     </button>
                   </div>
                 </div>
               </div>
 
-              {/* Gown Return Section */}
-              <div className="staff-gown-return-card">
-                <div className="gown-return-header">
-                  <div>
-                    <h4>Graduation Regalia Return Desk</h4>
-                    <p>Collect academic gown by 04:00 PM at Counter 04 and issue security clearance acknowledgment.</p>
-                  </div>
-                  {selectedStudent.gownReturned ? (
-                    <span className="gown-return-status-pill returned">
-                      <Icon name="check" size={13} /> Returned at {selectedStudent.gownReturnTime || '03:15 PM'}
-                    </span>
-                  ) : (
-                    <span className="gown-return-status-pill pending">
-                      <Icon name="clock" size={13} /> Gown with Graduate
-                    </span>
-                  )}
-                </div>
+            </section>
+          </div>
+        )}
 
-                <div className="gown-return-actions">
-                  {!selectedStudent.gownReturned ? (
-                    <button
-                      type="button"
-                      className="btn-return-gown"
-                      onClick={() => recordGownReturn(selectedStudent.id)}
-                    >
-                      <Icon name="check" size={16} />
-                      <span>Confirm Gown Return & Issue Clearance</span>
-                    </button>
-                  ) : (
-                    <div className="return-confirmed-banner">
-                      <Icon name="check" size={18} />
-                      <div>
-                        <strong>Gown Return Confirmed</strong>
-                        <span>Deposit clearance slip generated. Certificate release authorized.</span>
-                      </div>
+        {/* STEP 9 & 14: BREAKFAST AND LUNCH TOKEN VALIDATION */}
+        {activeTab === 'tokens' && (
+          <div className="staff-operation-page">
+            <section className="panel staff-operation-summary">
+              <div>
+                <p className="eyebrow">GRADUATION DAY STEPS 9 & 14</p>
+                <h2>Breakfast and lunch token validation</h2>
+                <p>Redeem breakfast tokens before the ceremony and lunch tokens after degree distribution and the photo session.</p>
+              </div>
+              <div className="operation-metrics">
+                <span><strong>{roster.filter((student) => student.breakfastTokenRedeemed).length}</strong> Breakfast served</span>
+                <span><strong>{roster.filter((student) => student.lunchTokenRedeemed).length}</strong> Lunch served</span>
+              </div>
+            </section>
+
+            <section className="panel operation-roster-panel">
+              <div className="operation-toolbar">
+                <div className="staff-search-input">
+                  <Icon name="search" size={17} />
+                  <input value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder="Search graduate name or register number…" />
+                </div>
+                <span>{filteredRoster.length} graduates</span>
+              </div>
+              <div className="operation-card-list">
+                {filteredRoster.map((student) => (
+                  <article className="operation-graduate-card" key={student.id}>
+                    <img src={studentPhoto} alt="" />
+                    <div className="operation-graduate-identity">
+                      <strong>{student.name}</strong>
+                      <span>{student.registerNumber} · Seat {student.row}-{student.seat}</span>
+                    </div>
+                    <div className="token-operation">
+                      <span className={`operation-status ${student.breakfastTokenRedeemed ? 'complete' : student.breakfastTokenIssued ? 'ready' : 'blocked'}`}>
+                        Breakfast: {student.breakfastTokenRedeemed ? `Served ${student.breakfastTime || ''}` : student.breakfastTokenIssued ? 'Token ready' : 'Token not issued'}
+                      </span>
                       <button
                         type="button"
-                        className="btn-undo-return"
-                        onClick={() => updateStudentKit(selectedStudent.id, 'gownReturned', false)}
+                        disabled={!student.breakfastTokenIssued}
+                        onClick={() => updateTimedStep(student.id, 'breakfastTokenRedeemed', !student.breakfastTokenRedeemed, 'breakfastTime')}
                       >
-                        Undo
+                        {student.breakfastTokenRedeemed ? 'Undo' : 'Redeem breakfast'}
                       </button>
                     </div>
-                  )}
-                </div>
+                    <div className="token-operation">
+                      <span className={`operation-status ${student.lunchTokenRedeemed ? 'complete' : student.degreeDistributed && student.lunchTokenIssued ? 'ready' : 'blocked'}`}>
+                        Lunch: {student.lunchTokenRedeemed ? `Served ${student.lunchTime || ''}` : student.degreeDistributed ? 'Ready after photo' : 'Awaiting certificate'}
+                      </span>
+                      <button
+                        type="button"
+                        disabled={!student.lunchTokenIssued || !student.degreeDistributed}
+                        onClick={() => {
+                          updateTimedStep(student.id, 'lunchTokenRedeemed', !student.lunchTokenRedeemed, 'lunchTime')
+                          if (!student.lunchTokenRedeemed) updateTimedStep(student.id, 'photoSessionCompleted', true, 'photoSessionAt')
+                        }}
+                      >
+                        {student.lunchTokenRedeemed ? 'Undo' : 'Confirm photo & redeem'}
+                      </button>
+                    </div>
+                  </article>
+                ))}
               </div>
             </section>
           </div>
         )}
 
-        {/* TAB 2: STUDENT LIST */}
+        {/* STEP 10: AUDITORIUM FACE RECOGNITION ENTRY */}
+        {activeTab === 'auditorium-entry' && (
+          <div className="staff-operation-page">
+            <section className="panel staff-operation-summary auditorium-summary">
+              <div>
+                <p className="eyebrow">GRADUATION DAY STEP 10</p>
+                <h2>Auditorium face-recognition entry</h2>
+                <p>Run the second recognition check and admit only graduates who completed attendance and graduation-kit collection.</p>
+              </div>
+              <div className="operation-metrics">
+                <span><strong>{roster.filter((student) => student.admittedAtGate).length}</strong> Admitted</span>
+                <span><strong>{roster.filter((student) => !student.admittedAtGate).length}</strong> Awaiting entry</span>
+              </div>
+            </section>
+
+            <section className="panel operation-roster-panel">
+              <div className="operation-toolbar">
+                <div className="staff-search-input">
+                  <Icon name="search" size={17} />
+                  <input value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder="Search graduate name, register number or gate…" />
+                </div>
+                <span>{staff.gate} scanner online</span>
+              </div>
+              <div className="auditorium-entry-grid">
+                {filteredRoster.map((student) => {
+                  const kitComplete = Boolean(student.attendanceRecorded && student.gownIssued && student.robeIssued && student.breakfastTokenIssued && student.lunchTokenIssued)
+                  return (
+                    <article className={`auditorium-entry-card ${student.admittedAtGate ? 'admitted' : ''}`} key={student.id}>
+                      <div className="auditorium-student-photo">
+                        <img src={studentPhoto} alt={student.name} />
+                        {student.auditoriumFaceVerified && <span><Icon name="check" size={13} /></span>}
+                      </div>
+                      <div className="auditorium-student-info">
+                        <div><strong>{student.name}</strong><span>{student.registerNumber}</span></div>
+                        <p>{student.gate} · {student.block} Block · Row {student.row} · Seat {student.seat}</p>
+                        <div className="entry-prerequisites">
+                          <span className={student.attendanceRecorded ? 'done' : ''}><Icon name={student.attendanceRecorded ? 'check' : 'clock'} size={12} /> Attendance</span>
+                          <span className={kitComplete ? 'done' : ''}><Icon name={kitComplete ? 'check' : 'clock'} size={12} /> Kit issued</span>
+                        </div>
+                      </div>
+                      <div className="auditorium-entry-action">
+                        {student.admittedAtGate ? (
+                          <span className="admitted-badge"><Icon name="check" size={14} /> Admitted {student.auditoriumEntryTime || student.admittedTime}</span>
+                        ) : (
+                          <button type="button" disabled={!kitComplete} onClick={() => handleAuditoriumAdmission(student.id)}>
+                            <Icon name="camera" size={15} /> {kitComplete ? 'Scan face & admit' : 'Complete kit first'}
+                          </button>
+                        )}
+                      </div>
+                    </article>
+                  )
+                })}
+              </div>
+            </section>
+          </div>
+        )}
+
+        {/* STEP 12: FACULTY DEGREE CERTIFICATE DISTRIBUTION */}
+        {activeTab === 'faculty-distribution' && (
+          <div className="faculty-portal-page" style={{ padding: 0, margin: 0, maxWidth: 'none' }}>
+            {/* Faculty Hero Banner */}
+            <section className="faculty-hero-banner panel">
+              <div className="faculty-profile-summary">
+                <div className="faculty-avatar">
+                  {currentFaculty.name.split(' ').map((p) => p[0]).join('').slice(0, 2).toUpperCase()}
+                </div>
+                <div>
+                  <div className="faculty-status-badges">
+                    <span className="badge-approved">
+                      <Icon name="check" size={13} /> {currentFaculty.status}
+                    </span>
+                    <span className="badge-role">Degree Distribution Faculty</span>
+                  </div>
+                  <h1>{currentFaculty.name}</h1>
+                  <p className="faculty-designation">
+                    {currentFaculty.designation} · {currentFaculty.department}
+                  </p>
+                  <div className="faculty-contact-row">
+                    <span><Icon name="shield" size={14} /> ID: <strong>{currentFaculty.employeeId}</strong></span>
+                    <span><Icon name="mail" size={14} /> {currentFaculty.email}</span>
+                    <span><Icon name="phone" size={14} /> {currentFaculty.mobile}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="faculty-header-actions">
+                <button
+                  type="button"
+                  className="secondary-button"
+                  onClick={() => setIsEditingFacultyProfile((prev) => !prev)}
+                >
+                  <Icon name="user" size={15} /> {isEditingFacultyProfile ? 'Cancel Edit' : 'Edit Faculty Details'}
+                </button>
+              </div>
+            </section>
+
+            {/* Profile Edit Panel */}
+            {isEditingFacultyProfile && (
+              <section className="panel faculty-edit-card">
+                <header className="kit-card-header">
+                  <div className="kit-header-info">
+                    <span className="eyebrow">UPDATE FACULTY REGISTRATION</span>
+                    <h3>Faculty Member Information</h3>
+                  </div>
+                </header>
+
+                <form className="faculty-edit-form" onSubmit={handleSaveFacultyProfile}>
+                  <div className="faculty-form-grid">
+                    <label>
+                      <span>Full Name</span>
+                      <input
+                        value={currentFaculty.name}
+                        onChange={(e) => setCurrentFaculty({ ...currentFaculty, name: e.target.value })}
+                        required
+                      />
+                    </label>
+                    <label>
+                      <span>Designation</span>
+                      <input
+                        value={currentFaculty.designation}
+                        onChange={(e) => setCurrentFaculty({ ...currentFaculty, designation: e.target.value })}
+                        required
+                      />
+                    </label>
+                    <label>
+                      <span>Department</span>
+                      <input
+                        value={currentFaculty.department}
+                        onChange={(e) => setCurrentFaculty({ ...currentFaculty, department: e.target.value })}
+                        required
+                      />
+                    </label>
+                    <label>
+                      <span>Employee ID</span>
+                      <input
+                        value={currentFaculty.employeeId}
+                        onChange={(e) => setCurrentFaculty({ ...currentFaculty, employeeId: e.target.value })}
+                        required
+                      />
+                    </label>
+                    <label>
+                      <span>Official Email</span>
+                      <input
+                        type="email"
+                        value={currentFaculty.email}
+                        onChange={(e) => setCurrentFaculty({ ...currentFaculty, email: e.target.value })}
+                        required
+                      />
+                    </label>
+                    <label>
+                      <span>Mobile Number</span>
+                      <input
+                        value={currentFaculty.mobile}
+                        onChange={(e) => setCurrentFaculty({ ...currentFaculty, mobile: e.target.value })}
+                        required
+                      />
+                    </label>
+                    <label className="span-full">
+                      <span>Assigned Auditorium Rows (comma-separated)</span>
+                      <input
+                        value={currentFaculty.assignedRows.join(', ')}
+                        onChange={(e) =>
+                          setCurrentFaculty({
+                            ...currentFaculty,
+                            assignedRows: e.target.value
+                              .split(',')
+                              .map((r) => r.trim().toUpperCase())
+                              .filter(Boolean),
+                          })
+                        }
+                        placeholder="e.g. A, E"
+                        required
+                      />
+                    </label>
+                  </div>
+                  <div className="faculty-form-actions">
+                    <button type="submit" className="flow-primary">
+                      Save Registration Details
+                    </button>
+                  </div>
+                </form>
+              </section>
+            )}
+
+            {/* Toast notification */}
+            {facultySuccessToast && (
+              <div className="faculty-toast" role="status">
+                <Icon name="check" size={18} />
+                <span>{facultySuccessToast}</span>
+              </div>
+            )}
+
+            {/* Assigned Rows Summary */}
+            <section className="faculty-assignment-bar panel">
+              <div className="assignment-lead">
+                <div className="assignment-icon">
+                  <Icon name="grid" size={24} />
+                </div>
+                <div>
+                  <span className="eyebrow">AUDITORIUM RESPONSIBILITY</span>
+                  <h3>Assigned Rows: {currentFaculty.assignedRows.join(', ')} · Front Block</h3>
+                  <p>You are responsible for degree certificate distribution to graduates seated in these rows.</p>
+                </div>
+              </div>
+
+              <div className="assignment-metrics">
+                <div className="metric-box">
+                  <span>TOTAL ASSIGNED</span>
+                  <strong>{assignedStudents.length}</strong>
+                </div>
+                <div className="metric-box highlight-pending">
+                  <span>PENDING HANDOVER</span>
+                  <strong>{pendingCount}</strong>
+                </div>
+                <div className="metric-box highlight-done">
+                  <span>DISTRIBUTED</span>
+                  <strong>{distributedCount}</strong>
+                </div>
+              </div>
+            </section>
+
+            {/* Degree Distribution List */}
+            <section className="panel faculty-roster-panel">
+              <div className="faculty-roster-controls">
+                <div>
+                  <h2>Assigned Graduates & Seat Identification</h2>
+                  <p>Identify each graduate by allotted seat number and record certificate distribution</p>
+                </div>
+
+                <div className="faculty-filter-group">
+                  <div className="faculty-search-box">
+                    <Icon name="search" size={16} />
+                    <input
+                      value={facultySearchQuery}
+                      onChange={(e) => setFacultySearchQuery(e.target.value)}
+                      placeholder="Search graduate name, seat or register no…"
+                      aria-label="Search assigned graduates"
+                    />
+                  </div>
+
+                  <div className="filter-chips">
+                    <button
+                      type="button"
+                      className={facultyFilterStatus === 'all' ? 'active' : ''}
+                      onClick={() => setFacultyFilterStatus('all')}
+                    >
+                      All ({assignedStudents.length})
+                    </button>
+                    <button
+                      type="button"
+                      className={facultyFilterStatus === 'pending' ? 'active' : ''}
+                      onClick={() => setFacultyFilterStatus('pending')}
+                    >
+                      Pending ({pendingCount})
+                    </button>
+                    <button
+                      type="button"
+                      className={facultyFilterStatus === 'distributed' ? 'active' : ''}
+                      onClick={() => setFacultyFilterStatus('distributed')}
+                    >
+                      Distributed ({distributedCount})
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {displayedFacultyStudents.length === 0 ? (
+                <div className="faculty-empty-state">
+                  <Icon name="search" size={28} />
+                  <p>No graduates found matching your search filter.</p>
+                </div>
+              ) : (
+                <div className="faculty-students-grid">
+                  {displayedFacultyStudents.map((student) => {
+                    const isDistributed = Boolean(student.degreeDistributed)
+                    return (
+                      <article
+                        key={student.id}
+                        className={`graduate-distribution-card ${isDistributed ? 'distributed' : 'pending'}`}
+                      >
+                        <div className="graduate-card-top">
+                          <div className="graduate-seat-badge">
+                            <small>ALLOTTED SEAT</small>
+                            <strong>{student.row}-{student.seat}</strong>
+                          </div>
+
+                          <div className="graduate-status-pill-wrap">
+                            {isDistributed ? (
+                              <span className="status-pill success">
+                                <Icon name="check" size={12} /> Certificate Handed Over ({student.degreeDistributedAt || 'Distributed'})
+                              </span>
+                            ) : (
+                              <span className="status-pill pending">
+                                <Icon name="clock" size={12} /> Pending Distribution
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="graduate-info-row">
+                          <img
+                            src={studentPhoto}
+                            alt={student.name}
+                            className="graduate-avatar-img"
+                          />
+                          <div className="graduate-text-details">
+                            <h3>{student.name}</h3>
+                            <p className="reg-no">{student.registerNumber}</p>
+                            <p className="degree-name">{student.degree} · {student.program}</p>
+                            <p className="gate-note">
+                              <Icon name="shield" size={13} /> Campus Arrival: Face Verified · Gate {student.gate}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="graduate-distribution-footer">
+                          <div className="next-step-hint">
+                            <small>NEXT MILESTONE:</small>
+                            <span>{isDistributed ? 'Proceed to Official Photo Studio' : 'Awaiting Faculty Handover'}</span>
+                          </div>
+
+                          {!isDistributed ? (
+                            <button
+                              type="button"
+                              className="distribute-action-btn"
+                              onClick={() => handleFacultyDistribute(student.id)}
+                            >
+                              <Icon name="award" size={16} /> Hand Over Certificate
+                            </button>
+                          ) : (
+                            <div className="distributed-confirmed-badge">
+                              <Icon name="check" size={16} /> Distributed to Student
+                            </div>
+                          )}
+                        </div>
+                      </article>
+                    )
+                  })}
+                </div>
+              )}
+            </section>
+          </div>
+        )}
+
+        {/* TAB 3: STUDENT LIST */}
         {activeTab === 'roster' && (
           <div className="staff-roster-view">
             <div className="panel roster-table-panel">
@@ -609,10 +1128,7 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout }: StaffPortal
                           <td className="roster-serial">{rosterPageStart + index + 1}</td>
                           <td>
                             <div className="student-cell">
-                              <div className="cell-avatar">{student.name[0]}</div>
-                              <div>
-                                <strong>{student.name}</strong>
-                              </div>
+                              <strong>{student.name}</strong>
                             </div>
                           </td>
                           <td><code>{student.registerNumber}</code></td>
@@ -794,7 +1310,7 @@ export function StaffPortalPage({ staff = DEFAULT_STAFF, onLogout }: StaffPortal
         {/* TAB 5: INSTRUCTIONS */}
         {activeTab === 'instructions' && (
           <div className="staff-instructions-view">
-            <InstructionsPage />
+            <StaffInstructionsPage />
           </div>
         )}
 

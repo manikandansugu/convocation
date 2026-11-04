@@ -1,24 +1,35 @@
 import { useState } from 'react'
 import { navigationItems, type PageId } from '../../config/navigation'
+import { STUDENT } from '../../config/student'
+import type { Student } from '../../types/registration'
 import { Icon } from '../ui/Icon'
 
 interface SidebarProps {
   activePage: PageId
   isOpen: boolean
   isCollapsed: boolean
+  student?: Student
   onClose: () => void
   onToggleCollapse: () => void
   onNavigate: (page: PageId) => void
   onLogout: () => void
 }
 
-export function Sidebar({ activePage, isOpen, isCollapsed, onClose, onToggleCollapse, onNavigate, onLogout }: SidebarProps) {
+export function Sidebar({ activePage, isOpen, isCollapsed, student = STUDENT, onClose, onToggleCollapse, onNavigate, onLogout }: SidebarProps) {
   const [profileOpen, setProfileOpen] = useState(false)
 
   const logout = () => {
     setProfileOpen(false)
     onLogout()
   }
+
+  const initials = student.name
+    .split(' ')
+    .filter(Boolean)
+    .map((p) => p[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase()
 
   return <>
     <button className={`sidebar-scrim ${isOpen ? 'visible' : ''}`} aria-label="Close navigation" onClick={onClose} />
@@ -53,14 +64,14 @@ export function Sidebar({ activePage, isOpen, isCollapsed, onClose, onToggleColl
             <button type="button" onClick={() => setProfileOpen(false)} aria-label="Close profile"><Icon name="x" size={16} /></button>
           </div>
           <div className="profile-popup-user">
-            <div className="avatar">AM</div>
+            <div className="avatar">{initials}</div>
             <div><strong>Arun Menon</strong><span>RA2011003010245</span></div>
           </div>
           <div className="profile-popup-detail"><span>Programme</span><strong>B.Tech — Computer Science</strong></div>
           <button type="button" className="profile-signout" onClick={logout}><Icon name="logout" size={17} /><span>Sign out</span></button>
         </div>}
         <button type="button" className="student-card profile-trigger" onClick={() => setProfileOpen((open) => !open)} aria-expanded={profileOpen} aria-haspopup="dialog">
-          <div className="avatar">AM</div><div><strong>Arun Menon</strong><span>RA2011003010245</span></div><Icon name="chevron" size={17} />
+          <div className="avatar">{initials}</div><div><strong>Arun Menon</strong><span>RA2011003010245</span></div><Icon name="chevron" size={17} />
         </button>
       </div>
     </aside>

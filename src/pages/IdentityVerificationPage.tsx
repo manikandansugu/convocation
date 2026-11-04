@@ -5,10 +5,19 @@ import studentPhoto from '../assets/student-verification.png'
 interface IdentityVerificationPageProps {
   onBack: () => void
   onContinue: () => void
+  onPhotoCaptured?: (photoUrl: string) => void
 }
 
-export function IdentityVerificationPage({ onBack, onContinue }: IdentityVerificationPageProps) {
+export function IdentityVerificationPage({ onBack, onContinue, onPhotoCaptured }: IdentityVerificationPageProps) {
   const [captured, setCaptured] = useState(false)
+
+  const handleCapture = () => {
+    const nextState = !captured
+    setCaptured(nextState)
+    if (nextState) {
+      onPhotoCaptured?.(studentPhoto)
+    }
+  }
 
   return (
     <div className="page prototype-page identity-page">
@@ -21,16 +30,28 @@ export function IdentityVerificationPage({ onBack, onContinue }: IdentityVerific
             </div>
             {captured && <span className="capture-success-mark"><Icon name="check" size={24}/></span>}
           </div>
-          <div className="camera-status"><span className={captured ? 'success' : ''}/>{captured ? 'Photo captured successfully' : 'Position your face inside the guide'}</div>
+          <div className="camera-status"><span className={captured ? 'success' : ''}/>{captured ? 'Live photo captured & registered for Face Recognition' : 'Position your face inside the guide'}</div>
         </div>
         <div className="capture-instructions">
-          <p className="eyebrow">CAPTURE GUIDELINES</p><h2>Take a clear front-facing photo</h2>
-          <ul><li><Icon name="check" size={15}/> Make sure your face is clearly visible</li><li><Icon name="check" size={15}/> Use a well-lit area with a plain background</li><li><Icon name="check" size={15}/> Remove sunglasses, masks, or head coverings</li><li><Icon name="check" size={15}/> Only one person should appear in the frame</li></ul>
-          <button className="capture-button" onClick={() => setCaptured(true)}><Icon name="camera" size={18}/>{captured ? 'Retake photo' : 'Capture photo'}</button>
-          <div className="privacy-note">Your photo is used only for convocation entry identity verification.</div>
+          <p className="eyebrow">CAPTURE GUIDELINES</p><h2>Capture your live photo</h2>
+          <ul>
+            <li><Icon name="check" size={15}/> This photo is required for event day campus check-in face recognition.</li>
+            <li><Icon name="check" size={15}/> Also used for auditorium entrance gate verification.</li>
+            <li><Icon name="check" size={15}/> Will be embossed directly on your official Graduation Day Pass.</li>
+            <li><Icon name="check" size={15}/> Ensure a well-lit area with a plain background.</li>
+          </ul>
+          <button className="capture-button" onClick={handleCapture}>
+            <Icon name="camera" size={18}/>{captured ? 'Retake live photo' : 'Capture live photo'}
+          </button>
+          <div className="privacy-note">Secure facial recognition data is retained only for Graduation Day verification access.</div>
         </div>
       </section>
-      <div className="standalone-actions"><button className="secondary-button" onClick={onBack}>Back</button><button className="flow-primary" onClick={onContinue} disabled={!captured}>Continue to payment <Icon name="arrow" size={18}/></button></div>
+      <div className="standalone-actions">
+        <button className="secondary-button" onClick={onBack}>Back</button>
+        <button className="flow-primary" onClick={onContinue} disabled={!captured}>
+          Continue to payment <Icon name="arrow" size={18}/>
+        </button>
+      </div>
     </div>
   )
 }
