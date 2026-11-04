@@ -53,7 +53,7 @@ export function InstructionsPage({ onStartRegistration }: InstructionsPageProps)
       <section className="instructions-event-banner">
         <div className="instructions-event-lead">
           <span><Icon name="calendar" size={22} /></span>
-          <div><small>CEREMONY DATE</small><strong>07 October 2026</strong></div>
+          <div><small>CEREMONY DATE</small><strong>29 November 2026</strong></div>
         </div>
         <div><small>TIME</small><strong>09:30 AM</strong></div>
         <div><small>VENUE</small><strong>Dr. T. P. Ganesan Auditorium</strong></div>

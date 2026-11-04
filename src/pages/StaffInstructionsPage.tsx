@@ -2,42 +2,42 @@ import { Icon } from '../components/ui/Icon'
 
 const STAFF_STEPS = [
   {
-    time: '08:00 AM',
+    number: '08',
     title: 'In-person check and graduation kit',
     owner: 'Graduation Kit Distribution Committee',
     detail: 'Scan the graduate’s face, record attendance, and issue the gown, robe, breakfast token and lunch token.',
     icon: 'tag' as const,
   },
   {
-    time: '09:00 AM',
+    number: '09',
     title: 'Breakfast token validation',
     owner: 'Breakfast Counter',
     detail: 'Validate and redeem the breakfast token before serving the graduate.',
     icon: 'ticket' as const,
   },
   {
-    time: '10:00 AM',
+    number: '10',
     title: 'Auditorium entry',
     owner: 'Auditorium Entrance Team',
     detail: 'Run the second face-recognition check and admit the graduate only after successful recognition.',
     icon: 'shield' as const,
   },
   {
-    time: '11:00 AM',
+    number: '11',
     title: 'Seat identification',
     owner: 'Seating Support Team',
     detail: 'Use the application to direct graduates and registered faculty to their allotted rows and seats.',
     icon: 'grid' as const,
   },
   {
-    time: '12:00 PM',
+    number: '12',
     title: 'Degree certificate distribution',
     owner: 'Registered Faculty',
     detail: 'Identify assigned graduates by seat and record each degree certificate handover.',
     icon: 'award' as const,
   },
   {
-    time: '02:00 PM',
+    number: '14',
     title: 'Lunch token validation',
     owner: 'Lunch Counter',
     detail: 'After the photo session, validate and redeem the lunch token before serving the graduate.',
@@ -62,8 +62,8 @@ export function StaffInstructionsPage() {
 
       <div className="staff-process-grid">
         {STAFF_STEPS.map((step) => (
-          <article className="panel staff-process-step" key={step.time}>
-            <span className="staff-process-number">{step.time}</span>
+          <article className="panel staff-process-step" key={step.number}>
+            <span className="staff-process-number">{step.number}</span>
             <span className="staff-process-icon"><Icon name={step.icon} size={20} /></span>
             <div>
               <h3>{step.title}</h3>

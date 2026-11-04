@@ -247,6 +247,11 @@ export function StaffPortalPage({
     (selectedStudent.robeIssued ? 1 : 0) +
     (selectedStudent.breakfastTokenIssued ? 1 : 0) +
     (selectedStudent.lunchTokenIssued ? 1 : 0)
+  const selectedKitComplete = completedStepsCount === 5
+  const eventAccessStepsCount =
+    (selectedStudent.breakfastTokenRedeemed ? 1 : 0) +
+    (selectedStudent.lunchTokenRedeemed ? 1 : 0) +
+    (selectedStudent.admittedAtGate ? 1 : 0)
 
   return (
     <div className="app-shell staff-app-shell">
@@ -413,20 +418,6 @@ export function StaffPortalPage({
         </header>
 
         <div className="staff-page-content">
-        {(['counter', 'tokens', 'auditorium-entry'] as StaffTab[]).includes(activeTab) && (
-          <nav className="staff-desk-tabs" aria-label="In-Person Check and Kit Desk sections">
-            <button type="button" className={activeTab === 'counter' ? 'active' : ''} onClick={() => setActiveTab('counter')}>
-              <Icon name="tag" size={16} /> In-Person Check & Kit
-            </button>
-            <button type="button" className={activeTab === 'tokens' ? 'active' : ''} onClick={() => setActiveTab('tokens')}>
-              <Icon name="ticket" size={16} /> Breakfast & Lunch Tokens
-            </button>
-            <button type="button" className={activeTab === 'auditorium-entry' ? 'active' : ''} onClick={() => setActiveTab('auditorium-entry')}>
-              <Icon name="shield" size={16} /> Auditorium Entry
-            </button>
-          </nav>
-        )}
-
         {/* TAB 1: KIT & GOWN COUNTER */}
         {activeTab === 'counter' && (
           <div className="staff-counter-grid">
@@ -519,6 +510,18 @@ export function StaffPortalPage({
                   <button type="button" className="btn-issue-all" onClick={() => issueAllKit(selectedStudent.id)}>
                     <Icon name="check" size={16} />
                     <span>Issue All Items</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-go-seat"
+                    onClick={() => {
+                      setActiveTab('seating')
+                      setSidebarOpen(false)
+                      window.scrollTo({ top: 0, behavior: 'smooth' })
+                    }}
+                  >
+                    <Icon name="location" size={15} />
+                    <span>Go to Seat</span>
                   </button>
                   <button type="button" className="btn-reset-kit" onClick={() => resetStudentKit(selectedStudent.id)}>
                     <Icon name="x" size={14} />
@@ -679,6 +682,89 @@ export function StaffPortalPage({
                       )}
                     >
                       {selectedStudent.degreeDistributed ? 'Mark Pending' : 'Confirm Handover'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="staff-kit-checklist integrated-desk-actions">
+                <div className="checklist-kicker">
+                  <h4>Token Validation & Auditorium Entry ({eventAccessStepsCount}/3 Completed)</h4>
+                  <span className={`overall-status-pill ${eventAccessStepsCount === 3 ? 'success' : 'pending'}`}>
+                    {eventAccessStepsCount === 3 ? 'Event Access Complete' : 'Pending Actions'}
+                  </span>
+                </div>
+
+                <div className="staff-checklist-grid">
+                  <div className={`staff-kit-card ${selectedStudent.breakfastTokenRedeemed ? 'issued' : 'pending'}`}>
+                    <div className="kit-card-icon"><Icon name={selectedStudent.breakfastTokenRedeemed ? 'check' : 'ticket'} size={18} /></div>
+                    <div className="kit-card-content">
+                      <div className="kit-card-top">
+                        <strong>Breakfast Token Validation</strong>
+                        <span className={`kit-pill ${selectedStudent.breakfastTokenRedeemed ? 'success' : 'pending'}`}>
+                          {selectedStudent.breakfastTokenRedeemed
+                            ? `Served ${selectedStudent.breakfastTime || ''}`
+                            : selectedStudent.breakfastTokenIssued ? 'Ready to Redeem' : 'Token Not Issued'}
+                        </span>
+                      </div>
+                      <p>Validate the issued breakfast token before serving the graduate.</p>
+                    </div>
+                    <button
+                      type="button"
+                      className={`btn-toggle-step ${selectedStudent.breakfastTokenRedeemed ? 'done' : ''}`}
+                      disabled={!selectedStudent.breakfastTokenIssued}
+                      onClick={() => updateTimedStep(selectedStudent.id, 'breakfastTokenRedeemed', !selectedStudent.breakfastTokenRedeemed, 'breakfastTime')}
+                    >
+                      {selectedStudent.breakfastTokenRedeemed ? 'Undo' : 'Redeem Breakfast'}
+                    </button>
+                  </div>
+
+                  <div className={`staff-kit-card ${selectedStudent.lunchTokenRedeemed ? 'issued' : 'pending'}`}>
+                    <div className="kit-card-icon"><Icon name={selectedStudent.lunchTokenRedeemed ? 'check' : 'ticket'} size={18} /></div>
+                    <div className="kit-card-content">
+                      <div className="kit-card-top">
+                        <strong>Lunch Token Validation</strong>
+                        <span className={`kit-pill ${selectedStudent.lunchTokenRedeemed ? 'success' : 'pending'}`}>
+                          {selectedStudent.lunchTokenRedeemed
+                            ? `Served ${selectedStudent.lunchTime || ''}`
+                            : selectedStudent.degreeDistributed ? 'Ready After Photo' : 'Awaiting Certificate'}
+                        </span>
+                      </div>
+                      <p>Confirm the certificate and photo-session milestone before serving lunch.</p>
+                    </div>
+                    <button
+                      type="button"
+                      className={`btn-toggle-step ${selectedStudent.lunchTokenRedeemed ? 'done' : ''}`}
+                      disabled={!selectedStudent.lunchTokenIssued || !selectedStudent.degreeDistributed}
+                      onClick={() => {
+                        updateTimedStep(selectedStudent.id, 'lunchTokenRedeemed', !selectedStudent.lunchTokenRedeemed, 'lunchTime')
+                        if (!selectedStudent.lunchTokenRedeemed) updateTimedStep(selectedStudent.id, 'photoSessionCompleted', true, 'photoSessionAt')
+                      }}
+                    >
+                      {selectedStudent.lunchTokenRedeemed ? 'Undo' : 'Confirm Photo & Redeem'}
+                    </button>
+                  </div>
+
+                  <div className={`staff-kit-card ${selectedStudent.admittedAtGate ? 'issued' : 'pending'}`}>
+                    <div className="kit-card-icon"><Icon name={selectedStudent.admittedAtGate ? 'check' : 'shield'} size={18} /></div>
+                    <div className="kit-card-content">
+                      <div className="kit-card-top">
+                        <strong>Auditorium Entry</strong>
+                        <span className={`kit-pill ${selectedStudent.admittedAtGate ? 'success' : 'pending'}`}>
+                          {selectedStudent.admittedAtGate
+                            ? `Admitted ${selectedStudent.auditoriumEntryTime || selectedStudent.admittedTime || ''}`
+                            : selectedKitComplete ? 'Ready for Face Scan' : 'Complete Kit First'}
+                        </span>
+                      </div>
+                      <p>Run the second face-recognition check before auditorium admission.</p>
+                    </div>
+                    <button
+                      type="button"
+                      className={`btn-toggle-step ${selectedStudent.admittedAtGate ? 'done' : ''}`}
+                      disabled={!selectedKitComplete || selectedStudent.admittedAtGate}
+                      onClick={() => handleAuditoriumAdmission(selectedStudent.id)}
+                    >
+                      {selectedStudent.admittedAtGate ? 'Admitted' : 'Scan Face & Admit'}
                     </button>
                   </div>
                 </div>

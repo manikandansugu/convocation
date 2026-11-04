@@ -13,6 +13,7 @@ export interface StudentQuery {
   category: string
   subject: string
   email: string
+  attachmentName?: string
   status: QueryStatus
   createdAt: string
   messages: QueryMessage[]

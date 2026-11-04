@@ -82,7 +82,7 @@ function PersonPass({ name, label, relationship, index, photoUrl, student, guest
               </div>
               <div className="ceremonial-detail">
                 <span>DATE</span>
-                <strong>{student.graduationDate || '07 October 2026'}</strong>
+                <strong>{student.graduationDate || '29 November 2026'}</strong>
               </div>
               <div className="ceremonial-detail ceremonial-detail-wide">
                 <span>VENUE</span>

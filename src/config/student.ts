@@ -88,7 +88,7 @@ export const STUDENT: Student = {
   seatNumber: 'A-25',
   venue: 'Dr. T. P. Ganesan Auditorium',
   kitCounter: 'Counter 04 (Ground Floor)',
-  graduationDate: '07 October 2026 · 09:30 AM',
+  graduationDate: '29 November 2026 · 09:30 AM',
   attendanceMode: 'in_person',
   coeApproved: true,
 }
