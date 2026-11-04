@@ -54,8 +54,6 @@ export function StaffPortalPage({
     { id: 'instructions' as const, label: 'Instructions', icon: 'file' as const },
     { id: 'roster' as const, label: 'Graduate List', icon: 'user' as const },
     { id: 'counter' as const, label: 'In-Person Check & Kit Desk', icon: 'tag' as const },
-    { id: 'tokens' as const, label: 'Breakfast & Lunch Tokens', icon: 'ticket' as const },
-    { id: 'auditorium-entry' as const, label: 'Auditorium Entry', icon: 'shield' as const },
     { id: 'seating' as const, label: 'Seating & Faculty Allocation', icon: 'grid' as const },
   ]
 
@@ -297,7 +295,9 @@ export function StaffPortalPage({
             <button
               key={item.id}
               type="button"
-              className={activeTab === item.id ? 'active' : ''}
+              className={item.id === 'counter'
+                ? (['counter', 'tokens', 'auditorium-entry'] as StaffTab[]).includes(activeTab) ? 'active' : ''
+                : activeTab === item.id ? 'active' : ''}
               title={sidebarCollapsed ? item.label : undefined}
               onClick={() => {
                 setActiveTab(item.id)
@@ -413,6 +413,20 @@ export function StaffPortalPage({
         </header>
 
         <div className="staff-page-content">
+        {(['counter', 'tokens', 'auditorium-entry'] as StaffTab[]).includes(activeTab) && (
+          <nav className="staff-desk-tabs" aria-label="In-Person Check and Kit Desk sections">
+            <button type="button" className={activeTab === 'counter' ? 'active' : ''} onClick={() => setActiveTab('counter')}>
+              <Icon name="tag" size={16} /> In-Person Check & Kit
+            </button>
+            <button type="button" className={activeTab === 'tokens' ? 'active' : ''} onClick={() => setActiveTab('tokens')}>
+              <Icon name="ticket" size={16} /> Breakfast & Lunch Tokens
+            </button>
+            <button type="button" className={activeTab === 'auditorium-entry' ? 'active' : ''} onClick={() => setActiveTab('auditorium-entry')}>
+              <Icon name="shield" size={16} /> Auditorium Entry
+            </button>
+          </nav>
+        )}
+
         {/* TAB 1: KIT & GOWN COUNTER */}
         {activeTab === 'counter' && (
           <div className="staff-counter-grid">

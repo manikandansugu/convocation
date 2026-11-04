@@ -2147,6 +2147,40 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
   gap: 20px;
 }
 
+.staff-desk-tabs {
+  width: fit-content;
+  max-width: 100%;
+  padding: 5px;
+  border: 1px solid #dce4ed;
+  border-radius: 11px;
+  background: #edf2f7;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  overflow-x: auto;
+}
+.staff-desk-tabs button {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 8px;
+  color: #5f6f84;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.staff-desk-tabs button.active {
+  color: #fff;
+  background: #1769e8;
+  box-shadow: 0 5px 12px rgba(23, 105, 232, .2);
+}
+
 .staff-instructions-view .instructions-page {
   max-width: none;
   margin: 0;
@@ -2157,6 +2191,7 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
   .staff-page-content {
     padding: 20px 16px 40px;
   }
+  .staff-desk-tabs { width: 100%; }
   .staff-topbar-station-pill {
     display: none;
   }
@@ -4061,8 +4096,8 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
 .staff-shift-note strong { color: #123d76; font-size: 14px; }
 .staff-shift-note span { color: #62738a; font-size: 12px; line-height: 1.45; }
 .staff-process-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
-.staff-process-step { padding: 18px; display: grid; grid-template-columns: 34px 42px minmax(0, 1fr); align-items: start; gap: 12px; }
-.staff-process-number { color: #1769e8; font-size: 12px; font-weight: 850; letter-spacing: .7px; }
+.staff-process-step { padding: 18px; display: grid; grid-template-columns: auto 42px minmax(0, 1fr); align-items: start; gap: 12px; }
+.staff-process-number { color: #1769e8; font-size: 11px; font-weight: 850; letter-spacing: .4px; white-space: nowrap; padding-top: 2px; }
 .staff-process-icon { width: 42px; height: 42px; border-radius: 10px; color: #1769e8; background: #edf4ff; display: grid; place-items: center; }
 .staff-process-step h3 { margin: 0 0 4px; color: #172033; font: 750 14px var(--display); }
 .staff-process-step strong { color: #1769e8; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; }
