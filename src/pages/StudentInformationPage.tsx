@@ -52,7 +52,7 @@ export function StudentInformationPage({ student = STUDENT, onContinue, onUpdate
         <div className="student-info-grid">
           <div><span>Department</span><strong>{student.department}</strong></div>
           <div><span>Degree</span><strong>{student.degree}</strong></div>
-          <div><span>Program</span><strong>{student.program || 'Computer Science and Engineering'}</strong></div>
+          <div><span>Program</span><strong>{student.program || 'Business Administration'}</strong></div>
           <div><span>Graduation year</span><strong>{student.graduationYear}</strong></div>
 
           <div className="readable-contact">

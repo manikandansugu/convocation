@@ -581,7 +581,7 @@ export function StaffPortalPage({
                           {selectedStudent.robeIssued ? 'Robe Issued' : 'Pending'}
                         </span>
                       </div>
-                      <p>Computing Technologies discipline stole & ceremonial hood</p>
+                      <p>{selectedStudent.department} discipline stole & ceremonial hood</p>
                     </div>
                     <button
                       type="button"

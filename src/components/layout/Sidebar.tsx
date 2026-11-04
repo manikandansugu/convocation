@@ -65,13 +65,13 @@ export function Sidebar({ activePage, isOpen, isCollapsed, student = STUDENT, on
           </div>
           <div className="profile-popup-user">
             <div className="avatar">{initials}</div>
-            <div><strong>Arun Menon</strong><span>RA2011003010245</span></div>
+            <div><strong>{student.name}</strong><span>{student.registerNumber}</span></div>
           </div>
-          <div className="profile-popup-detail"><span>Programme</span><strong>B.Tech — Computer Science</strong></div>
+          <div className="profile-popup-detail"><span>Programme</span><strong>{student.degree} — {student.program}</strong></div>
           <button type="button" className="profile-signout" onClick={logout}><Icon name="logout" size={17} /><span>Sign out</span></button>
         </div>}
         <button type="button" className="student-card profile-trigger" onClick={() => setProfileOpen((open) => !open)} aria-expanded={profileOpen} aria-haspopup="dialog">
-          <div className="avatar">{initials}</div><div><strong>Arun Menon</strong><span>RA2011003010245</span></div><Icon name="chevron" size={17} />
+          <div className="avatar">{initials}</div><div><strong>{student.name}</strong><span>{student.registerNumber}</span></div><Icon name="chevron" size={17} />
         </button>
       </div>
     </aside>

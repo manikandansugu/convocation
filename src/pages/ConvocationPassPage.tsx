@@ -36,7 +36,7 @@ function PersonPass({ name, label, relationship, index, photoUrl, student, guest
   const seatId = isPrimaryStudent ? (student.seatNumber || 'A-25') : `R-${25 + index}`
   const attendeeRegistration = isPrimaryStudent ? student.registerNumber : passId
   const attendeeProgram = isPrimaryStudent
-    ? `${student.degree} — ${student.program || 'Computer Science and Engineering'}`
+    ? `${student.degree} — ${student.program || 'Business Administration'}`
     : `${relationship || 'Guest'} of ${student.name}`
 
   return (
@@ -135,7 +135,7 @@ const GRADUATION_KIT_ITEMS: KitItemConfig[] = [
   {
     id: 'robe',
     title: 'Ceremony Robe & Stole',
-    subtitle: 'Computing Technologies academic stole & ceremonial hood',
+    subtitle: 'Ceremonial discipline academic stole & hood',
     stepNumber: 'Kit Item 2',
   },
   {
@@ -306,7 +306,7 @@ function GraduationDayLifecyclePanel({ onNavigateToSeating }: GraduationDayFlowP
                 </span>
               </div>
               <p>
-                Supporting Faculty: <strong>Dr. Meena Krishnan</strong> (Computing Technologies · Assigned to Row A).
+                Supporting Faculty: <strong>Dr. Meena Krishnan</strong> (School of Management · Assigned to Row A).
                 Faculty verifies graduate seat A-25 and distributes certificate inside auditorium.
               </p>
               {!degreeDistributed && (

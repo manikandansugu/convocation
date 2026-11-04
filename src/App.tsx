@@ -260,6 +260,7 @@ function App() {
         activePage={activePage}
         isOpen={sidebarOpen}
         isCollapsed={sidebarCollapsed}
+        student={studentInfo}
         onClose={() => setSidebarOpen(false)}
         onToggleCollapse={() => setSidebarCollapsed((collapsed) => !collapsed)}
         onNavigate={navigateTo}
