@@ -4,6 +4,7 @@ export interface QueryMessage {
   id: string
   sender: 'Student' | 'Administrator'
   body: string
+  attachmentName?: string
   sentAt: string
   channel: 'Portal' | 'Email'
 }

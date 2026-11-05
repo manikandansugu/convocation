@@ -71,7 +71,7 @@ function App() {
         <QueriesPage
           queries={queries}
           onSubmitQuery={(query) => setQueries((items) => [query, ...items])}
-          onReplyQuery={(queryId, body) => setQueries((items) => items.map((query) => (
+          onReplyQuery={(queryId, body, attachmentName) => setQueries((items) => items.map((query) => (
             query.id === queryId
               ? {
                   ...query,
@@ -80,6 +80,7 @@ function App() {
                     id: `query-message-${Date.now()}`,
                     sender: 'Student',
                     body,
+                    attachmentName,
                     sentAt: 'Just now',
                     channel: 'Portal',
                   }],

@@ -3219,6 +3219,18 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
 .query-table-replies { width: 27px; height: 27px; border-radius: 50%; color: #1769e8; background: #edf4ff; display: grid; place-items: center; font-size: 10px; font-weight: 800; }
 .query-view-button { min-height: 34px; padding: 0 12px; border: 1px solid #b9cff0; border-radius: 7px; color: #1769e8; background: #fff; display: inline-flex; align-items: center; justify-content: center; gap: 7px; cursor: pointer; font: 750 10px var(--font); transition: background-color .18s ease, border-color .18s ease; }
 .query-view-button:hover { border-color: #1769e8; background: #f2f7ff; }
+.query-ticket-page { display: grid; gap: 14px; }
+.query-ticket-page-heading { display: flex; align-items: center; justify-content: space-between; gap: 15px; }
+.query-ticket-page-heading > button { padding: 0; border: 0; color: #1769e8; background: transparent; display: inline-flex; align-items: center; gap: 7px; cursor: pointer; font: 750 11px var(--font); }
+.query-ticket-page-heading > button .icon { transform: rotate(180deg); }
+.query-ticket-detail-panel { overflow: hidden; }
+.query-ticket-detail-header { padding: 20px; border-bottom: 1px solid #e5eaf0; display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
+.query-ticket-detail-header > div { display: grid; gap: 7px; }
+.query-ticket-detail-meta { display: flex; align-items: center; gap: 8px; }
+.query-ticket-detail-header h2 { margin: 0; color: #172033; font: 750 18px var(--display); }
+.query-ticket-detail-header p { margin: 0; color: #7b8797; font-size: 10px; }
+.query-ticket-detail-header > span { color: #7b8797; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.query-ticket-detail-header .query-attachment-name { color: #1769e8; display: inline-flex; align-items: center; gap: 5px; font-size: 10px; }
 .query-detail-row > td { padding: 0; background: #fbfcfe; }
 .query-detail-header { padding: 16px 20px 0; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .query-detail-header > div { display: grid; gap: 3px; }
@@ -3236,11 +3248,16 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
 .query-message strong { color: #253044; font-size: 9px; }
 .query-message > div > div span { color: #8591a2; display: flex; align-items: center; gap: 4px; font-size: 8px; }
 .query-message p { margin: 5px 0 0; color: #566477; font-size: 13px; line-height: 1.5; }
+.query-message-attachment { width: fit-content; margin-top: 8px; padding: 6px 9px; border: 1px solid #cfe0f5; border-radius: 6px; color: #1769e8; background: #fff; display: inline-flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 700; }
 .query-reply-composer { margin-top: 7px; display: grid; grid-template-columns: 34px minmax(0, 1fr); align-items: start; gap: 10px; }
 .query-reply-avatar { width: 34px; height: 34px; border-radius: 50%; color: #fff; background: #123d76; display: grid; place-items: center; font-size: 9px; font-weight: 800; }
 .query-reply-composer > div { min-width: 0; }
 .query-reply-composer textarea { width: 100%; min-height: 35px; box-sizing: border-box; padding: 8px 2px; border: 0; border-bottom: 1px solid #cfd8e4; border-radius: 0; color: #253044; background: transparent; outline: none; resize: vertical; font: 13px/1.45 var(--font); transition: border-color .18s ease; }
 .query-reply-composer textarea:focus { border-bottom: 2px solid #253044; }
+.query-reply-toolbar { margin-top: 9px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.query-reply-attachment-button { max-width: 55%; padding: 7px 10px; border: 1px solid #cbd8e9; border-radius: 7px; color: #1769e8; background: #f7faff; display: inline-flex; align-items: center; gap: 6px; overflow: hidden; cursor: pointer; font-size: 9px; font-weight: 750; white-space: nowrap; text-overflow: ellipsis; }
+.query-reply-attachment-button input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.query-reply-toolbar .query-reply-actions { margin-top: 0; }
 .query-reply-actions { margin-top: 9px; display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
 .query-reply-actions button { min-height: 32px; padding: 0 13px; border: 0; border-radius: 99px; cursor: pointer; font-size: 9px; font-weight: 750; }
 .query-reply-cancel { color: #42526a; background: transparent; }
@@ -3262,6 +3279,9 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
   .query-form-grid .query-form-full { grid-column: auto; }
   .query-form-footer { align-items: stretch; flex-direction: column; }
   .query-form-footer button { justify-content: center; }
+  .query-ticket-detail-header { flex-direction: column; }
+  .query-reply-toolbar { align-items: stretch; flex-direction: column; }
+  .query-reply-attachment-button { max-width: 100%; }
   .query-message > div > div { align-items: flex-start; flex-direction: column; }
 }
 

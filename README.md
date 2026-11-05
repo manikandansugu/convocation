@@ -54,3 +54,21 @@ npm run build
 npm run lint
 npm run preview
 ```
+
+## One-command deployment
+
+From the `srm_changes` branch, run:
+
+```bash
+npm run deploy
+```
+
+This runs lint and the production build, commits all pending project changes
+with the default message `Deploy UI updates`, pushes `srm_changes`, and triggers
+the GitHub Pages workflow.
+
+To provide a custom commit message:
+
+```bash
+npm run deploy -- "Update query support flow"
+```

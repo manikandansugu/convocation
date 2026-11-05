@@ -9,8 +9,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "bash scripts/deploy-github.sh",
+    "deploy:direct": "npm run build && gh-pages -d dist"
   },
   "dependencies": {
     "html-to-image": "^1.11.13",
