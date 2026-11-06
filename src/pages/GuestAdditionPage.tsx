@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { Icon } from '../components/ui/Icon'
-import { REGISTRATION_AMOUNT, REGISTRATION_ID } from '../config/student'
+import { REGISTRATION_AMOUNT } from '../config/student'
 import type { Guest } from '../types/registration'
 
 const MAX_GUESTS = 1
@@ -15,10 +15,7 @@ export function GuestAdditionPage({ initialGuests, onBack, onContinue }: GuestAd
   const [guests, setGuests] = useState<Guest[]>(initialGuests.slice(0, MAX_GUESTS))
   const [documentPreviews, setDocumentPreviews] = useState<Record<number, { front?: string; back?: string }>>({})
   const [extractingGuest, setExtractingGuest] = useState<number | null>(null)
-  const [couponShareStatus, setCouponShareStatus] = useState('')
   const extractionTimers = useRef<Record<number, number>>({})
-  const guestCouponCode = `${REGISTRATION_ID}-GUEST-01`
-  const guestCouponLink = `${window.location.origin}${import.meta.env.BASE_URL}?guestCoupon=${encodeURIComponent(guestCouponCode)}`
 
   const updateGuestCount = (count: number) => {
     setGuests((current) =>
@@ -71,26 +68,6 @@ export function GuestAdditionPage({ initialGuests, onBack, onContinue }: GuestAd
     updateGuest(guestIndex, 'aadhaarNumber', '')
   }
 
-  const copyGuestCouponLink = async () => {
-    await navigator.clipboard.writeText(guestCouponLink)
-    setCouponShareStatus('Guest coupon link copied')
-    window.setTimeout(() => setCouponShareStatus(''), 2500)
-  }
-
-  const shareGuestCouponLink = async () => {
-    if (navigator.share) {
-      await navigator.share({
-        title: 'Convocation guest coupon',
-        text: 'Use this one-time coupon link to generate your convocation guest pass.',
-        url: guestCouponLink,
-      })
-      setCouponShareStatus('Guest coupon link shared')
-      window.setTimeout(() => setCouponShareStatus(''), 2500)
-      return
-    }
-    await copyGuestCouponLink()
-  }
-
   return (
     <div className="page prototype-page guest-addition-page">
       <div className="five-step-progress"><span className="done"><Icon name="check" size={13}/></span><i className="done"/><span className="done"><Icon name="check" size={13}/></span><i className="done"/><span className="done"><Icon name="check" size={13}/></span><i className="done"/><span className="active">4</span><i/><span>5</span></div>
@@ -136,23 +113,6 @@ export function GuestAdditionPage({ initialGuests, onBack, onContinue }: GuestAd
             </section>)}
           </div>
         }
-        {guests.length === 1 && (
-          <section className="guest-coupon-panel">
-            <div className="guest-coupon-heading">
-              <span><Icon name="ticket" size={20}/></span>
-              <div><p className="eyebrow">GUEST COUPON</p><h3>Share the one-time guest pass link</h3><small>This coupon can be redeemed once and generates only one guest pass.</small></div>
-            </div>
-            <div className="guest-coupon-link">
-              <div><small>Coupon link</small><strong>{guestCouponLink}</strong></div>
-              <span>{guestCouponCode}</span>
-            </div>
-            <div className="guest-coupon-actions">
-              <button type="button" className="secondary-button" onClick={copyGuestCouponLink}><Icon name="file" size={15}/> Copy link</button>
-              <button type="button" className="flow-primary" onClick={shareGuestCouponLink}><Icon name="arrow" size={15}/> Share link</button>
-              {couponShareStatus && <p><Icon name="check" size={14}/> {couponShareStatus}</p>}
-            </div>
-          </section>
-        )}
         <div className="screen-actions"><button type="button" className="secondary-button" onClick={onBack}>Back</button><button className="flow-primary" type="submit">Generate Passes <Icon name="arrow" size={18}/></button></div>
       </form>
     </div>

@@ -133,6 +133,9 @@ export function StaffPortalPage({
     row: student.row,
     seat: student.seat,
     type: 'student',
+    department: student.department,
+    role: student.degree ? `${student.degree} Graduate` : 'Graduate attendee',
+    email: student.officialEmail || student.personalEmail,
   } as SeatAllocation)), ...FACULTY_STAFF_ALLOCATIONS]
 
   const updateTimedStep = (
@@ -1406,7 +1409,7 @@ export function StaffPortalPage({
               <div><p className="eyebrow">AUDITORIUM ALLOCATION</p><h2>Student & Staff Seating Locator</h2><p>Select an attendee to highlight their exact block, row and seat.</p></div>
               <span><Icon name="location" size={16} /> Dr. T. P. Ganesan Auditorium</span>
             </div>
-            <SeatingLayout allocations={seatingAllocations} selectedId={selectedSeatAllocationId} onSelect={setSelectedSeatAllocationId} showRoster />
+            <SeatingLayout allocations={seatingAllocations} selectedId={selectedSeatAllocationId} onSelect={setSelectedSeatAllocationId} showRoster isStaffView />
           </div>
         )}
 

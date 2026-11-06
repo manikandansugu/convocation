@@ -16,6 +16,7 @@ interface ConvocationPassPageProps {
   photoUrl?: string
   student?: Student
   onNavigateToSeating?: () => void
+  onNavigateToMap?: () => void
 }
 
 interface PersonPassProps {
@@ -155,9 +156,10 @@ const GRADUATION_KIT_ITEMS: KitItemConfig[] = [
 
 interface GraduationDayFlowProps {
   onNavigateToSeating?: () => void
+  onNavigateToMap?: () => void
 }
 
-function GraduationDayLifecyclePanel({ onNavigateToSeating }: GraduationDayFlowProps) {
+function GraduationDayLifecyclePanel({ onNavigateToSeating, onNavigateToMap }: GraduationDayFlowProps) {
   // Graduation Day lifecycle stages state
   const [faceCheckinDone] = useState(true)
   const [kitReceived] = useState(true)
@@ -180,6 +182,12 @@ function GraduationDayLifecyclePanel({ onNavigateToSeating }: GraduationDayFlowP
               <Icon name="check" size={13} />
               Registration Completed Online
             </span>
+            {onNavigateToMap && (
+              <button type="button" className="kit-verified-badge info-clickable" onClick={onNavigateToMap}>
+                <Icon name="map" size={13} />
+                Campus, Dining & Parking Map
+              </button>
+            )}
           </div>
         </header>
 
@@ -243,15 +251,26 @@ function GraduationDayLifecyclePanel({ onNavigateToSeating }: GraduationDayFlowP
                 </span>
               </div>
               <p>Present breakfast token from Graduation Kit at Food Court 02 counter between 08:15 AM and 09:15 AM.</p>
-              {!breakfastRedeemed && (
-                <button
-                  type="button"
-                  className="token-validate-btn"
-                  onClick={() => setBreakfastRedeemed(true)}
-                >
-                  <Icon name="check" size={14} /> Validate Breakfast Token (Demonstration)
-                </button>
-              )}
+              <div className="lifecycle-action-row">
+                {!breakfastRedeemed && (
+                  <button
+                    type="button"
+                    className="token-validate-btn"
+                    onClick={() => setBreakfastRedeemed(true)}
+                  >
+                    <Icon name="check" size={14} /> Validate Breakfast Token (Demonstration)
+                  </button>
+                )}
+                {onNavigateToMap && (
+                  <button
+                    type="button"
+                    className="token-validate-btn secondary"
+                    onClick={onNavigateToMap}
+                  >
+                    <Icon name="coffee" size={14} /> View Food Court 01 on Map
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
@@ -362,15 +381,26 @@ function GraduationDayLifecyclePanel({ onNavigateToSeating }: GraduationDayFlowP
                 </span>
               </div>
               <p>After photo session, present the lunch token from your Graduation Kit at Food Court 02.</p>
-              {photoSessionDone && !lunchRedeemed && (
-                <button
-                  type="button"
-                  className="token-validate-btn"
-                  onClick={() => setLunchRedeemed(true)}
-                >
-                  <Icon name="check" size={14} /> Validate Lunch Token (Demonstration)
-                </button>
-              )}
+              <div className="lifecycle-action-row">
+                {photoSessionDone && !lunchRedeemed && (
+                  <button
+                    type="button"
+                    className="token-validate-btn"
+                    onClick={() => setLunchRedeemed(true)}
+                  >
+                    <Icon name="check" size={14} /> Validate Lunch Token (Demonstration)
+                  </button>
+                )}
+                {onNavigateToMap && (
+                  <button
+                    type="button"
+                    className="token-validate-btn secondary"
+                    onClick={onNavigateToMap}
+                  >
+                    <Icon name="coffee" size={14} /> View Food Court 02 on Map
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -379,7 +409,7 @@ function GraduationDayLifecyclePanel({ onNavigateToSeating }: GraduationDayFlowP
   )
 }
 
-export function ConvocationPassPage({ guests, photoUrl, student = STUDENT, onNavigateToSeating }: ConvocationPassPageProps) {
+export function ConvocationPassPage({ guests, photoUrl, student = STUDENT, onNavigateToSeating, onNavigateToMap }: ConvocationPassPageProps) {
   const [downloadStatus, setDownloadStatus] = useState<'idle' | 'working' | 'error'>('idle')
 
   const filenameFor = (personName: string) =>
@@ -510,7 +540,7 @@ export function ConvocationPassPage({ guests, photoUrl, student = STUDENT, onNav
           <div><h2>Event Day Process Flow & Token Clearance</h2></div>
           <span>Campus Check-in to Lunch</span>
         </div>
-        <GraduationDayLifecyclePanel onNavigateToSeating={onNavigateToSeating} />
+        <GraduationDayLifecyclePanel onNavigateToSeating={onNavigateToSeating} onNavigateToMap={onNavigateToMap} />
       </section>
 
       <section className="pass-group guest-pass-group">

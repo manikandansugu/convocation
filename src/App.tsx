@@ -9,6 +9,7 @@ import { InstructionsPage } from './pages/InstructionsPage'
 import { NotificationsPage } from './pages/NotificationsPage'
 import { QueriesPage } from './pages/QueriesPage'
 import { SeatingLayoutPage } from './pages/SeatingLayoutPage'
+import { MapPage } from './pages/MapPage'
 import { PaymentPage } from './pages/PaymentPage'
 import { StudentInformationPage } from './pages/StudentInformationPage'
 import { LoginPage, type UserRole, type StaffTab } from './pages/LoginPage'
@@ -55,6 +56,9 @@ function App() {
     }
     if (activePage === 'Seating Layout') {
       return <SeatingLayoutPage />
+    }
+    if (activePage === 'Map') {
+      return <MapPage />
     }
     if (activePage === 'Notifications') {
       return (
@@ -121,6 +125,7 @@ function App() {
         photoUrl={capturedPhotoUrl}
         student={studentInfo}
         onNavigateToSeating={() => navigateTo('Seating Layout')}
+        onNavigateToMap={() => navigateTo('Map')}
       />
     )
   }
@@ -171,6 +176,14 @@ function App() {
           eyebrow: 'CONVOCATION 2026',
           icon: 'grid',
           status: { label: 'Seat allocated', icon: 'check', tone: 'success' },
+        }
+      case 'Map':
+        return {
+          title: 'Campus & Venue Map',
+          subtitle: 'Locate the Auditorium, Refreshment zones (Breakfast & Lunch), and designated Car Parking areas.',
+          eyebrow: 'SRM CAMPUS · CONVOCATION 2026',
+          icon: 'map',
+          status: { label: 'Event Day Guide', icon: 'location', tone: 'info' },
         }
       case 'Student Information':
         return {

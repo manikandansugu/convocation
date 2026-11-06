@@ -8,7 +8,7 @@ export const DEFAULT_FACULTY: FacultyMember = {
   department: 'School of Management',
   email: 'meena.krishnan@srmist.edu.in',
   mobile: '+91 94440 12345',
-  assignedRows: ['A', 'E'],
+  assignedRows: ['A', 'B'],
   assignedBlock: 'Front Block',
   status: 'Approved',
   registeredAt: '25 September 2026',

@@ -8,7 +8,7 @@ const SEATING_ALLOCATIONS: SeatAllocation[] = [{
   registerNumber: STUDENT.registerNumber,
   block: 'Front',
   row: 'A',
-  seat: 25,
+  seat: 6,
   type: 'student',
 }, ...FACULTY_STAFF_ALLOCATIONS]
 

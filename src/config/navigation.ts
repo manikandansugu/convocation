@@ -1,6 +1,16 @@
 import type { IconName } from '../components/ui/Icon'
 
-export type PageId = 'Instructions' | 'Notifications' | 'Queries & Support' | 'Seating Layout' | 'Student Information' | 'ID Verification' | 'Payment' | 'Guest Addition' | 'Convocation Pass'
+export type PageId =
+  | 'Instructions'
+  | 'Notifications'
+  | 'Queries & Support'
+  | 'Seating Layout'
+  | 'Map'
+  | 'Student Information'
+  | 'ID Verification'
+  | 'Payment'
+  | 'Guest Addition'
+  | 'Convocation Pass'
 
 export interface NavigationItem {
   label: PageId
@@ -16,5 +26,6 @@ export const navigationItems: NavigationItem[] = [
   { label: 'Guest Addition', icon: 'user' },
   { label: 'Convocation Pass', icon: 'ticket' },
   { label: 'Seating Layout', icon: 'grid' },
+  { label: 'Map', icon: 'map' },
   { label: 'Queries & Support', icon: 'help' },
 ]

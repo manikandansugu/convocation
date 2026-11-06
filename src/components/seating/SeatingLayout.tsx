@@ -20,6 +20,7 @@ interface SeatingLayoutProps {
   selectedId: string
   onSelect?: (id: string) => void
   showRoster?: boolean
+  isStaffView?: boolean
 }
 
 type GateId = '1' | '2'
@@ -76,7 +77,7 @@ function aisleFor(position: SeatPosition) {
   return Math.abs(position.x - AISLES[0]) <= Math.abs(position.x - AISLES[1]) ? AISLES[0] : AISLES[1]
 }
 
-export function SeatingLayout({ allocations, selectedId, onSelect, showRoster = false }: SeatingLayoutProps) {
+export function SeatingLayout({ allocations, selectedId, onSelect, showRoster = false, isStaffView = false }: SeatingLayoutProps) {
   const [activeId, setActiveId] = useState(selectedId)
   const currentId = onSelect ? selectedId : activeId
   const selected = allocations.find((item) => item.id === currentId) || allocations[0]
@@ -118,9 +119,9 @@ export function SeatingLayout({ allocations, selectedId, onSelect, showRoster = 
     const steps = [`Enter through ${gate.label}.`]
     if (gate.x !== aisle) steps.push(`Walk along the cross aisle to the ${aisleName} aisle.`)
     steps.push(`Walk up the aisle towards the stage to Row ${position.row}.`)
-    steps.push(`Turn ${side} and go ${seatsIn} seat${seatsIn === 1 ? '' : 's'} in. Your seat is ${position.row}${position.number}.`)
+    steps.push(`Turn ${side} and go ${seatsIn} seat${seatsIn === 1 ? '' : 's'} in. ${isStaffView ? 'Allocated seat is' : 'Your seat is'} ${position.row}${position.number}.`)
     return steps
-  }, [gateId, position])
+  }, [gateId, isStaffView, position])
 
   const chooseAllocation = (allocation: SeatAllocation) => {
     setActiveId(allocation.id)
@@ -150,7 +151,11 @@ export function SeatingLayout({ allocations, selectedId, onSelect, showRoster = 
       <section className="panel seat-finder-card">
         <div className="seat-finder-heading">
           <div><p className="eyebrow">DR. T. P. GANESAN AUDITORIUM</p><h2>Convocation Seat Finder</h2></div>
-          {selected && <p>Welcome, <strong>{selected.name}</strong>. Your allocated seat is <strong>{displayedSeat}</strong>.</p>}
+          {selected && (
+            <p>
+              {isStaffView ? 'Attendee:' : 'Welcome,'} <strong>{selected.name}</strong>. {isStaffView ? 'Allocated seat is' : 'Your allocated seat is'} <strong>{displayedSeat}</strong>.
+            </p>
+          )}
         </div>
 
         <div className="seat-finder-map-wrap">
@@ -158,38 +163,42 @@ export function SeatingLayout({ allocations, selectedId, onSelect, showRoster = 
             <rect className="seat-finder-stage" x="250" y="20" width="360" height="36" rx="8" />
             <text className="seat-finder-stage-label" x="430" y="43" textAnchor="middle">STAGE</text>
 
-            {ROWS.map((row, rowIndex) => (
-              <g key={row}>
-                <text className="seat-finder-row-label" x="14" y={rowY(rowIndex) + 4}>{row}</text>
-                {BLOCKS.flatMap((block) => Array.from({ length: block.count }, (_, index) => {
-                  const number = block.start + index
-                  const seatId = `${row}-${number}`
-                  const allocation = allocationBySeat.get(seatId)
-                  const isMine = seatId === displayedSeat && Boolean(position)
-                  const isTaken = OCCUPIED_SEATS.has(seatId) || Boolean(allocation)
-                  const isFacultyOrStaff = allocation?.type === 'faculty' || allocation?.type === 'staff'
-                  const className = `seat-finder-seat ${isMine ? 'mine' : isTaken ? 'taken' : ''} ${isFacultyOrStaff ? 'staff' : ''}`
-                  return (
-                    <rect
-                      key={seatId}
-                      className={className}
-                      x={block.x0 + index * PITCH}
-                      y={rowY(rowIndex) - 9}
-                      width="18"
-                      height="18"
-                      rx="4"
-                      role={allocation ? 'button' : undefined}
-                      tabIndex={allocation ? 0 : undefined}
-                      aria-label={allocation ? `${allocation.name}, seat ${seatId}` : `Seat ${seatId}`}
-                      onClick={() => allocation && chooseAllocation(allocation)}
-                      onKeyDown={(event) => allocation && (event.key === 'Enter' || event.key === ' ') && chooseAllocation(allocation)}
-                    >
-                      <title>{allocation ? `${seatId} · ${allocation.name}` : seatId}</title>
-                    </rect>
-                  )
-                }))}
-              </g>
-            ))}
+            {ROWS.map((row, rowIndex) => {
+              const isStaffRow = isStaffView && (row === 'A' || row === 'B')
+              return (
+                <g key={row}>
+                  <text className={`seat-finder-row-label ${isStaffRow ? 'staff-row-label' : ''}`} x="14" y={rowY(rowIndex) + 4}>{row}</text>
+                  {BLOCKS.flatMap((block) => Array.from({ length: block.count }, (_, index) => {
+                    const number = block.start + index
+                    const seatId = `${row}-${number}`
+                    const allocation = allocationBySeat.get(seatId)
+                    const isMine = seatId === displayedSeat && Boolean(position)
+                    const isTaken = OCCUPIED_SEATS.has(seatId) || Boolean(allocation)
+                    const isFacultyOrStaff = allocation?.type === 'faculty' || allocation?.type === 'staff'
+                    const isStaffStudent = Boolean(isStaffView && allocation?.type === 'student')
+                    const className = `seat-finder-seat ${isMine ? 'mine' : isTaken ? 'taken' : ''} ${isFacultyOrStaff ? 'staff' : ''} ${isStaffStudent ? 'staff-student' : ''}`
+                    return (
+                      <rect
+                        key={seatId}
+                        className={className}
+                        x={block.x0 + index * PITCH}
+                        y={rowY(rowIndex) - 9}
+                        width="18"
+                        height="18"
+                        rx="4"
+                        role={allocation ? 'button' : undefined}
+                        tabIndex={allocation ? 0 : undefined}
+                        aria-label={allocation ? `${allocation.name}, seat ${seatId}` : `Seat ${seatId}`}
+                        onClick={() => allocation && chooseAllocation(allocation)}
+                        onKeyDown={(event) => allocation && (event.key === 'Enter' || event.key === ' ') && chooseAllocation(allocation)}
+                      >
+                        <title>{allocation ? `${seatId} · ${allocation.name}` : seatId}</title>
+                      </rect>
+                    )
+                  }))}
+                </g>
+              )
+            })}
 
             {(Object.entries(GATES) as Array<[GateId, (typeof GATES)[GateId]]>).map(([id, gate]) => (
               <g key={id} onClick={() => setGateId(id)} style={{ cursor: 'pointer' }} role="button" tabIndex={0} onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setGateId(id)}>
@@ -217,7 +226,8 @@ export function SeatingLayout({ allocations, selectedId, onSelect, showRoster = 
           <span><i className="available" />Available</span>
           <span><i className="occupied" />Occupied</span>
           <span><i className="staff" />Faculty / Staff</span>
-          <span><i className="mine" />Your seat</span>
+          {isStaffView && <span><i className="staff-student" />Assigned Graduates (Rows A–B)</span>}
+          <span><i className="mine" />{isStaffView ? 'Selected attendee' : 'Your seat'}</span>
           <span><i className="route" />Route</span>
         </div>
 
