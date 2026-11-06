@@ -2,42 +2,42 @@ import { Icon } from '../components/ui/Icon'
 
 const STAFF_STEPS = [
   {
-    number: '08',
+    number: '08:00 AM',
     title: 'In-person check and graduation kit',
     owner: 'Graduation Kit Distribution Committee',
     detail: 'Scan the graduate’s face, record attendance, and issue the gown, robe, breakfast token and lunch token.',
     icon: 'tag' as const,
   },
   {
-    number: '09',
+    number: '09:00 AM',
     title: 'Breakfast token validation',
     owner: 'Breakfast Counter',
     detail: 'Validate and redeem the breakfast token before serving the graduate.',
     icon: 'ticket' as const,
   },
   {
-    number: '10',
+    number: '10:00 AM',
     title: 'Auditorium entry',
     owner: 'Auditorium Entrance Team',
     detail: 'Run the second face-recognition check and admit the graduate only after successful recognition.',
     icon: 'shield' as const,
   },
   {
-    number: '11',
+    number: '11:00 AM',
     title: 'Seat identification',
     owner: 'Seating Support Team',
     detail: 'Use the application to direct graduates and registered faculty to their allotted rows and seats.',
     icon: 'grid' as const,
   },
   {
-    number: '12',
+    number: '12:00 PM',
     title: 'Degree certificate distribution',
     owner: 'Registered Faculty',
     detail: 'Identify assigned graduates by seat and record each degree certificate handover.',
     icon: 'award' as const,
   },
   {
-    number: '14',
+    number: '02:00 PM',
     title: 'Lunch token validation',
     owner: 'Lunch Counter',
     detail: 'After the photo session, validate and redeem the lunch token before serving the graduate.',

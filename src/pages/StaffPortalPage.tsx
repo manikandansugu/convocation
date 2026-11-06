@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Icon } from '../components/ui/Icon'
 import { DEFAULT_STAFF, INITIAL_ROSTER, type StaffMember, type StudentRosterRecord } from '../config/staff'
 import { DEFAULT_FACULTY } from '../config/faculty'
+import { FACULTY_STAFF_ALLOCATIONS } from '../config/seating'
 import type { FacultyMember } from '../types/faculty'
 import studentPhoto from '../assets/student-verification.png'
 import { SeatingLayout, type SeatAllocation } from '../components/seating/SeatingLayout'
@@ -30,6 +31,7 @@ export function StaffPortalPage({
   const [profileOpen, setProfileOpen] = useState(false)
   const [roster, setRoster] = useState<StudentRosterRecord[]>(INITIAL_ROSTER)
   const [selectedStudentId, setSelectedStudentId] = useState<string>('student-1')
+  const [selectedSeatAllocationId, setSelectedSeatAllocationId] = useState<string>('student-1')
   const [drawerStudentId, setDrawerStudentId] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [rosterPage, setRosterPage] = useState(1)
@@ -123,7 +125,7 @@ export function StaffPortalPage({
 
   const selectedStudent = roster.find((s) => s.id === selectedStudentId) || roster[0]
   const drawerStudent = roster.find((s) => s.id === drawerStudentId)
-  const seatingAllocations: SeatAllocation[] = roster.map((student) => ({
+  const seatingAllocations: SeatAllocation[] = [...roster.map((student) => ({
     id: student.id,
     name: student.name,
     registerNumber: student.registerNumber,
@@ -131,7 +133,7 @@ export function StaffPortalPage({
     row: student.row,
     seat: student.seat,
     type: 'student',
-  }))
+  } as SeatAllocation)), ...FACULTY_STAFF_ALLOCATIONS]
 
   const updateTimedStep = (
     studentId: string,
@@ -515,6 +517,7 @@ export function StaffPortalPage({
                     type="button"
                     className="btn-go-seat"
                     onClick={() => {
+                      setSelectedSeatAllocationId(selectedStudent.id)
                       setActiveTab('seating')
                       setSidebarOpen(false)
                       window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -1403,7 +1406,7 @@ export function StaffPortalPage({
               <div><p className="eyebrow">AUDITORIUM ALLOCATION</p><h2>Student & Staff Seating Locator</h2><p>Select an attendee to highlight their exact block, row and seat.</p></div>
               <span><Icon name="location" size={16} /> Dr. T. P. Ganesan Auditorium</span>
             </div>
-            <SeatingLayout allocations={seatingAllocations} selectedId={selectedStudentId} onSelect={setSelectedStudentId} showRoster />
+            <SeatingLayout allocations={seatingAllocations} selectedId={selectedSeatAllocationId} onSelect={setSelectedSeatAllocationId} showRoster />
           </div>
         )}
 

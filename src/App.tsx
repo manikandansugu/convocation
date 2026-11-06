@@ -24,7 +24,6 @@ import './App.css'
 
 const DEFAULT_GUESTS: Guest[] = [
   { name: '', relationship: '', aadhaarNumber: '' },
-  { name: '', relationship: '', aadhaarNumber: '' },
 ]
 
 function App() {

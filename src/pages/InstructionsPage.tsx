@@ -32,6 +32,8 @@ const INSTRUCTION_SECTIONS: InstructionSection[] = [
       'Show the QR pass at the entrance for scanning and security verification.',
       'Collect your RFID tag, academic gown, graduation cap and ceremony kit.',
       'Proceed to the allotted block, row and seat shown on your pass.',
+      'Use the refreshment area at Food Court 02 and follow the displayed token timings.',
+      'Use the designated car parking area at Parking Zone P1 beside Gate 1.',
     ],
   },
   {
@@ -85,6 +87,7 @@ export function InstructionsPage({ onStartRegistration }: InstructionsPageProps)
           <ul>
             <li>Entry is permitted only with a valid QR pass; screenshots that cannot be scanned may be rejected.</li>
             <li>Children and additional guests without registered passes cannot be admitted.</li>
+            <li>Refreshments are available at Food Court 02; car parking is available only in Parking Zone P1.</li>
             <li>Return the academic gown at Counter 04 by 04:00 PM and collect the clearance acknowledgement.</li>
           </ul>
         </div>

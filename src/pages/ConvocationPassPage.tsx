@@ -6,6 +6,8 @@ import { Icon } from '../components/ui/Icon'
 import { REGISTRATION_ID, STUDENT } from '../config/student'
 import type { Guest, Student } from '../types/registration'
 import studentPhoto from '../assets/student-verification.png'
+import guestPhoto from '../assets/guest-male-portrait.png'
+import convocationLogo from '../assets/srm-convocation-logo.png'
 
 const QR_TARGET_URL = 'https://neccampus.srmtech.com/'
 
@@ -33,7 +35,8 @@ function PersonPass({ name, label, relationship, index, photoUrl, student, guest
   const isPrimaryStudent = index === 0
 
   const activePhoto = photoUrl || studentPhoto
-  const seatId = isPrimaryStudent ? (student.seatNumber || 'A-25') : `R-${25 + index}`
+  const seatId = student.seatNumber || 'A-25'
+  const guestHallNumber = 'Hall 01'
   const attendeeRegistration = isPrimaryStudent ? student.registerNumber : passId
   const attendeeProgram = isPrimaryStudent
     ? `${student.degree} — ${student.program || 'Business Administration'}`
@@ -44,8 +47,8 @@ function PersonPass({ name, label, relationship, index, photoUrl, student, guest
       <article className="person-pass ceremonial-pass" id={elementId}>
         <div className="ceremonial-pass-inner">
           <header className="ceremonial-pass-heading">
-            <div className="ceremonial-emblem" aria-label="CampusTrust Convocation 2026">
-              <span><img src={import.meta.env.BASE_URL + 'campus-trust-logo.png'} alt="CampusTrust" /></span>
+            <div className="ceremonial-emblem" aria-label="SRM Institute of Science and Technology Convocation 2026">
+              <span><img src={convocationLogo} alt="SRM Institute of Science and Technology" /></span>
               <small>CONVOCATION 2026</small>
             </div>
             <h2>Graduation Day Pass</h2>
@@ -57,9 +60,7 @@ function PersonPass({ name, label, relationship, index, photoUrl, student, guest
               {isPrimaryStudent ? (
                 <img src={activePhoto} alt={name} />
               ) : (
-                <div className="ceremonial-guest-avatar">
-                  {name.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase()}
-                </div>
+                <img src={guestPhoto} alt={`${name} guest`} />
               )}
             </div>
 
@@ -100,8 +101,8 @@ function PersonPass({ name, label, relationship, index, photoUrl, student, guest
 
           <footer className="ceremonial-pass-footer">
             <div>
-              <span>SEAT NUMBER</span>
-              <strong>{seatId}</strong>
+              <span>{isPrimaryStudent ? 'SEAT NUMBER' : 'HALL NUMBER'}</span>
+              <strong>{isPrimaryStudent ? seatId : guestHallNumber}</strong>
             </div>
             <div>
               <span>KIT COUNTER</span>

@@ -1077,6 +1077,19 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
 .empty-guest-state { min-height: 180px; margin-top: 19px; border: 1px dashed #ccd6e2; border-radius: 9px; color: #8290a2; background: #fafbfc; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; }
 .empty-guest-state strong { color: #475467; font-size: 12px; }
 .empty-guest-state span { font-size: 9px; }
+.guest-coupon-panel { margin-top: 18px; padding: 18px; border: 1px solid #c9dcf5; border-radius: 10px; background: #f6f9ff; display: grid; gap: 14px; }
+.guest-coupon-heading { display: flex; align-items: flex-start; gap: 11px; }
+.guest-coupon-heading > span { width: 40px; height: 40px; flex: 0 0 auto; border-radius: 9px; color: #1769e8; background: #e7f1ff; display: grid; place-items: center; }
+.guest-coupon-heading h3 { margin: 2px 0 3px; color: #172033; font: 750 14px var(--display); }
+.guest-coupon-heading small { color: #67758a; font-size: 11px; }
+.guest-coupon-link { padding: 11px 12px; border: 1px solid #d6e2f2; border-radius: 8px; background: #fff; display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.guest-coupon-link > div { min-width: 0; display: grid; gap: 3px; }
+.guest-coupon-link small { color: #7b8797; font-size: 10px; font-weight: 700; }
+.guest-coupon-link strong { color: #344054; overflow: hidden; font-size: 11px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.guest-coupon-link > span { padding: 5px 8px; border-radius: 6px; color: #1769e8; background: #edf4ff; font-size: 9px; font-weight: 800; white-space: nowrap; }
+.guest-coupon-actions { display: flex; align-items: center; gap: 9px; }
+.guest-coupon-actions button { min-height: 38px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.guest-coupon-actions p { margin: 0 0 0 auto; color: #23704b; display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 700; }
 
 .passes-page { max-width: 1450px; }
 .passes-page .college-title h1 { font-size: 20px; }
@@ -1158,6 +1171,9 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
   .registration-reference { display: none; }
   .guest-addition-card > header { flex-direction: column; }
   .guest-person-card { grid-template-columns: 1fr; }
+  .guest-coupon-link { align-items: flex-start; flex-direction: column; }
+  .guest-coupon-actions { align-items: stretch; flex-direction: column; }
+  .guest-coupon-actions p { margin-left: 0; }
   .person-pass { grid-template-columns: 1fr; }
   .person-pass-qr { border-left: 0; border-top: 1px dashed #cbd5e1; }
   .pass-event-info { grid-template-columns: 1fr; }
@@ -3069,19 +3085,43 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
 .seat-finder-gate-label { fill: #fff; font-size: 10px; font-weight: 800; }
 .seat-finder-route { fill: none; stroke: #1769e8; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 10 8; animation: seat-finder-route-flow 1s linear infinite; }
 @keyframes seat-finder-route-flow { to { stroke-dashoffset: -18; } }
+.seat-finder-facility rect { stroke-width: 1.2; }
+.seat-finder-facility text { font-size: 10px; font-weight: 850; letter-spacing: .7px; }
+.seat-finder-facility .seat-finder-facility-subtitle { font-size: 7px; font-weight: 750; letter-spacing: .45px; }
+.seat-finder-facility.parking rect { fill: #edf3ff; stroke: #9bbcf0; }
+.seat-finder-facility.parking text { fill: #164f9b; }
+.seat-finder-facility.refreshment rect { fill: #eaf8f1; stroke: #8fd3b0; }
+.seat-finder-facility.refreshment text { fill: #13704d; }
 .seat-finder-legend { margin-top: 9px; display: flex; flex-wrap: wrap; gap: 12px; color: #657183; font-size: 9px; }
 .seat-finder-legend span { display: inline-flex; align-items: center; gap: 6px; }
 .seat-finder-legend i { width: 12px; height: 12px; border-radius: 3px; background: #d9e5f1; }
 .seat-finder-legend i.occupied { background: #aeb8c4; }
+.seat-finder-legend i.staff { border: 1px solid #d4ad62; background: #e8c786; }
 .seat-finder-legend i.mine { background: #e8590c; }
 .seat-finder-legend i.route { background: #1769e8; }
 .seat-finder-directions { margin: 12px 0 0; padding: 12px 16px 12px 31px; border: 1px solid #d9e6f6; border-radius: 9px; color: #526176; background: #f5f9ff; display: grid; gap: 5px; font-size: 10px; line-height: 1.45; }
 .seat-finder-directions li::marker { color: #1769e8; font-weight: 800; }
+.seating-attendee-detail { margin-top: 14px; padding: 15px; border: 1px solid #cfe0f5; border-radius: 10px; background: #f5f9ff; display: grid; grid-template-columns: minmax(190px, .7fr) minmax(0, 1.3fr); gap: 18px; align-items: center; }
+.seating-attendee-detail.staff { border-color: #ead3a8; background: #fffaf0; }
+.seating-attendee-heading { min-width: 0; display: flex; align-items: center; gap: 11px; }
+.seating-attendee-heading > span { width: 42px; height: 42px; flex: 0 0 auto; border-radius: 50%; color: #0b3d78; background: #e5f0ff; display: grid; place-items: center; font-size: 11px; font-weight: 850; }
+.seating-attendee-detail.staff .seating-attendee-heading > span { color: #805313; background: #f8e7c6; }
+.seating-attendee-heading > div { min-width: 0; }
+.seating-attendee-heading p { margin: 0 0 2px; color: #1769e8; font-size: 8px; font-weight: 850; letter-spacing: .8px; }
+.seating-attendee-detail.staff .seating-attendee-heading p { color: #9a6517; }
+.seating-attendee-heading h3 { margin: 0; overflow: hidden; color: #172033; font: 750 14px var(--display); text-overflow: ellipsis; white-space: nowrap; }
+.seating-attendee-heading small { color: #7b8797; font-size: 10px; }
+.seating-attendee-detail dl { margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 14px; }
+.seating-attendee-detail dl > div { min-width: 0; display: grid; gap: 2px; }
+.seating-attendee-detail dt { color: #8995a5; font-size: 8px; font-weight: 750; text-transform: uppercase; letter-spacing: .5px; }
+.seating-attendee-detail dd { margin: 0; overflow: hidden; color: #344054; font-size: 11px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
 
 @media (max-width: 700px) {
   .seat-finder-card { padding: 18px 14px; }
   .seat-finder-heading { align-items: flex-start; flex-direction: column; gap: 7px; }
   .seat-finder-heading > p { text-align: left; }
+  .seating-attendee-detail { grid-template-columns: 1fr; }
+  .seating-attendee-detail dl { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 /* Student notifications */
@@ -4129,8 +4169,8 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
 .staff-shift-note strong { color: #123d76; font-size: 14px; }
 .staff-shift-note span { color: #62738a; font-size: 12px; line-height: 1.45; }
 .staff-process-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
-.staff-process-step { padding: 18px; display: grid; grid-template-columns: 34px 42px minmax(0, 1fr); align-items: start; gap: 12px; }
-.staff-process-number { color: #1769e8; font-size: 12px; font-weight: 850; letter-spacing: .7px; }
+.staff-process-step { padding: 18px; display: grid; grid-template-columns: 70px 42px minmax(0, 1fr); align-items: start; gap: 12px; }
+.staff-process-number { color: #1769e8; font-size: 11px; font-weight: 850; letter-spacing: .3px; white-space: nowrap; }
 .staff-process-icon { width: 42px; height: 42px; border-radius: 10px; color: #1769e8; background: #edf4ff; display: grid; place-items: center; }
 .staff-process-step h3 { margin: 0 0 4px; color: #172033; font: 750 14px var(--display); }
 .staff-process-step strong { color: #1769e8; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; }
@@ -4230,18 +4270,19 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
 .ceremonial-pass-heading { text-align: center; display: grid; justify-items: center; }
 .ceremonial-emblem { display: grid; justify-items: center; gap: 5px; }
 .ceremonial-emblem > span {
-  width: 56px;
-  height: 56px;
-  padding: 6px;
-  border: 3px solid #d1ac00;
+  width: 72px;
+  height: 72px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
   border-radius: 50%;
-  background: #fff;
-  box-shadow: inset 0 0 0 2px #123d76, 0 0 0 2px #fff, 0 0 0 3px #d1ac00;
+  background: transparent;
+  box-shadow: none;
   display: grid;
   place-items: center;
 }
-.ceremonial-emblem img { width: 100%; height: 100%; object-fit: contain; }
-.ceremonial-emblem small { color: #315786; font-size: 6px; font-weight: 800; letter-spacing: 1.2px; }
+.ceremonial-emblem img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.ceremonial-emblem small { color: #123d76; font-size: 8px; font-weight: 800; letter-spacing: 1.5px; }
 .ceremonial-pass-heading h2 {
   margin: 9px 0 10px;
   color: #092f69;

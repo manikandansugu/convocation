@@ -7,7 +7,12 @@ export interface SeatAllocation {
   block: string
   row: string
   seat: number
-  type?: 'student' | 'staff'
+  type?: 'student' | 'faculty' | 'staff'
+  role?: string
+  department?: string
+  email?: string
+  assignedStudentCount?: number
+  studentCapacity?: number
 }
 
 interface SeatingLayoutProps {
@@ -134,7 +139,7 @@ export function SeatingLayout({ allocations, selectedId, onSelect, showRoster = 
             {allocations.map((allocation) => (
               <button type="button" key={allocation.id} className={allocation.id === selected?.id ? 'active' : ''} onClick={() => chooseAllocation(allocation)}>
                 <span className="seating-roster-avatar">{allocation.name.split(' ').map((part) => part[0]).join('').slice(0, 2)}</span>
-                <span><strong>{allocation.name}</strong><small>{allocation.registerNumber}</small></span>
+                <span><strong>{allocation.name}</strong><small>{allocation.registerNumber}{allocation.role ? ` · ${allocation.role}` : ''}</small></span>
                 <b>{allocation.row}-{allocation.seat}</b>
               </button>
             ))}
@@ -149,7 +154,7 @@ export function SeatingLayout({ allocations, selectedId, onSelect, showRoster = 
         </div>
 
         <div className="seat-finder-map-wrap">
-          <svg className="seat-finder-map" viewBox="0 0 860 520" role="img" aria-label="Auditorium seating map">
+          <svg className="seat-finder-map" viewBox="0 0 860 580" role="img" aria-label="Auditorium seating, refreshment and car parking map">
             <rect className="seat-finder-stage" x="250" y="20" width="360" height="36" rx="8" />
             <text className="seat-finder-stage-label" x="430" y="43" textAnchor="middle">STAGE</text>
 
@@ -162,7 +167,8 @@ export function SeatingLayout({ allocations, selectedId, onSelect, showRoster = 
                   const allocation = allocationBySeat.get(seatId)
                   const isMine = seatId === displayedSeat && Boolean(position)
                   const isTaken = OCCUPIED_SEATS.has(seatId) || Boolean(allocation)
-                  const className = `seat-finder-seat ${isMine ? 'mine' : isTaken ? 'taken' : ''} ${allocation?.type === 'staff' ? 'staff' : ''}`
+                  const isFacultyOrStaff = allocation?.type === 'faculty' || allocation?.type === 'staff'
+                  const className = `seat-finder-seat ${isMine ? 'mine' : isTaken ? 'taken' : ''} ${isFacultyOrStaff ? 'staff' : ''}`
                   return (
                     <rect
                       key={seatId}
@@ -193,12 +199,24 @@ export function SeatingLayout({ allocations, selectedId, onSelect, showRoster = 
             ))}
 
             {routePoints && <polyline className="seat-finder-route" points={routePoints} />}
+
+            <g className="seat-finder-facility parking" aria-label="Car Parking Zone P1">
+              <rect x="80" y="530" width="250" height="34" rx="8" />
+              <text x="205" y="546" textAnchor="middle">CAR PARKING</text>
+              <text className="seat-finder-facility-subtitle" x="205" y="558" textAnchor="middle">ZONE P1 · BESIDE GATE 1</text>
+            </g>
+            <g className="seat-finder-facility refreshment" aria-label="Refreshment Food Court 02">
+              <rect x="530" y="530" width="250" height="34" rx="8" />
+              <text x="655" y="546" textAnchor="middle">REFRESHMENT</text>
+              <text className="seat-finder-facility-subtitle" x="655" y="558" textAnchor="middle">FOOD COURT 02</text>
+            </g>
           </svg>
         </div>
 
         <div className="seat-finder-legend" aria-label="Seating legend">
           <span><i className="available" />Available</span>
           <span><i className="occupied" />Occupied</span>
+          <span><i className="staff" />Faculty / Staff</span>
           <span><i className="mine" />Your seat</span>
           <span><i className="route" />Route</span>
         </div>
@@ -206,6 +224,28 @@ export function SeatingLayout({ allocations, selectedId, onSelect, showRoster = 
         <ol className="seat-finder-directions">
           {directions.map((direction) => <li key={direction}>{direction}</li>)}
         </ol>
+
+        {selected && (
+          <section className={`seating-attendee-detail ${selected.type === 'faculty' || selected.type === 'staff' ? 'staff' : ''}`}>
+            <div className="seating-attendee-heading">
+              <span>{selected.name.split(' ').filter(Boolean).map((part) => part[0]).join('').slice(0, 2)}</span>
+              <div>
+                <p>{selected.type === 'faculty' ? 'FACULTY SEATING' : selected.type === 'staff' ? 'STAFF SEATING' : 'STUDENT SEATING'}</p>
+                <h3>{selected.name}</h3>
+                <small>{selected.registerNumber}</small>
+              </div>
+            </div>
+            <dl>
+              <div><dt>Role</dt><dd>{selected.role || 'Graduate attendee'}</dd></div>
+              <div><dt>Department</dt><dd>{selected.department || 'Student'}</dd></div>
+              <div><dt>Block</dt><dd>{selected.block}</dd></div>
+              <div><dt>Row</dt><dd>{selected.row}</dd></div>
+              <div><dt>Seat</dt><dd>{selected.seat}</dd></div>
+              <div><dt>Assigned Students</dt><dd>{selected.assignedStudentCount !== undefined ? `${selected.assignedStudentCount} / ${selected.studentCapacity || 13}` : '—'}</dd></div>
+              <div><dt>Email</dt><dd>{selected.email || '—'}</dd></div>
+            </dl>
+          </section>
+        )}
       </section>
     </div>
   )

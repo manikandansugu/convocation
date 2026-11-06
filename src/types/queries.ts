@@ -56,7 +56,7 @@ export const INITIAL_QUERIES: StudentQuery[] = [
       {
         id: 'query-message-3',
         sender: 'Student',
-        body: 'I completed the ₹1,050 payment successfully, but the registration page still shows payment pending.',
+        body: 'I completed the ₹500 payment successfully, but the registration page still shows payment pending.',
         sentAt: '25 Oct 2026, 09:40 AM',
         channel: 'Portal',
       },
