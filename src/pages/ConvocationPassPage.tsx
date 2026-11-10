@@ -41,9 +41,9 @@ function PersonPass({ name, label, relationship, index, photoUrl, student, guest
   const seatId = student.seatNumber || 'A-25'
   const guestHallNumber = 'Hall 01'
   const attendeeRegistration = isPrimaryStudent ? student.registerNumber : passId
-  const attendeeProgram = isPrimaryStudent
+  const attendeeProgramOrRelation = isPrimaryStudent
     ? `${student.degree} — ${student.program || 'Business Administration'}`
-    : `${relationship || 'Guest'} of ${student.name}`
+    : relationship || 'Registered Guest'
 
   return (
     <div className="pass-card-wrapper">
@@ -77,8 +77,8 @@ function PersonPass({ name, label, relationship, index, photoUrl, student, guest
                 <strong>{attendeeRegistration}</strong>
               </div>
               <div className="ceremonial-detail">
-                <span>PROGRAM</span>
-                <strong>{attendeeProgram}</strong>
+                <span>{isPrimaryStudent ? 'PROGRAM' : 'RELATION'}</span>
+                <strong>{attendeeProgramOrRelation}</strong>
               </div>
               <div className="ceremonial-detail">
                 <span>ACCOMPANYING GUEST(S)</span>
