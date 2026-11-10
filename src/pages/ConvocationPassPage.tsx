@@ -10,6 +10,8 @@ import guestPhoto from '../assets/guest-male-portrait.png'
 import convocationLogo from '../assets/srm-convocation-logo.png'
 
 const QR_TARGET_URL = 'https://neccampus.srmtech.com/'
+const PASS_EXPORT_WIDTH = 720
+const PASS_EXPORT_HEIGHT = 514
 
 interface ConvocationPassPageProps {
   guests: Guest[]
@@ -429,14 +431,38 @@ export function ConvocationPassPage({ guests, photoUrl, student = STUDENT, onNav
   const renderPass = async (elementId: string) => {
     const passElement = document.getElementById(elementId)
     if (!passElement) throw new Error('Pass element was not found')
-    await document.fonts.ready
-    await waitForImages(passElement)
-    return toPng(passElement, {
-      cacheBust: true,
-      pixelRatio: 2,
-      backgroundColor: '#ffffff',
-      skipFonts: true,
-    })
+
+    const exportHost = document.createElement('div')
+    exportHost.className = 'pass-export-host'
+    exportHost.setAttribute('aria-hidden', 'true')
+
+    const exportPass = passElement.cloneNode(true) as HTMLElement
+    exportPass.removeAttribute('id')
+    exportPass.classList.add('pass-exporting')
+    exportHost.appendChild(exportPass)
+    document.body.appendChild(exportHost)
+
+    try {
+      await document.fonts.ready
+      await waitForImages(exportPass)
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+
+      return await toPng(exportPass, {
+        cacheBust: true,
+        pixelRatio: 2,
+        width: PASS_EXPORT_WIDTH,
+        height: PASS_EXPORT_HEIGHT,
+        backgroundColor: '#ffffff',
+        style: {
+          width: `${PASS_EXPORT_WIDTH}px`,
+          height: `${PASS_EXPORT_HEIGHT}px`,
+          maxWidth: 'none',
+          minWidth: `${PASS_EXPORT_WIDTH}px`,
+        },
+      })
+    } finally {
+      exportHost.remove()
+    }
   }
 
   const triggerDownload = (blob: Blob, filename: string) => {

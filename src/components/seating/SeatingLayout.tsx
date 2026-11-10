@@ -7,7 +7,7 @@ export interface SeatAllocation {
   block: string
   row: string
   seat: number
-  type?: 'student' | 'faculty' | 'staff'
+  type?: 'student' | 'guest' | 'faculty' | 'staff'
   role?: string
   department?: string
   email?: string
@@ -153,7 +153,7 @@ export function SeatingLayout({ allocations, selectedId, onSelect, showRoster = 
           <div><p className="eyebrow">DR. T. P. GANESAN AUDITORIUM</p><h2>Convocation Seat Finder</h2></div>
           {selected && (
             <p>
-              {isStaffView ? 'Attendee:' : 'Welcome,'} <strong>{selected.name}</strong>. {isStaffView ? 'Allocated seat is' : 'Your allocated seat is'} <strong>{displayedSeat}</strong>.
+              {selected.type === 'guest' ? 'Guest allocation:' : isStaffView ? 'Attendee:' : 'Welcome,'} <strong>{selected.name}</strong>. Allocated seat: <strong>{displayedSeat}</strong>.
             </p>
           )}
         </div>
@@ -176,7 +176,8 @@ export function SeatingLayout({ allocations, selectedId, onSelect, showRoster = 
                     const isTaken = OCCUPIED_SEATS.has(seatId) || Boolean(allocation)
                     const isFacultyOrStaff = allocation?.type === 'faculty' || allocation?.type === 'staff'
                     const isStaffStudent = Boolean(isStaffView && allocation?.type === 'student')
-                    const className = `seat-finder-seat ${isMine ? 'mine' : isTaken ? 'taken' : ''} ${isFacultyOrStaff ? 'staff' : ''} ${isStaffStudent ? 'staff-student' : ''}`
+                    const isGuest = allocation?.type === 'guest'
+                    const className = `seat-finder-seat ${isMine ? 'mine' : isTaken ? 'taken' : ''} ${isFacultyOrStaff ? 'staff' : ''} ${isStaffStudent ? 'staff-student' : ''} ${isGuest ? 'guest' : ''}`
                     return (
                       <rect
                         key={seatId}
@@ -225,6 +226,7 @@ export function SeatingLayout({ allocations, selectedId, onSelect, showRoster = 
         <div className="seat-finder-legend" aria-label="Seating legend">
           <span><i className="available" />Available</span>
           <span><i className="occupied" />Occupied</span>
+          <span><i className="guest" />Registered guest</span>
           <span><i className="staff" />Faculty / Staff</span>
           {isStaffView && <span><i className="staff-student" />Assigned Graduates (Rows A–B)</span>}
           <span><i className="mine" />{isStaffView ? 'Selected attendee' : 'Your seat'}</span>
@@ -236,18 +238,18 @@ export function SeatingLayout({ allocations, selectedId, onSelect, showRoster = 
         </ol>
 
         {selected && (
-          <section className={`seating-attendee-detail ${selected.type === 'faculty' || selected.type === 'staff' ? 'staff' : ''}`}>
+          <section className={`seating-attendee-detail ${selected.type === 'faculty' || selected.type === 'staff' ? 'staff' : ''} ${selected.type === 'guest' ? 'guest' : ''}`}>
             <div className="seating-attendee-heading">
               <span>{selected.name.split(' ').filter(Boolean).map((part) => part[0]).join('').slice(0, 2)}</span>
               <div>
-                <p>{selected.type === 'faculty' ? 'FACULTY SEATING' : selected.type === 'staff' ? 'STAFF SEATING' : 'STUDENT SEATING'}</p>
+                <p>{selected.type === 'faculty' ? 'FACULTY SEATING' : selected.type === 'staff' ? 'STAFF SEATING' : selected.type === 'guest' ? 'GUEST SEATING' : 'STUDENT SEATING'}</p>
                 <h3>{selected.name}</h3>
                 <small>{selected.registerNumber}</small>
               </div>
             </div>
             <dl>
-              <div><dt>Role</dt><dd>{selected.role || 'Graduate attendee'}</dd></div>
-              <div><dt>Department</dt><dd>{selected.department || 'Student'}</dd></div>
+              <div><dt>Role</dt><dd>{selected.role || (selected.type === 'guest' ? 'Registered guest' : 'Graduate attendee')}</dd></div>
+              <div><dt>{selected.type === 'guest' ? 'Linked Student' : 'Department'}</dt><dd>{selected.department || (selected.type === 'guest' ? '—' : 'Student')}</dd></div>
               <div><dt>Block</dt><dd>{selected.block}</dd></div>
               <div><dt>Row</dt><dd>{selected.row}</dd></div>
               <div><dt>Seat</dt><dd>{selected.seat}</dd></div>

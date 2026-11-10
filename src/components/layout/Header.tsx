@@ -18,10 +18,9 @@ export interface HeaderProps {
     icon?: IconName
     tone?: 'success' | 'info' | 'neutral'
   }
-  onSwitchRole?: (role: 'staff') => void
 }
 
-export function Header({ activePage, onOpenNavigation, title, subtitle, eyebrow, icon, action, status, onSwitchRole }: HeaderProps) {
+export function Header({ activePage, onOpenNavigation, title, subtitle, eyebrow, icon, action, status }: HeaderProps) {
   const detailed = Boolean(subtitle || eyebrow || icon)
 
   return <header className={`topbar ${detailed ? 'topbar-detailed' : ''}`}>
@@ -35,19 +34,6 @@ export function Header({ activePage, onOpenNavigation, title, subtitle, eyebrow,
       </div>
     </div>
     <div className="topbar-actions">
-      {onSwitchRole && (
-        <div className="topbar-role-switchers">
-          <button
-            type="button"
-            className="topbar-role-pill staff"
-            onClick={() => onSwitchRole('staff')}
-            title="Open Faculty & Staff Operations Desk"
-          >
-            <Icon name="shield" size={13} /> Faculty & Staff Desk
-          </button>
-        </div>
-      )}
-
       {action ? (
         <button type="button" className="topbar-primary-action" onClick={action.onClick}>
           <Icon name={action.icon} size={16} /> {action.label}

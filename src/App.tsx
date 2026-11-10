@@ -55,7 +55,7 @@ function App() {
       return <InstructionsPage onStartRegistration={() => navigateTo('Student Information')} />
     }
     if (activePage === 'Seating Layout') {
-      return <SeatingLayoutPage />
+      return <SeatingLayoutPage guests={guests} />
     }
     if (activePage === 'Map') {
       return <MapPage />
@@ -262,7 +262,6 @@ function App() {
         faculty={currentFaculty}
         initialTab={staffInitialTab}
         onLogout={logout}
-        onSwitchToStudentView={() => setUserRole('student')}
       />
     )
   }
@@ -283,7 +282,6 @@ function App() {
         <Header
           activePage={activePage}
           onOpenNavigation={() => setSidebarOpen(true)}
-          onSwitchRole={(newRole) => setUserRole(newRole)}
           {...pageHeaderDetails}
         />
         {renderPage()}

@@ -15,7 +15,6 @@ interface StaffPortalPageProps {
   faculty?: FacultyMember
   initialTab?: StaffTab
   onLogout: () => void
-  onSwitchToStudentView?: () => void
 }
 
 export function StaffPortalPage({
@@ -23,7 +22,6 @@ export function StaffPortalPage({
   faculty = DEFAULT_FACULTY,
   initialTab = 'counter',
   onLogout,
-  onSwitchToStudentView,
 }: StaffPortalPageProps) {
   const [activeTab, setActiveTab] = useState<StaffTab>(initialTab)
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -125,6 +123,20 @@ export function StaffPortalPage({
 
   const selectedStudent = roster.find((s) => s.id === selectedStudentId) || roster[0]
   const drawerStudent = roster.find((s) => s.id === drawerStudentId)
+  const guestSeatAllocations: SeatAllocation[] = roster.flatMap((student, studentIndex) => (
+    Array.from({ length: student.guestCount }, (_, guestIndex) => ({
+      id: `${student.id}-guest-${guestIndex + 1}`,
+      name: `Guest ${guestIndex + 1} of ${student.name}`,
+      registerNumber: `${student.registrationId}-G${guestIndex + 1}`,
+      block: 'Guest Gallery',
+      row: 'K',
+      seat: studentIndex * 2 + guestIndex + 1,
+      type: 'guest',
+      role: 'Registered Guest',
+      department: `${student.name} · ${student.registerNumber}`,
+      email: student.personalEmail,
+    } as SeatAllocation))
+  ))
   const seatingAllocations: SeatAllocation[] = [...roster.map((student) => ({
     id: student.id,
     name: student.name,
@@ -136,7 +148,7 @@ export function StaffPortalPage({
     department: student.department,
     role: student.degree ? `${student.degree} Graduate` : 'Graduate attendee',
     email: student.officialEmail || student.personalEmail,
-  } as SeatAllocation)), ...FACULTY_STAFF_ALLOCATIONS]
+  } as SeatAllocation)), ...guestSeatAllocations, ...FACULTY_STAFF_ALLOCATIONS]
 
   const updateTimedStep = (
     studentId: string,
@@ -397,19 +409,6 @@ export function StaffPortalPage({
           <div className="topbar-title">{TAB_TITLES[activeTab]}</div>
           <div className="topbar-actions">
             <div className="status-pill"><span /> Convocation 2026</div>
-            <span className="staff-topbar-station-pill">
-              <Icon name="shield" size={13} /> {staff.counter}
-            </span>
-            {onSwitchToStudentView && (
-              <button
-                type="button"
-                className="role-switch-btn"
-                onClick={onSwitchToStudentView}
-                title="Switch to student portal view"
-              >
-                <Icon name="cap" size={15} /> View Student Pass
-              </button>
-            )}
             <button
               type="button"
               className="staff-topbar-signout-btn"

@@ -3078,6 +3078,7 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
 .seat-finder-seat { fill: #d9e5f1; stroke: #c9d6e4; stroke-width: 1; transition: opacity .18s, filter .18s; }
 .seat-finder-seat.taken { fill: #aeb8c4; stroke: #a4afbb; }
 .seat-finder-seat.staff { fill: #e8c786; stroke: #d4ad62; }
+.seat-finder-seat.guest { fill: #a98be8; stroke: #8664cf; }
 .seat-finder-seat.staff-student { fill: #1769e8; stroke: #0c4cb4; stroke-width: 1.5; }
 .seat-finder-seat.staff-student.mine { fill: #1769e8; stroke: #f59e0b; stroke-width: 3.5; animation: seat-finder-pulse 1.2s infinite; }
 .seat-finder-seat.mine { fill: #e8590c; stroke: #d54e07; animation: seat-finder-pulse 1.2s infinite; }
@@ -3101,6 +3102,7 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
 .seat-finder-legend span { display: inline-flex; align-items: center; gap: 6px; }
 .seat-finder-legend i { width: 12px; height: 12px; border-radius: 3px; background: #d9e5f1; }
 .seat-finder-legend i.occupied { background: #aeb8c4; }
+.seat-finder-legend i.guest { background: #a98be8; }
 .seat-finder-legend i.staff { border: 1px solid #d4ad62; background: #e8c786; }
 .seat-finder-legend i.staff-student { border: 1px solid #0c4cb4; background: #1769e8; }
 .seat-finder-legend i.mine { background: #e8590c; }
@@ -3109,12 +3111,15 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
 .seat-finder-directions li::marker { color: #1769e8; font-weight: 800; }
 .seating-attendee-detail { margin-top: 14px; padding: 15px; border: 1px solid #cfe0f5; border-radius: 10px; background: #f5f9ff; display: grid; grid-template-columns: minmax(190px, .7fr) minmax(0, 1.3fr); gap: 18px; align-items: center; }
 .seating-attendee-detail.staff { border-color: #ead3a8; background: #fffaf0; }
+.seating-attendee-detail.guest { border-color: #d7c8f5; background: #faf8ff; }
 .seating-attendee-heading { min-width: 0; display: flex; align-items: center; gap: 11px; }
 .seating-attendee-heading > span { width: 42px; height: 42px; flex: 0 0 auto; border-radius: 50%; color: #0b3d78; background: #e5f0ff; display: grid; place-items: center; font-size: 11px; font-weight: 850; }
 .seating-attendee-detail.staff .seating-attendee-heading > span { color: #805313; background: #f8e7c6; }
+.seating-attendee-detail.guest .seating-attendee-heading > span { color: #5e3aa9; background: #eee7fb; }
 .seating-attendee-heading > div { min-width: 0; }
 .seating-attendee-heading p { margin: 0 0 2px; color: #1769e8; font-size: 8px; font-weight: 850; letter-spacing: .8px; }
 .seating-attendee-detail.staff .seating-attendee-heading p { color: #9a6517; }
+.seating-attendee-detail.guest .seating-attendee-heading p { color: #7048bd; }
 .seating-attendee-heading h3 { margin: 0; overflow: hidden; color: #172033; font: 750 14px var(--display); text-overflow: ellipsis; white-space: nowrap; }
 .seating-attendee-heading small { color: #7b8797; font-size: 10px; }
 .seating-attendee-detail dl { margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 14px; }
@@ -4374,6 +4379,52 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
   .ceremonial-pass-qr.person-pass-qr { grid-column: auto; }
   .ceremonial-pass-footer { grid-template-columns: 1fr; }
 }
+
+/* Stable fixed canvas used only by HTML-to-image pass downloads. */
+.pass-export-host {
+  width: 720px;
+  height: 514px;
+  position: fixed;
+  z-index: -1;
+  top: 0;
+  left: -10000px;
+  overflow: hidden;
+  pointer-events: none;
+}
+.ceremonial-pass.person-pass.pass-exporting {
+  width: 720px !important;
+  min-width: 720px !important;
+  max-width: none !important;
+  height: 514px !important;
+  min-height: 514px !important;
+  aspect-ratio: auto !important;
+}
+.pass-exporting .ceremonial-pass-inner {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  padding: 18px 24px 20px !important;
+  gap: 14px !important;
+}
+.pass-exporting .ceremonial-pass-heading h2 { font-size: 30px !important; letter-spacing: -1px !important; }
+.pass-exporting .entry-pass-title { width: 270px !important; }
+.pass-exporting .entry-pass-title strong { padding: 6px 12px !important; font-size: 11px !important; letter-spacing: 2px !important; }
+.pass-exporting .ceremonial-pass-content {
+  grid-template-columns: 130px minmax(0, 1fr) 105px !important;
+  align-items: center !important;
+  justify-items: stretch !important;
+  gap: 18px !important;
+}
+.pass-exporting .ceremonial-photo-frame { width: 100% !important; }
+.pass-exporting .ceremonial-pass-details { width: auto !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; column-gap: 18px !important; row-gap: 12px !important; }
+.pass-exporting .ceremonial-detail-wide { grid-column: 1 / -1 !important; }
+.pass-exporting .ceremonial-detail > span,
+.pass-exporting .ceremonial-pass-footer span { font-size: 8px !important; }
+.pass-exporting .ceremonial-detail > strong { font-size: 12px !important; }
+.pass-exporting .ceremonial-pass-qr.person-pass-qr { grid-column: auto !important; align-self: center !important; }
+.pass-exporting .ceremonial-pass-qr.person-pass-qr a svg { width: 86px !important; height: 86px !important; }
+.pass-exporting .ceremonial-pass-footer { min-height: 52px !important; grid-template-columns: 1fr 1fr !important; }
+.pass-exporting .ceremonial-pass-footer strong { font-size: 16px !important; }
 
 @media print {
   .ceremonial-pass.person-pass { aspect-ratio: 1.4 / 1; break-inside: avoid; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
