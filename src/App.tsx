@@ -54,7 +54,7 @@ function App() {
     if (activePage === 'Instructions') {
       return <InstructionsPage onStartRegistration={() => navigateTo('Student Information')} />
     }
-    if (activePage === 'Seating Layout') {
+    if (activePage === 'Seating' || activePage === 'Seating Layout') {
       return <SeatingLayoutPage guests={guests} />
     }
     if (activePage === 'Map') {
@@ -124,7 +124,7 @@ function App() {
         guests={guests}
         photoUrl={capturedPhotoUrl}
         student={studentInfo}
-        onNavigateToSeating={() => navigateTo('Seating Layout')}
+        onNavigateToSeating={() => navigateTo('Seating')}
         onNavigateToMap={() => navigateTo('Map')}
       />
     )
@@ -169,13 +169,14 @@ function App() {
             onClick: () => setQueryFormOpen((open) => !open),
           },
         }
+      case 'Seating':
       case 'Seating Layout':
         return {
-          title: 'Seating Layout',
-          subtitle: 'View your allocated auditorium block, row and seat before arriving at the venue.',
-          eyebrow: 'CONVOCATION 2026',
+          title: 'Seating',
+          subtitle: 'Dr. T. P. Ganesan Auditorium Seating Layout (2,852 Seats · 52 Rows)',
+          eyebrow: 'DR. T. P. GANESAN AUDITORIUM · CONVOCATION 2026',
           icon: 'grid',
-          status: { label: 'Seat allocated', icon: 'check', tone: 'success' },
+          status: { label: 'Seat allocated: A-6', icon: 'check', tone: 'success' },
         }
       case 'Map':
         return {

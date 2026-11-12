@@ -4,6 +4,7 @@ export type PageId =
   | 'Instructions'
   | 'Notifications'
   | 'Queries & Support'
+  | 'Seating'
   | 'Seating Layout'
   | 'Map'
   | 'Student Information'
@@ -25,7 +26,7 @@ export const navigationItems: NavigationItem[] = [
   { label: 'Payment', icon: 'wallet' },
   { label: 'Guest Addition', icon: 'user' },
   { label: 'Convocation Pass', icon: 'ticket' },
-  { label: 'Seating Layout', icon: 'grid' },
+  { label: 'Seating', icon: 'grid' },
   { label: 'Map', icon: 'map' },
   { label: 'Queries & Support', icon: 'help' },
 ]

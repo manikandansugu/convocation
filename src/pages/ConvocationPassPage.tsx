@@ -302,7 +302,7 @@ function GraduationDayLifecyclePanel({ onNavigateToSeating, onNavigateToMap }: G
                 <strong>Step 6: Seat Identification</strong>
                 <span className="status-pill success">Allotted Seat: A-25</span>
               </div>
-              <p>Front Block, Row A, Seat 25. Clearly displayed with aisle navigation.</p>
+              <p>Front Left Block, Row A, Seat 6 (A-6). Clearly displayed with aisle navigation.</p>
               {onNavigateToSeating && (
                 <button
                   type="button"

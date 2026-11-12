@@ -3135,6 +3135,247 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
   .seating-attendee-detail dl { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
+/* Seating Toolbar & Controls */
+.seating-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  border-radius: 9px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.seating-tier-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.seating-tier-tabs button {
+  appearance: none;
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.seating-tier-tabs button:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+.seating-tier-tabs button.active {
+  background: #1769e8;
+  border-color: #1769e8;
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(23, 105, 232, 0.3);
+}
+
+.seating-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.seating-seat-search {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.seating-seat-search input {
+  padding: 5px 9px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 11px;
+  width: 140px;
+  outline: none;
+}
+
+.seating-seat-search input:focus {
+  border-color: #1769e8;
+  box-shadow: 0 0 0 2px rgba(23, 105, 232, 0.15);
+}
+
+.seating-seat-search .search-btn {
+  padding: 5px 10px;
+  background: #1769e8;
+  border: 1px solid #1769e8;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.seating-zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 2px 6px;
+}
+
+.seating-zoom-controls button {
+  background: none;
+  border: none;
+  padding: 3px 6px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #475569;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.seating-zoom-controls button:hover {
+  background: #f1f5f9;
+}
+
+.seating-zoom-controls span {
+  font-size: 10px;
+  font-weight: 750;
+  color: #64748b;
+  min-width: 32px;
+  text-align: center;
+}
+
+.seating-hover-tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: #0f172a;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 10px;
+  z-index: 20;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.seating-hover-tooltip strong {
+  color: #60a5fa;
+  font-size: 12px;
+}
+
+.seating-hover-tooltip span {
+  color: #cbd5e1;
+}
+
+.seating-hover-tooltip small {
+  color: #94a3b8;
+  font-size: 9px;
+}
+
+.seat-badge-highlight {
+  display: inline-block;
+  padding: 2px 7px;
+  background: #ffedd5;
+  color: #c2410c;
+  border: 1px solid #fed7aa;
+  border-radius: 4px;
+  font-weight: 800;
+}
+
+.tier-pill {
+  display: inline-block;
+  padding: 2px 7px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  font-size: 9px;
+  font-weight: 700;
+  margin-left: 4px;
+}
+
+.seating-roster-search {
+  padding: 8px 12px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.seating-roster-search input {
+  width: 100%;
+  padding: 6px 10px;
+  font-size: 11px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  outline: none;
+}
+
+.seating-roster-search input:focus {
+  border-color: #1769e8;
+}
+
+.seating-roster-stats {
+  padding: 10px 14px;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  text-align: center;
+}
+
+.seating-roster-stats small {
+  display: block;
+  font-size: 8px;
+  color: #64748b;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.seating-roster-stats strong {
+  font-size: 10px;
+  color: #1e293b;
+}
+
+.seat-finder-directions-card {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border: 1px solid #d9e6f6;
+  border-radius: 9px;
+  background: #f5f9ff;
+}
+
+.seat-finder-directions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.seat-finder-directions-header h4 {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 800;
+  color: #1e3a8a;
+}
+
+.gate-selector-pill {
+  font-size: 9px;
+  color: #3b82f6;
+  background: #dbeafe;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
 /* Student notifications */
 .notifications-page { padding-bottom: 70px; }
 .notifications-summary { padding: 20px 22px; border-color: #cfe0f5; background: linear-gradient(100deg, #f6faff, #edf5ff); display: grid; grid-template-columns: 44px 1fr auto; align-items: center; gap: 14px; }
