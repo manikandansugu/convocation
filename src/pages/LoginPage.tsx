@@ -339,10 +339,6 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                   )}
                 </button>
 
-                <div className="login-demo-helper">
-                  <Icon name="help" size={14} />
-                  <span>Demo: EMP9041 for staff or EMP-FAC-401 for faculty · Password: 123456</span>
-                </div>
               </form>
             </>
           )}
