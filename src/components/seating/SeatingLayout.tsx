@@ -1,4 +1,5 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Icon } from '../ui/Icon'
 import {
   AUDITORIUM_ROWS,
   TOTAL_SEAT_COUNT,
@@ -118,6 +119,30 @@ export function SeatingLayout({
   const [searchQuery, setSearchQuery] = useState('')
   const [zoomLevel, setZoomLevel] = useState(1)
   const [hoveredTooltip, setHoveredTooltip] = useState<TooltipData | null>(null)
+  const [isMaximized, setIsMaximized] = useState(false)
+
+  // Close maximized view on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isMaximized) {
+        setIsMaximized(false)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isMaximized])
+
+  // Prevent background scroll when maximized
+  useEffect(() => {
+    if (isMaximized) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [isMaximized])
 
   // Map of seatId -> allocation (e.g. "A-6" -> SeatAllocation)
   const allocationBySeat = useMemo(() => {
@@ -301,7 +326,20 @@ export function SeatingLayout({
   }
 
   return (
-    <div className={`seating-layout-shell ${showRoster ? 'with-roster' : ''}`}>
+    <div className={`seating-layout-shell ${showRoster ? 'with-roster' : ''} ${isMaximized ? 'seating-maximized-popover' : ''}`}>
+      {isMaximized && (
+        <button
+          type="button"
+          className="seating-popover-floating-close"
+          onClick={() => setIsMaximized(false)}
+          title="Exit full screen (Esc)"
+          aria-label="Exit full screen"
+        >
+          <Icon name="x" size={18} />
+          <span>Exit Full Screen (Esc)</span>
+        </button>
+      )}
+
       {showRoster && (
         <aside className="panel seating-roster-panel">
           <div className="seating-roster-heading">
@@ -388,16 +426,28 @@ export function SeatingLayout({
             <p className="eyebrow">DR. T. P. GANESAN AUDITORIUM</p>
             <h2>Auditorium Seating Layout</h2>
           </div>
-          {selected && (
-            <p>
-              {selected.type === 'guest' ? 'Guest allocation:' : isStaffView ? 'Attendee:' : 'Welcome,'}{' '}
-              <strong>{selected.name}</strong>. Allocated seat:{' '}
-              <strong className="seat-badge-highlight">{displayedSeatId}</strong>{' '}
-              <span className="tier-pill">
-                {selectedRowConfig?.tier === 'balcony' ? 'Balcony Level' : 'Ground Floor'}
-              </span>
-            </p>
-          )}
+          <div className="seat-finder-heading-actions">
+            {selected && (
+              <p>
+                {selected.type === 'guest' ? 'Guest allocation:' : isStaffView ? 'Attendee:' : 'Welcome,'}{' '}
+                <strong>{selected.name}</strong>. Allocated seat:{' '}
+                <strong className="seat-badge-highlight">{displayedSeatId}</strong>{' '}
+                <span className="tier-pill">
+                  {selectedRowConfig?.tier === 'balcony' ? 'Balcony Level' : 'Ground Floor'}
+                </span>
+              </p>
+            )}
+            <button
+              type="button"
+              className={`seating-maximize-btn ${isMaximized ? 'is-maximized' : ''}`}
+              onClick={() => setIsMaximized((prev) => !prev)}
+              title={isMaximized ? "Exit full screen view (Esc)" : "Spread seating layout to entire screen"}
+              aria-label={isMaximized ? "Exit full screen view" : "Spread seating layout to entire screen"}
+            >
+              <Icon name={isMaximized ? 'minimize' : 'maximize'} size={16} />
+              <span>{isMaximized ? 'Exit Full Screen' : 'Maximize'}</span>
+            </button>
+          </div>
         </div>
 
         {/* Toolbar: Tiers, Zoom, Search */}
@@ -463,6 +513,15 @@ export function SeatingLayout({
               </button>
               <button type="button" onClick={() => setZoomLevel(1)} title="Reset Zoom">
                 Reset
+              </button>
+              <button
+                type="button"
+                className={`zoom-maximize-btn ${isMaximized ? 'active' : ''}`}
+                onClick={() => setIsMaximized((prev) => !prev)}
+                title={isMaximized ? "Exit full screen (Esc)" : "Maximize seating layout to spread entire screen"}
+                aria-label={isMaximized ? "Exit full screen" : "Maximize seating layout to spread entire screen"}
+              >
+                <Icon name={isMaximized ? 'minimize' : 'maximize'} size={15} />
               </button>
             </div>
           </div>

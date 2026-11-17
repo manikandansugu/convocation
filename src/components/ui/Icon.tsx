@@ -6,6 +6,7 @@ export type IconName =
   | 'check' | 'chevron' | 'download' | 'card' | 'bank' | 'phone'
   | 'camera' | 'mail' | 'wallet' | 'tag' | 'award' | 'x' | 'lock'
   | 'eye' | 'eye-off' | 'shield' | 'search' | 'plus' | 'map' | 'coffee' | 'car'
+  | 'maximize' | 'minimize'
 
 const iconPaths: Record<IconName, ReactNode> = {
   grid: <><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></>,
@@ -42,6 +43,8 @@ const iconPaths: Record<IconName, ReactNode> = {
   map: <><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></>,
   coffee: <><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></>,
   car: <><path d="M14 16H9m10 0h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2h-1.6a2 2 0 0 1-1.8-1.1L15 5H9L7.4 7.9A2 2 0 0 1 5.6 9H4a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1"/><circle cx="7" cy="16" r="2"/><circle cx="17" cy="16" r="2"/></>,
+  maximize: <><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></>,
+  minimize: <><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></>,
 }
 
 interface IconProps {
