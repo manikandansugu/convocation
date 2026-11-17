@@ -55,7 +55,7 @@ function App() {
       return <InstructionsPage onStartRegistration={() => navigateTo('Student Information')} />
     }
     if (activePage === 'Seating' || activePage === 'Seating Layout') {
-      return <SeatingLayoutPage guests={guests} />
+      return <SeatingLayoutPage />
     }
     if (activePage === 'Map') {
       return <MapPage />

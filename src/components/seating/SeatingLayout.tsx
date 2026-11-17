@@ -18,7 +18,7 @@ export interface SeatAllocation {
   block: string
   row: string
   seat: number
-  type?: 'student' | 'guest' | 'faculty' | 'staff'
+  type?: 'student' | 'faculty' | 'staff'
   role?: string
   department?: string
   email?: string
@@ -377,14 +377,13 @@ export function SeatingLayout({
                   .join('')
                   .slice(0, 2)
                 const isActive = allocation.id === selected?.id
-                const isGuest = allocation.type === 'guest'
                 const isFaculty = allocation.type === 'faculty' || allocation.type === 'staff'
 
                 return (
                   <button
                     type="button"
                     key={allocation.id}
-                    className={`${isActive ? 'active' : ''} ${isGuest ? 'guest' : ''} ${isFaculty ? 'staff' : ''}`}
+                    className={`${isActive ? 'active' : ''} ${isFaculty ? 'staff' : ''}`}
                     onClick={() => chooseAllocation(allocation)}
                   >
                     <span className="seating-roster-avatar">{initials}</span>
@@ -429,7 +428,7 @@ export function SeatingLayout({
           <div className="seat-finder-heading-actions">
             {selected && (
               <p>
-                {selected.type === 'guest' ? 'Guest allocation:' : isStaffView ? 'Attendee:' : 'Welcome,'}{' '}
+                {isStaffView ? 'Attendee:' : 'Welcome,'}{' '}
                 <strong>{selected.name}</strong>. Allocated seat:{' '}
                 <strong className="seat-badge-highlight">{displayedSeatId}</strong>{' '}
                 <span className="tier-pill">
@@ -752,13 +751,11 @@ export function SeatingLayout({
                       const isTaken = allocation ? true : isDeterministicallyOccupied(rowConfig.row, seatNumber)
                       const isFacultyOrStaff = allocation?.type === 'faculty' || allocation?.type === 'staff'
                       const isStaffStudent = isStaffView && allocation?.type === 'student'
-                      const isGuest = allocation?.type === 'guest'
 
                       let className = 'seat-finder-seat'
                       if (isMine) className += ' mine'
                       else if (isStaffStudent) className += ' staff-student'
                       else if (isFacultyOrStaff) className += ' staff'
-                      else if (isGuest) className += ' guest'
                       else if (isTaken) className += ' taken'
 
                       return (
@@ -964,10 +961,6 @@ export function SeatingLayout({
             Occupied
           </span>
           <span>
-            <i className="guest" />
-            Registered Guest (Row K)
-          </span>
-          <span>
             <i className="staff" />
             Faculty / Staff Coordinator
           </span>
@@ -1010,8 +1003,6 @@ export function SeatingLayout({
             className={`seating-attendee-detail ${
               selected.type === 'faculty' || selected.type === 'staff'
                 ? 'staff'
-                : selected.type === 'guest'
-                ? 'guest'
                 : ''
             }`}
           >
@@ -1030,8 +1021,6 @@ export function SeatingLayout({
                     ? 'FACULTY SEATING'
                     : selected.type === 'staff'
                     ? 'STAFF SEATING'
-                    : selected.type === 'guest'
-                    ? 'GUEST SEATING'
                     : 'STUDENT SEATING'}
                 </p>
                 <h3>{selected.name}</h3>
@@ -1041,11 +1030,11 @@ export function SeatingLayout({
             <dl>
               <div>
                 <dt>Role</dt>
-                <dd>{selected.role || (selected.type === 'guest' ? 'Registered Guest' : 'Graduate Attendee')}</dd>
+                <dd>{selected.role || 'Graduate Attendee'}</dd>
               </div>
               <div>
-                <dt>{selected.type === 'guest' ? 'Linked Student' : 'Department'}</dt>
-                <dd>{selected.department || (selected.type === 'guest' ? '—' : 'Student')}</dd>
+                <dt>Department</dt>
+                <dd>{selected.department || 'Student'}</dd>
               </div>
               <div>
                 <dt>Tier</dt>

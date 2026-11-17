@@ -124,32 +124,21 @@ export function StaffPortalPage({
 
   const selectedStudent = roster.find((s) => s.id === selectedStudentId) || roster[0]
   const drawerStudent = roster.find((s) => s.id === drawerStudentId)
-  const guestSeatAllocations: SeatAllocation[] = roster.flatMap((student, studentIndex) => (
-    Array.from({ length: student.guestCount }, (_, guestIndex) => ({
-      id: `${student.id}-guest-${guestIndex + 1}`,
-      name: `Guest ${guestIndex + 1} of ${student.name}`,
-      registerNumber: `${student.registrationId}-G${guestIndex + 1}`,
-      block: 'Guest Gallery',
-      row: 'K',
-      seat: studentIndex * 2 + guestIndex + 1,
-      type: 'guest',
-      role: 'Registered Guest',
-      department: `${student.name} · ${student.registerNumber}`,
-      email: student.personalEmail,
-    } as SeatAllocation))
-  ))
-  const seatingAllocations: SeatAllocation[] = [...roster.map((student) => ({
-    id: student.id,
-    name: student.name,
-    registerNumber: student.registerNumber,
-    block: student.block,
-    row: student.row,
-    seat: student.seat,
-    type: 'student',
-    department: student.department,
-    role: student.degree ? `${student.degree} Graduate` : 'Graduate attendee',
-    email: student.officialEmail || student.personalEmail,
-  } as SeatAllocation)), ...guestSeatAllocations, ...FACULTY_STAFF_ALLOCATIONS]
+  const seatingAllocations: SeatAllocation[] = [
+    ...roster.map((student) => ({
+      id: student.id,
+      name: student.name,
+      registerNumber: student.registerNumber,
+      block: student.block,
+      row: student.row,
+      seat: student.seat,
+      type: 'student' as const,
+      department: student.department,
+      role: student.degree ? `${student.degree} Graduate` : 'Graduate attendee',
+      email: student.officialEmail || student.personalEmail,
+    })),
+    ...FACULTY_STAFF_ALLOCATIONS,
+  ]
 
   const updateTimedStep = (
     studentId: string,
