@@ -214,6 +214,15 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                       Back
                     </button>
                   </div>
+
+                  <div className="login-assistance-card">
+                    <div className="login-assistance-icon">
+                      <Icon name="help" size={16} />
+                    </div>
+                    <div className="login-assistance-text">
+                      <strong>Login Assistance:</strong> If you experience any difficulties while logging in to the student portal or accessing your Graduation Pass, please contact the support team or raise a support ticket through your student portal for assistance.
+                    </div>
+                  </div>
                 </div>
               ) : (
                 <form className="login-form" onSubmit={handleStudentSubmit} noValidate>
@@ -269,6 +278,15 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                       <button type="button" className="demo-chip" onClick={() => setNetId('C10001')}>C10001 (In Person · Approved)</button>
                       <button type="button" className="demo-chip" onClick={() => setNetId('C10002')}>C10002 (In Absentia)</button>
                       <button type="button" className="demo-chip" onClick={() => setNetId('C99999')}>C99999 (Unapproved)</button>
+                    </div>
+                  </div>
+
+                  <div className="login-assistance-card">
+                    <div className="login-assistance-icon">
+                      <Icon name="help" size={16} />
+                    </div>
+                    <div className="login-assistance-text">
+                      <strong>Login Assistance:</strong> If you experience any difficulties while logging in to the student portal or accessing your Graduation Pass, please contact the support team or raise a support ticket through your student portal for assistance.
                     </div>
                   </div>
                 </form>

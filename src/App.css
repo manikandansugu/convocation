@@ -2076,6 +2076,42 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
   gap: 8px;
 }
 
+.login-assistance-card {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 9px;
+  background: #f0f7ff;
+  border: 1px solid #bfdbfe;
+  color: #1e3a8a;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+
+.login-assistance-icon {
+  width: 26px;
+  height: 26px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #dbeafe;
+  color: #1d4ed8;
+  display: grid;
+  place-items: center;
+  margin-top: 1px;
+}
+
+.login-assistance-text {
+  color: #1e3a8a;
+}
+
+.login-assistance-text strong {
+  color: #0f2d6b;
+  font-weight: 800;
+  margin-right: 4px;
+}
+
 /* Staff Portal Shell & Side Menu */
 .staff-app-shell {
   min-height: 100svh;
