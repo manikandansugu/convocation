@@ -108,7 +108,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
       setIsSubmitting(true)
       window.setTimeout(() => {
         setIsSubmitting(false)
-        onLogin('staff', { faculty, initialTab: 'faculty-distribution' })
+        onLogin('staff', { faculty, initialTab: 'instructions' })
       }, 600)
       return
     }
@@ -120,7 +120,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
     setIsSubmitting(true)
     window.setTimeout(() => {
       setIsSubmitting(false)
-      onLogin('staff', { staff: staffDetails, initialTab: 'counter' })
+      onLogin('staff', { staff: staffDetails, initialTab: 'instructions' })
     }, 600)
   }
 

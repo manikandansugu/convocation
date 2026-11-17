@@ -33,10 +33,10 @@ function App() {
   const [studentInfo, setStudentInfo] = useState<Student>(STUDENT)
   const [currentFaculty, setCurrentFaculty] = useState<FacultyMember>(DEFAULT_FACULTY)
   const [currentStaff, setCurrentStaff] = useState<StaffMember>(DEFAULT_STAFF)
-  const [staffInitialTab, setStaffInitialTab] = useState<StaffTab>('counter')
+  const [staffInitialTab, setStaffInitialTab] = useState<StaffTab>('instructions')
   const [capturedPhotoUrl, setCapturedPhotoUrl] = useState<string>('')
 
-  const [activePage, setActivePage] = useState<PageId>('Student Information')
+  const [activePage, setActivePage] = useState<PageId>('Instructions')
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [guests, setGuests] = useState<Guest[]>(DEFAULT_GUESTS)
@@ -133,7 +133,8 @@ function App() {
   const logout = () => {
     setIsAuthenticated(false)
     setUserRole('student')
-    setActivePage('Student Information')
+    setActivePage('Instructions')
+    setStaffInitialTab('instructions')
     setSidebarOpen(false)
     setSidebarCollapsed(false)
   }
@@ -236,7 +237,7 @@ function App() {
           setUserRole(role)
           if (payload?.faculty) setCurrentFaculty(payload.faculty)
           if (payload?.staff) setCurrentStaff(payload.staff)
-          if (payload?.initialTab) setStaffInitialTab(payload.initialTab)
+          setStaffInitialTab(payload?.initialTab || 'instructions')
           if (payload?.student) {
             setStudentInfo((prev) => ({
               ...prev,
@@ -249,6 +250,7 @@ function App() {
               email: payload.student!.email,
               mobile: payload.student!.mobile,
             }))
+            setActivePage('Instructions')
           }
           setIsAuthenticated(true)
         }}

@@ -20,7 +20,7 @@ interface StaffPortalPageProps {
 export function StaffPortalPage({
   staff = DEFAULT_STAFF,
   faculty = DEFAULT_FACULTY,
-  initialTab = 'counter',
+  initialTab = 'instructions',
   onLogout,
 }: StaffPortalPageProps) {
   const [activeTab, setActiveTab] = useState<StaffTab>(initialTab)
@@ -55,6 +55,7 @@ export function StaffPortalPage({
     { id: 'roster' as const, label: 'Graduate List', icon: 'user' as const },
     { id: 'counter' as const, label: 'In-Person Check & Kit Desk', icon: 'tag' as const },
     { id: 'seating' as const, label: 'Seating & Faculty Allocation', icon: 'grid' as const },
+    ...(faculty && faculty.employeeId ? [{ id: 'faculty-distribution' as const, label: 'Degree Distribution', icon: 'award' as const }] : []),
   ]
 
   const TAB_TITLES: Record<StaffTab, string> = {
