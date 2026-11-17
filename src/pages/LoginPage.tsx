@@ -271,16 +271,6 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                     )}
                   </button>
 
-                  <div className="login-demo-helper">
-                    <Icon name="help" size={14} />
-                    <div>
-                      <span><strong>Demo NetIDs:</strong></span>
-                      <button type="button" className="demo-chip" onClick={() => setNetId('C10001')}>C10001 (In Person · Approved)</button>
-                      <button type="button" className="demo-chip" onClick={() => setNetId('C10002')}>C10002 (In Absentia)</button>
-                      <button type="button" className="demo-chip" onClick={() => setNetId('C99999')}>C99999 (Unapproved)</button>
-                    </div>
-                  </div>
-
                   <div className="login-assistance-card">
                     <div className="login-assistance-icon">
                       <Icon name="help" size={16} />
