@@ -58,31 +58,32 @@ interface TooltipData {
   y: number
 }
 
-// SVG Canvas Geometry
-const CANVAS_WIDTH = 1420
-const LEFT_BLOCK_START_X = 70
-const LEFT_AISLE_X = 373
-const CENTER_BLOCK_START_X = 406
-const CENTER_BLOCK_WIDTH = 600
-const RIGHT_AISLE_X = 1039
-const RIGHT_BLOCK_START_X = 1072
-const SEAT_PITCH = 20
-const SEAT_SIZE = 14
+// SVG Canvas Geometry (Enlarged seat dimensions)
+const CANVAS_WIDTH = 1810
+const LEFT_BLOCK_START_X = 75
+const LEFT_AISLE_X = 475
+const CENTER_BLOCK_START_X = 511
+const CENTER_BLOCK_WIDTH = 780
+const RIGHT_AISLE_X = 1327
+const RIGHT_BLOCK_START_X = 1363
+const SEAT_PITCH = 26
+const SEAT_SIZE = 20
+const SEAT_RX = 4.5
 
-const GROUND_ROW_START_Y = 100
-const GROUND_ROW_PITCH_Y = 22
+const GROUND_ROW_START_Y = 120
+const GROUND_ROW_PITCH_Y = 29
 
-const BALCONY_ONLY_ROW_START_Y = 100
-const ALL_BALCONY_ROW_START_Y = 820
+const BALCONY_ONLY_ROW_START_Y = 120
+const ALL_BALCONY_ROW_START_Y = 1040
 
 const GATES: Record<GateId, { x: number; y: number; label: string; sub: string }> = {
-  '1': { x: LEFT_AISLE_X, y: 720, label: 'Gate 1', sub: 'Beside Car Parking Zone P1' },
-  '2': { x: RIGHT_AISLE_X, y: 720, label: 'Gate 2', sub: 'Beside Refreshment Food Court 02' },
+  '1': { x: LEFT_AISLE_X, y: 925, label: 'Gate 1', sub: 'Beside Car Parking Zone P1' },
+  '2': { x: RIGHT_AISLE_X, y: 925, label: 'Gate 2', sub: 'Beside Refreshment Food Court 02' },
 }
 
 const BALCONY_PORTALS: Record<GateId, { x: number; y: number; label: string; sub: string }> = {
-  '1': { x: LEFT_AISLE_X, y: 720, label: 'Balcony Portal 1', sub: 'West Stairway & Lift' },
-  '2': { x: RIGHT_AISLE_X, y: 720, label: 'Balcony Portal 2', sub: 'East Stairway & Foyer' },
+  '1': { x: LEFT_AISLE_X, y: 925, label: 'Balcony Portal 1', sub: 'West Stairway & Lift' },
+  '2': { x: RIGHT_AISLE_X, y: 925, label: 'Balcony Portal 2', sub: 'East Stairway & Foyer' },
 }
 
 // Deterministic occupied checker for unassigned seats
@@ -204,8 +205,8 @@ export function SeatingLayout({
 
   // Canvas height depending on tier view
   const canvasHeight = useMemo(() => {
-    if (tierFilter === 'all') return 1620
-    return 860
+    if (tierFilter === 'all') return 2040
+    return 1080
   }, [tierFilter])
 
   // Walking route points
@@ -217,11 +218,11 @@ export function SeatingLayout({
     const gate = isBalcony ? BALCONY_PORTALS[gateId] : GATES[gateId]
     const aisle = selectedPosition.aisleX
     const crossAisleY = tierFilter === 'all'
-      ? selectedPosition.tier === 'balcony' ? 1460 : 690
-      : 690
+      ? selectedPosition.tier === 'balcony' ? 1800 : 885
+      : 885
 
     const gateY = tierFilter === 'all'
-      ? selectedPosition.tier === 'balcony' ? 1500 : 720
+      ? selectedPosition.tier === 'balcony' ? 1845 : 925
       : gate.y
 
     const points = [
@@ -494,26 +495,26 @@ export function SeatingLayout({
                 <g className="seat-finder-stage-group">
                   <rect
                     className="seat-finder-stage"
-                    x="350"
+                    x="455"
                     y="18"
-                    width="720"
-                    height="42"
-                    rx="8"
+                    width="900"
+                    height="48"
+                    rx="10"
                   />
                   <text
                     className="seat-finder-stage-label"
-                    x="710"
-                    y="44"
+                    x="905"
+                    y="46"
                     textAnchor="middle"
                   >
                     STAGE — DR. T. P. GANESAN AUDITORIUM
                   </text>
                   <text
-                    x="710"
-                    y="55"
+                    x="905"
+                    y="58"
                     textAnchor="middle"
                     fill="#93c5fd"
-                    fontSize="9"
+                    fontSize="10"
                     fontWeight="600"
                     letterSpacing="1px"
                   >
@@ -527,27 +528,27 @@ export function SeatingLayout({
                 <g className="seat-finder-stage-group">
                   <rect
                     className="seat-finder-stage balcony"
-                    x="350"
+                    x="455"
                     y="18"
-                    width="720"
-                    height="42"
-                    rx="8"
+                    width="900"
+                    height="48"
+                    rx="10"
                     fill="#1e293b"
                   />
                   <text
                     className="seat-finder-stage-label"
-                    x="710"
-                    y="44"
+                    x="905"
+                    y="46"
                     textAnchor="middle"
                   >
                     STAGE VIEW — BALCONY LEVEL (UPPER TIER)
                   </text>
                   <text
-                    x="710"
-                    y="55"
+                    x="905"
+                    y="58"
                     textAnchor="middle"
                     fill="#94a3b8"
-                    fontSize="9"
+                    fontSize="10"
                     fontWeight="600"
                     letterSpacing="1px"
                   >
@@ -558,34 +559,34 @@ export function SeatingLayout({
 
               {/* BALCONY PROMENADE DIVIDER (When All is selected) */}
               {tierFilter === 'all' && (
-                <g className="seat-finder-balcony-divider" transform="translate(0, 750)">
+                <g className="seat-finder-balcony-divider" transform="translate(0, 960)">
                   <rect
-                    x="60"
+                    x="65"
                     y="0"
-                    width="1300"
-                    height="42"
-                    rx="8"
+                    width="1680"
+                    height="48"
+                    rx="9"
                     fill="#0f172a"
                     stroke="#334155"
                     strokeWidth="1.5"
                   />
                   <text
-                    x="710"
-                    y="24"
+                    x="905"
+                    y="28"
                     textAnchor="middle"
                     fill="#f8fafc"
-                    fontSize="13"
+                    fontSize="14"
                     fontWeight="800"
                     letterSpacing="1.5px"
                   >
                     ▲ BALCONY LEVEL (UPPER TIER) — ROWS AA TO ZZ (1,453 SEATS) ▲
                   </text>
                   <text
-                    x="710"
-                    y="36"
+                    x="905"
+                    y="41"
                     textAnchor="middle"
                     fill="#94a3b8"
-                    fontSize="8.5"
+                    fontSize="9.5"
                     fontWeight="600"
                     letterSpacing="1px"
                   >
@@ -669,7 +670,7 @@ export function SeatingLayout({
                         className="seat-finder-row-highlight"
                         x="50"
                         y={rowBaseY - 4}
-                        width="1320"
+                        width="1710"
                         height={SEAT_SIZE + 8}
                         rx="6"
                       />
@@ -678,8 +679,8 @@ export function SeatingLayout({
                     {/* Left row label */}
                     <text
                       className={`seat-finder-row-label ${isStaffHighlightedRow ? 'staff-row-label' : ''}`}
-                      x="32"
-                      y={rowBaseY + 11}
+                      x="35"
+                      y={rowBaseY + 14}
                       textAnchor="middle"
                     >
                       {rowConfig.row}
@@ -709,7 +710,7 @@ export function SeatingLayout({
                           y={y}
                           width={SEAT_SIZE}
                           height={SEAT_SIZE}
-                          rx="3"
+                          rx={SEAT_RX}
                           role="button"
                           tabIndex={allocation ? 0 : -1}
                           aria-label={allocation ? `${allocation.name}, Seat ${seatId}` : `Seat ${seatId}`}
@@ -750,8 +751,8 @@ export function SeatingLayout({
                     {/* Right row label */}
                     <text
                       className={`seat-finder-row-label ${isStaffHighlightedRow ? 'staff-row-label' : ''}`}
-                      x="1388"
-                      y={rowBaseY + 11}
+                      x="1775"
+                      y={rowBaseY + 14}
                       textAnchor="middle"
                     >
                       {rowConfig.row}
@@ -777,11 +778,11 @@ export function SeatingLayout({
                     >
                       <rect
                         className={`seat-finder-gate ${gateId === id ? 'active' : ''}`}
-                        x={gate.x - 48}
-                        y={gate.y - 14}
-                        width="96"
-                        height="30"
-                        rx="6"
+                        x={gate.x - 55}
+                        y={gate.y - 17}
+                        width="110"
+                        height="34"
+                        rx="7"
                       />
                       <text
                         className="seat-finder-gate-label"
@@ -796,21 +797,21 @@ export function SeatingLayout({
 
                   {/* CAR PARKING & REFRESHMENT FACILITIES */}
                   <g className="seat-finder-facility parking" aria-label="Car Parking Zone P1">
-                    <rect x="120" y="780" width="380" height="42" rx="8" />
-                    <text x="310" y="798" textAnchor="middle">
+                    <rect x="120" y="990" width="480" height="48" rx="9" />
+                    <text x="360" y="1011" textAnchor="middle">
                       CAR PARKING — ZONE P1
                     </text>
-                    <text className="seat-finder-facility-subtitle" x="310" y="812" textAnchor="middle">
+                    <text className="seat-finder-facility-subtitle" x="360" y="1027" textAnchor="middle">
                       LOCATED BESIDE MAIN GATE 1 · DEDICATED STUDENT &amp; GUEST PARKING
                     </text>
                   </g>
 
                   <g className="seat-finder-facility refreshment" aria-label="Refreshment Food Court 02">
-                    <rect x="920" y="780" width="380" height="42" rx="8" />
-                    <text x="1110" y="798" textAnchor="middle">
+                    <rect x="1210" y="990" width="480" height="48" rx="9" />
+                    <text x="1450" y="1011" textAnchor="middle">
                       REFRESHMENT — FOOD COURT 02
                     </text>
-                    <text className="seat-finder-facility-subtitle" x="1110" y="812" textAnchor="middle">
+                    <text className="seat-finder-facility-subtitle" x="1450" y="1027" textAnchor="middle">
                       BREAKFAST &amp; LUNCH COUNTERS BESIDE GATE 2
                     </text>
                   </g>
@@ -832,11 +833,11 @@ export function SeatingLayout({
                       >
                         <rect
                           className={`seat-finder-gate ${gateId === id ? 'active' : ''}`}
-                          x={portal.x - 65}
-                          y={portal.y - 14}
-                          width="130"
-                          height="30"
-                          rx="6"
+                          x={portal.x - 70}
+                          y={portal.y - 17}
+                          width="140"
+                          height="34"
+                          rx="7"
                         />
                         <text
                           className="seat-finder-gate-label"
@@ -851,21 +852,21 @@ export function SeatingLayout({
                   )}
 
                   <g className="seat-finder-facility parking">
-                    <rect x="120" y="780" width="380" height="42" rx="8" />
-                    <text x="310" y="798" textAnchor="middle">
+                    <rect x="120" y="990" width="480" height="48" rx="9" />
+                    <text x="360" y="1011" textAnchor="middle">
                       WEST BALCONY FOYER &amp; RESTROOMS
                     </text>
-                    <text className="seat-finder-facility-subtitle" x="310" y="812" textAnchor="middle">
+                    <text className="seat-finder-facility-subtitle" x="360" y="1027" textAnchor="middle">
                       ACCESSIBLE VIA WEST STAIRWAY · BESIDE BALCONY PORTAL 1
                     </text>
                   </g>
 
                   <g className="seat-finder-facility refreshment">
-                    <rect x="920" y="780" width="380" height="42" rx="8" />
-                    <text x="1110" y="798" textAnchor="middle">
+                    <rect x="1210" y="990" width="480" height="48" rx="9" />
+                    <text x="1450" y="1011" textAnchor="middle">
                       EAST BALCONY REFRESHMENT KIOSK
                     </text>
-                    <text className="seat-finder-facility-subtitle" x="1110" y="812" textAnchor="middle">
+                    <text className="seat-finder-facility-subtitle" x="1450" y="1027" textAnchor="middle">
                       SNACKS &amp; WATER COUNTER BESIDE BALCONY PORTAL 2
                     </text>
                   </g>

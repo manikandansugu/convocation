@@ -144,10 +144,10 @@ function App() {
       case 'Instructions':
         return {
           title: 'Instructions & Guidelines',
-          subtitle: 'Read the essential procedures and important information before completing your registration.',
-          eyebrow: 'CONVOCATION 2026',
+          subtitle: 'Read the essential procedures and important information carefully before attending the Graduation Day ceremony.',
+          eyebrow: 'GRADUATION DAY 2026',
           icon: 'file',
-          status: { label: 'Important information', icon: 'check', tone: 'info' },
+          status: { label: '29 Nov 2026 · 11:00 AM', icon: 'calendar', tone: 'info' },
         }
       case 'Notifications':
         return {
