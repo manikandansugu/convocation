@@ -1,50 +1,5 @@
 import { Icon } from '../components/ui/Icon'
 
-const STAFF_STEPS = [
-  {
-    number: '08:00 AM',
-    title: 'In-person check and graduation kit',
-    owner: 'Graduation Kit Distribution Committee',
-    detail: 'Scan the graduate’s face, verify attendance against the COE-approved presentee list, and issue the gown, robe, breakfast token, and lunch token.',
-    icon: 'tag' as const,
-  },
-  {
-    number: '09:00 AM',
-    title: 'Breakfast token validation',
-    owner: 'Breakfast Counter',
-    detail: 'Validate and redeem the breakfast token before serving the graduate at designated breakfast areas.',
-    icon: 'ticket' as const,
-  },
-  {
-    number: '10:00 AM',
-    title: 'Auditorium entry & biometric verification',
-    owner: 'Auditorium Entrance Team',
-    detail: 'Run the second face-recognition check and admit the graduate only after successful verification. Strictly enforce no late entry.',
-    icon: 'shield' as const,
-  },
-  {
-    number: '11:00 AM',
-    title: 'Seat identification & hall ushering',
-    owner: 'Seating Support Team',
-    detail: 'Direct graduates and registered faculty to their allotted seats across 52 rows (2,852 seats). Faculty seated in rows A & B.',
-    icon: 'grid' as const,
-  },
-  {
-    number: '12:00 PM',
-    title: 'In-seat degree certificate distribution',
-    owner: 'Registered Faculty',
-    detail: 'Identify assigned graduates by seat and handover degree certificates directly in-seat. Withhold original marksheet for fee defaulters.',
-    icon: 'award' as const,
-  },
-  {
-    number: '02:00 PM',
-    title: 'Lunch token validation & dispersal',
-    owner: 'Lunch Counter at Sannasi Hostel',
-    detail: 'After photo session concludes, validate and redeem the lunch token before serving graduates at Sannasi Hostel.',
-    icon: 'ticket' as const,
-  },
-]
-
 export function StaffInstructionsPage() {
   return (
     <div className="page instructions-page staff-instructions-content">
@@ -70,40 +25,6 @@ export function StaffInstructionsPage() {
           <strong>07:30 AM (Counters open 08:00 AM)</strong>
         </div>
       </section>
-
-      {/* Operations Directive Summary */}
-      <section className="staff-process-summary panel">
-        <div>
-          <p className="eyebrow">GRADUATION DAY 2026 · OPERATIONS DIRECTIVE</p>
-          <h2>Staff Process &amp; Counter Responsibilities</h2>
-          <p>
-            No registration committee is required on the event day because student registration is completed online. 
-            All staff and faculty members are entrusted with enforcing verification, auditorium decorum, and in-seat certificate distribution.
-          </p>
-        </div>
-        <div className="staff-shift-note">
-          <Icon name="clock" size={20} />
-          <div>
-            <strong>09:00 AM staff movement</strong>
-            <span>All members remain at kit counters until 09:00 AM; afterwards, 80% move to the auditorium for seating support.</span>
-          </div>
-        </div>
-      </section>
-
-      {/* Operational Timeline Grid */}
-      <div className="staff-process-grid">
-        {STAFF_STEPS.map((step) => (
-          <article className="panel staff-process-step" key={step.number}>
-            <span className="staff-process-number">{step.number}</span>
-            <span className="staff-process-icon"><Icon name={step.icon} size={20} /></span>
-            <div>
-              <h3>{step.title}</h3>
-              <strong>{step.owner}</strong>
-              <p>{step.detail}</p>
-            </div>
-          </article>
-        ))}
-      </div>
 
       {/* 01 | Student Verification & Dress Code Enforcement */}
       <section className="instructions-section-card panel">
