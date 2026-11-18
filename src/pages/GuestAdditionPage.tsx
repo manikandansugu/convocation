@@ -12,18 +12,15 @@ interface GuestAdditionPageProps {
 }
 
 export function GuestAdditionPage({ initialGuests, onBack, onContinue }: GuestAdditionPageProps) {
-  const [guests, setGuests] = useState<Guest[]>(initialGuests.slice(0, MAX_GUESTS))
+  const [guests, setGuests] = useState<Guest[]>(() => {
+    if (initialGuests && initialGuests.length > 0) {
+      return initialGuests.slice(0, MAX_GUESTS)
+    }
+    return [{ name: '', relationship: '', aadhaarNumber: '' }]
+  })
   const [documentPreviews, setDocumentPreviews] = useState<Record<number, { front?: string; back?: string }>>({})
   const [extractingGuest, setExtractingGuest] = useState<number | null>(null)
   const extractionTimers = useRef<Record<number, number>>({})
-
-  const updateGuestCount = (count: number) => {
-    setGuests((current) =>
-      Array.from({ length: count }, (_, index) =>
-        current[index] ?? { name: '', relationship: '', aadhaarNumber: '' },
-      ),
-    )
-  }
 
   const updateGuest = (index: number, field: keyof Guest, value: string) => {
     setGuests((current) =>
@@ -73,12 +70,11 @@ export function GuestAdditionPage({ initialGuests, onBack, onContinue }: GuestAd
       <div className="five-step-progress"><span className="done"><Icon name="check" size={13}/></span><i className="done"/><span className="done"><Icon name="check" size={13}/></span><i className="done"/><span className="done"><Icon name="check" size={13}/></span><i className="done"/><span className="active">4</span><i/><span>5</span></div>
 
       <form className="panel guest-addition-card" onSubmit={(event) => { event.preventDefault(); onContinue(guests) }}>
-        <header><div><p className="eyebrow">GUEST INFORMATION</p><h2>Who is joining you?</h2></div><div className="guest-options">{Array.from({ length: MAX_GUESTS + 1 }, (_, count) => <button type="button" className={guests.length === count ? 'selected' : ''} key={count} onClick={() => updateGuestCount(count)}>{count}</button>)}</div></header>
+        <header><div><p className="eyebrow">GUEST INFORMATION</p><h2>Who is joining you?</h2></div></header>
         <div className="guest-payment-note"><Icon name="check" size={17}/><div><strong>Payment completed — ₹{REGISTRATION_AMOUNT.toLocaleString('en-IN')}</strong><span>One guest pass is included in your registration. No additional payment is required.</span></div></div>
         {guests.length === 0 ? <div className="empty-guest-state"><Icon name="user" size={32}/><strong>No guests added</strong><span>You can continue and generate only your student pass.</span></div> :
           <div className="guest-form-list">
             {guests.map((guest, index) => <section className="guest-person-card" key={index}>
-              <div className="guest-number">{index + 1}</div>
               <div className="guest-person-content">
                 <div className="guest-fields two-fields">
                   <label><span>Guest name <b>*</b></span><input value={guest.name} onChange={(event) => updateGuest(index, 'name', event.target.value)} placeholder="Enter full name" required/></label>

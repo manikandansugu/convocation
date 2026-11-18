@@ -1144,7 +1144,7 @@ export function StaffPortalPage({
                             <p className="reg-no">{student.registerNumber}</p>
                             <p className="degree-name">{student.degree} · {student.program}</p>
                             <p className="gate-note">
-                              <Icon name="shield" size={13} /> Campus Arrival: Face Verified · Gate {student.gate}
+                              <Icon name="shield" size={13} /> Campus Arrival: Face Verified · {student.gate}
                             </p>
                           </div>
                         </div>
@@ -1226,14 +1226,14 @@ export function StaffPortalPage({
                               <strong>{student.name}</strong>
                             </div>
                           </td>
-                          <td><code>{student.registerNumber}</code></td>
-                          <td>{student.academicYear}</td>
-                          <td>{student.mobileNumber}</td>
-                          <td>{student.personalEmail}</td>
-                          <td>{student.officialEmail}</td>
-                          <td>{student.degree}</td>
-                          <td>{student.program}</td>
-                          <td><span className="roster-pill success">{student.graduationType}</span></td>
+                          <td data-label="Register No."><code>{student.registerNumber}</code></td>
+                          <td data-label="Academic Year">{student.academicYear}</td>
+                          <td data-label="Mobile No.">{student.mobileNumber}</td>
+                          <td data-label="Personal Email">{student.personalEmail}</td>
+                          <td data-label="Official Email">{student.officialEmail}</td>
+                          <td data-label="Degree">{student.degree}</td>
+                          <td data-label="Program">{student.program}</td>
+                          <td data-label="Type"><span className="roster-pill success">{student.graduationType}</span></td>
                           <td>
                             <button
                               type="button"

@@ -11,7 +11,7 @@ import convocationLogo from '../assets/srm-convocation-logo.png'
 
 const QR_TARGET_URL = 'https://neccampus.srmtech.com/'
 const PASS_EXPORT_WIDTH = 720
-const PASS_EXPORT_HEIGHT = 514
+const PASS_EXPORT_HEIGHT = 524
 
 interface ConvocationPassPageProps {
   guests: Guest[]
@@ -509,30 +509,16 @@ export function ConvocationPassPage({ guests, photoUrl, student = STUDENT, onNav
 
   return (
     <div className="page passes-page prototype-page">
-      <div className="prototype-heading">
-        <div className="college-title">
-          <div className="college-logo"><Icon name="ticket" size={26}/></div>
-          <div>
-            <p className="eyebrow">ONLINE REGISTRATION COMPLETE</p>
-            <h1>Graduation Day Passes</h1>
-            <p className="page-subtitle">
-              Generated for COE-approved in-person attendee {student.name} and {guests.length} guest{guests.length === 1 ? '' : 's'}.
-            </p>
-          </div>
-        </div>
-        <div className="step-badge">Step 5 of 5</div>
-      </div>
-
       <div className="five-step-progress">
-        <span className="done"><Icon name="check" size={13}/></span><i className="done"/>
-        <span className="done"><Icon name="check" size={13}/></span><i className="done"/>
-        <span className="done"><Icon name="check" size={13}/></span><i className="done"/>
-        <span className="done"><Icon name="check" size={13}/></span><i className="done"/>
+        <span className="done"><Icon name="check" size={16}/></span><i className="done"/>
+        <span className="done"><Icon name="check" size={16}/></span><i className="done"/>
+        <span className="done"><Icon name="check" size={16}/></span><i className="done"/>
+        <span className="done"><Icon name="check" size={16}/></span><i className="done"/>
         <span className="active">5</span>
       </div>
 
       <div className="pass-success">
-        <span><Icon name="check" size={22}/></span>
+        <span><Icon name="check" size={24}/></span>
         <div>
           <strong>Online Registration & Pass Generation Complete</strong>
           <p>

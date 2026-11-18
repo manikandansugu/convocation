@@ -326,7 +326,7 @@ export function SeatingLayout({
   }
 
   return (
-    <div className={`seating-layout-shell ${showRoster ? 'with-roster' : ''} ${isMaximized ? 'seating-maximized-popover' : ''}`}>
+    <div className={`seating-layout-shell ${showRoster && !isMaximized ? 'with-roster' : ''} ${isMaximized ? 'seating-maximized-popover' : ''}`}>
       {isMaximized && (
         <button
           type="button"
@@ -340,7 +340,7 @@ export function SeatingLayout({
         </button>
       )}
 
-      {showRoster && (
+      {showRoster && !isMaximized && (
         <aside className="panel seating-roster-panel">
           <div className="seating-roster-heading">
             <div>
@@ -436,16 +436,6 @@ export function SeatingLayout({
                 </span>
               </p>
             )}
-            <button
-              type="button"
-              className={`seating-maximize-btn ${isMaximized ? 'is-maximized' : ''}`}
-              onClick={() => setIsMaximized((prev) => !prev)}
-              title={isMaximized ? "Exit full screen view (Esc)" : "Spread seating layout to entire screen"}
-              aria-label={isMaximized ? "Exit full screen view" : "Spread seating layout to entire screen"}
-            >
-              <Icon name={isMaximized ? 'minimize' : 'maximize'} size={16} />
-              <span>{isMaximized ? 'Exit Full Screen' : 'Maximize'}</span>
-            </button>
           </div>
         </div>
 
@@ -458,8 +448,9 @@ export function SeatingLayout({
               aria-selected={tierFilter === 'ground'}
               className={tierFilter === 'ground' ? 'active' : ''}
               onClick={() => setTierFilter('ground')}
+              title="Ground Floor (Rows A–Z · 1,399 Seats)"
             >
-              Ground Floor (Rows A–Z · 1,399 Seats)
+              Ground Floor (1,399 Seats)
             </button>
             <button
               type="button"
@@ -467,8 +458,9 @@ export function SeatingLayout({
               aria-selected={tierFilter === 'balcony'}
               className={tierFilter === 'balcony' ? 'active' : ''}
               onClick={() => setTierFilter('balcony')}
+              title="Balcony Tier (Rows AA–ZZ · 1,453 Seats)"
             >
-              Balcony Tier (Rows AA–ZZ · 1,453 Seats)
+              Balcony Tier (1,453 Seats)
             </button>
             <button
               type="button"
@@ -476,8 +468,9 @@ export function SeatingLayout({
               aria-selected={tierFilter === 'all'}
               className={tierFilter === 'all' ? 'active' : ''}
               onClick={() => setTierFilter('all')}
+              title="Entire Auditorium (52 Rows · 2,852 Seats)"
             >
-              Entire Auditorium (52 Rows · 2,852 Seats)
+              Entire Auditorium (2,852 Seats)
             </button>
           </div>
 
@@ -485,7 +478,7 @@ export function SeatingLayout({
             <form onSubmit={handleSearchSubmit} className="seating-seat-search">
               <input
                 type="text"
-                placeholder="Find seat (e.g. A6, K1, AA14)"
+                placeholder="Find seat (e.g. A6, AA14)"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -526,6 +519,11 @@ export function SeatingLayout({
           </div>
         </div>
 
+        {/* Mobile Horizontal Scroll Hint */}
+        <div className="seating-mobile-scroll-hint" aria-hidden="true">
+          <span>⇄ Swipe horizontally to explore all auditorium seats &amp; aisles</span>
+        </div>
+
         {/* Interactive SVG Seating Map */}
         <div className="seat-finder-map-wrap" style={{ position: 'relative' }}>
           <div
@@ -553,28 +551,28 @@ export function SeatingLayout({
                 <g className="seat-finder-stage-group">
                   <rect
                     className="seat-finder-stage"
-                    x="455"
-                    y="18"
-                    width="900"
-                    height="48"
+                    x="120"
+                    y="16"
+                    width="1570"
+                    height="54"
                     rx="10"
                   />
                   <text
                     className="seat-finder-stage-label"
                     x="905"
-                    y="46"
+                    y="39"
                     textAnchor="middle"
                   >
                     STAGE — DR. T. P. GANESAN AUDITORIUM
                   </text>
                   <text
                     x="905"
-                    y="58"
+                    y="55"
                     textAnchor="middle"
                     fill="#93c5fd"
-                    fontSize="14"
-                    fontWeight="600"
-                    letterSpacing="1px"
+                    fontSize="11"
+                    fontWeight="700"
+                    letterSpacing="1.2px"
                   >
                     DAIS · VIP PODIUM · FACULTY SEATING FRONT
                   </text>
@@ -586,29 +584,29 @@ export function SeatingLayout({
                 <g className="seat-finder-stage-group">
                   <rect
                     className="seat-finder-stage balcony"
-                    x="455"
-                    y="18"
-                    width="900"
-                    height="48"
+                    x="120"
+                    y="16"
+                    width="1570"
+                    height="54"
                     rx="10"
                     fill="#1e293b"
                   />
                   <text
                     className="seat-finder-stage-label"
                     x="905"
-                    y="46"
+                    y="39"
                     textAnchor="middle"
                   >
                     STAGE VIEW — BALCONY LEVEL (UPPER TIER)
                   </text>
                   <text
                     x="905"
-                    y="58"
+                    y="55"
                     textAnchor="middle"
                     fill="#94a3b8"
-                    fontSize="14"
-                    fontWeight="600"
-                    letterSpacing="1px"
+                    fontSize="11"
+                    fontWeight="700"
+                    letterSpacing="1.2px"
                   >
                     ELEVATED BALCONY VIEW OVERLOOKING AUDITORIUM GROUND FLOOR
                   </text>

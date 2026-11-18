@@ -33,7 +33,7 @@ export function PaymentPage({ onBack, onSuccess }: PaymentPageProps) {
 
   return (
     <div className="page payment-page prototype-page">
-      <div className="five-step-progress"><span className="done"><Icon name="check" size={13}/></span><i className="done"/><span className="done"><Icon name="check" size={13}/></span><i className="done"/><span className="active">3</span><i/><span>4</span><i/><span>5</span></div>
+      <div className="five-step-progress"><span className="done"><Icon name="check" size={16}/></span><i className="done"/><span className="done"><Icon name="check" size={16}/></span><i className="done"/><span className="active">3</span><i/><span>4</span><i/><span>5</span></div>
 
       <div className="payment-layout">
         <form className="panel payment-card" onSubmit={startPayment}>

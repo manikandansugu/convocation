@@ -17,7 +17,7 @@ export function SeatingLayoutPage() {
   ]
 
   return (
-    <div className="page seating-page prototype-page">
+    <div className="page seating-page">
       <SeatingLayout allocations={seatingAllocations} selectedId="student-current" showRoster />
     </div>
   )

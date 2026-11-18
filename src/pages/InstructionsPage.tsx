@@ -26,7 +26,7 @@ export function InstructionsPage({ onStartRegistration }: InstructionsPageProps)
         </div>
         <div>
           <small>REPORTING</small>
-          <strong>Arrive well in advance for registration</strong>
+          <strong>Students are requested to arrive well in advance to complete the registration formalities.</strong>
         </div>
       </section>
 
@@ -35,7 +35,7 @@ export function InstructionsPage({ onStartRegistration }: InstructionsPageProps)
         <div className="instructions-card-header">
           <span><Icon name="check" size={22} /></span>
           <div>
-            <span className="section-tag">01 | Preparation</span>
+            <span className="section-tag">01 | Before You Arrive</span>
             <h2>Before You Arrive</h2>
           </div>
         </div>
@@ -80,7 +80,7 @@ export function InstructionsPage({ onStartRegistration }: InstructionsPageProps)
         <div className="instructions-card-header">
           <span><Icon name="location" size={22} /></span>
           <div>
-            <span className="section-tag">02 | On-Campus Sequence</span>
+            <span className="section-tag">02 | Venue Procedure &amp; Locations</span>
             <h2>Venue Procedure &amp; Locations</h2>
           </div>
         </div>
@@ -139,7 +139,7 @@ export function InstructionsPage({ onStartRegistration }: InstructionsPageProps)
             <span className="venue-type">LUNCH VENUE</span>
             <h4>Sannasi Hostel</h4>
             <a
-              href="https://maps.google.com/?q=Sannasi+Hostel+SRM+University+Kattankulathur"
+              href="https://maps.app.goo.gl/GAxoaVyLgXdR3VEc8"
               target="_blank"
               rel="noopener noreferrer"
               className="map-link"
@@ -152,7 +152,7 @@ export function InstructionsPage({ onStartRegistration }: InstructionsPageProps)
             <span className="venue-type">CAR PARKING</span>
             <h4>Playground (In front of Dr. T. P. Ganesan Auditorium)</h4>
             <a
-              href="https://maps.google.com/?q=Dr.+T.P.+Ganesan+Auditorium+SRM+University"
+              href="https://goo.gl/maps/A2oZrTT8pBSL1cLfA"
               target="_blank"
               rel="noopener noreferrer"
               className="map-link"
@@ -168,7 +168,7 @@ export function InstructionsPage({ onStartRegistration }: InstructionsPageProps)
         <div className="instructions-card-header">
           <span><Icon name="cap" size={22} /></span>
           <div>
-            <span className="section-tag">03 | Discipline &amp; Decorum</span>
+            <span className="section-tag">03 | Auditorium Conduct</span>
             <h2>Auditorium Conduct</h2>
           </div>
         </div>
@@ -227,7 +227,7 @@ export function InstructionsPage({ onStartRegistration }: InstructionsPageProps)
         <div className="instructions-card-header">
           <span><Icon name="camera" size={22} /></span>
           <div>
-            <span className="section-tag">04 | Photography Schedule</span>
+            <span className="section-tag">04 | Post-Graduation Photo Session</span>
             <h2>Post-Graduation Photo Session</h2>
           </div>
         </div>
@@ -266,7 +266,7 @@ export function InstructionsPage({ onStartRegistration }: InstructionsPageProps)
         <div className="instructions-card-header">
           <span><Icon name="shield" size={22} /></span>
           <div>
-            <span className="section-tag">05 | Crucial Guidelines</span>
+            <span className="section-tag">05 | Important Restrictions &amp; Instructions</span>
             <h2>Important Restrictions &amp; Instructions</h2>
           </div>
         </div>
@@ -275,19 +275,19 @@ export function InstructionsPage({ onStartRegistration }: InstructionsPageProps)
           <li className="instructions-item-row">
             <span className="instructions-item-badge">1</span>
             <div className="instructions-item-content">
-              <strong>Guest Entry:</strong> Guests and family members are not permitted inside the auditorium.
+              <strong>Guest Entry:</strong> Guests and accompanying family members will not be permitted inside the auditorium.
             </div>
           </li>
           <li className="instructions-item-row">
             <span className="instructions-item-badge">2</span>
             <div className="instructions-item-content">
-              <strong>Guest Expenses:</strong> Students must bear all guest-related expenses. DODE will not reimburse them.
+              <strong>Guest Expenses:</strong> Any expenses incurred for accompanying guests must be borne by the students themselves. The Directorate of Online Education (DODE) will not provide or reimburse guest-related expenses.
             </div>
           </li>
           <li className="instructions-item-row">
             <span className="instructions-item-badge">3</span>
             <div className="instructions-item-content">
-              <strong>Original Marksheet:</strong> Students with unpaid tuition or examination fees will receive only a photocopy.
+              <strong>Original Marksheet:</strong> Students who have not paid their applicable tuition fees and/or examination fees will receive only a photocopy of their marksheet. The original marksheet will not be issued to such students.
             </div>
           </li>
         </ul>
@@ -325,14 +325,13 @@ export function InstructionsPage({ onStartRegistration }: InstructionsPageProps)
       </section>
 
       {/* Footer Navigation Action */}
-      <div className="instructions-actions">
-        <p><Icon name="help" size={17} /> Need assistance? Contact the DODE student support desk before the ceremony date.</p>
-        {onStartRegistration && (
+      {onStartRegistration && (
+        <div className="instructions-actions">
           <button type="button" className="flow-primary" onClick={onStartRegistration}>
             View Registration Details <Icon name="arrow" size={18} />
           </button>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   )
 }
