@@ -7,7 +7,8 @@
   font-family: var(--sans); color: var(--ink); background: var(--surface);
   font-synthesis: none; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased;
 }
-html { background: var(--surface); }
-body { margin: 0; min-width: 320px; min-height: 100vh; }
+html { background: var(--surface); font-size: 13px; }
+body { margin: 0; min-width: 320px; min-height: 100vh; font-size: 13px; }
 body, button, input, select, textarea, code, pre { font-family: var(--font); }
+small { font-size: inherit; }
 button:focus-visible, a:focus-visible { outline: 3px solid rgba(21,91,195,.28); outline-offset: 2px; }

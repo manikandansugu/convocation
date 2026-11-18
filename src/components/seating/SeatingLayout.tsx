@@ -572,7 +572,7 @@ export function SeatingLayout({
                     y="58"
                     textAnchor="middle"
                     fill="#93c5fd"
-                    fontSize="10"
+                    fontSize="13"
                     fontWeight="600"
                     letterSpacing="1px"
                   >
@@ -606,7 +606,7 @@ export function SeatingLayout({
                     y="58"
                     textAnchor="middle"
                     fill="#94a3b8"
-                    fontSize="10"
+                    fontSize="13"
                     fontWeight="600"
                     letterSpacing="1px"
                   >
@@ -644,7 +644,7 @@ export function SeatingLayout({
                     y="41"
                     textAnchor="middle"
                     fill="#94a3b8"
-                    fontSize="9.5"
+                    fontSize="13"
                     fontWeight="600"
                     letterSpacing="1px"
                   >

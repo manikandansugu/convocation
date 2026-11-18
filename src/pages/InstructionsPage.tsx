@@ -43,7 +43,7 @@ export function InstructionsPage({ onStartRegistration }: InstructionsPageProps)
           Complete the following requirements before arriving at the venue.
         </p>
 
-        <ul className="instructions-items-list">
+        <ul className="instructions-items-list instructions-crucial-list">
           <li className="instructions-item-row">
             <span className="instructions-item-badge">1</span>
             <div className="instructions-item-content">
@@ -275,19 +275,19 @@ export function InstructionsPage({ onStartRegistration }: InstructionsPageProps)
           <li className="instructions-item-row">
             <span className="instructions-item-badge">1</span>
             <div className="instructions-item-content">
-              <strong>Guest Entry:</strong> Guests and accompanying family members will not be permitted inside the auditorium.
+              <strong>Guest Entry:</strong> Guests and family members are not permitted inside the auditorium.
             </div>
           </li>
           <li className="instructions-item-row">
             <span className="instructions-item-badge">2</span>
             <div className="instructions-item-content">
-              <strong>Guest Expenses:</strong> Any expenses incurred for accompanying guests must be borne by the students themselves. The Directorate of Online Education (DODE) will not provide or reimburse guest-related expenses.
+              <strong>Guest Expenses:</strong> Students must bear all guest-related expenses. DODE will not reimburse them.
             </div>
           </li>
           <li className="instructions-item-row">
             <span className="instructions-item-badge">3</span>
             <div className="instructions-item-content">
-              <strong>Original Marksheet:</strong> Students who have not paid their applicable tuition fees and/or examination fees will receive only a photocopy of their marksheet. The original marksheet will not be issued to such students.
+              <strong>Original Marksheet:</strong> Students with unpaid tuition or examination fees will receive only a photocopy.
             </div>
           </li>
         </ul>
