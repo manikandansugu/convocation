@@ -43,7 +43,7 @@ export function InstructionsPage({ onStartRegistration }: InstructionsPageProps)
           Complete the following requirements before arriving at the venue.
         </p>
 
-        <ul className="instructions-items-list instructions-crucial-list">
+        <ul className="instructions-items-list">
           <li className="instructions-item-row">
             <span className="instructions-item-badge">1</span>
             <div className="instructions-item-content">
