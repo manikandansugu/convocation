@@ -40,6 +40,8 @@ function PersonPass({ name, label, relationship, index, photoUrl, student, guest
   const activePhoto = photoUrl || studentPhoto
   const seatId = student.seatNumber || 'A-25'
   const guestHallNumber = 'Hall 01'
+  const parkingVenue = isPrimaryStudent ? student.parkingVenue || 'Parking Zone P1' : 'Parking Zone P2'
+  const lunchVenue = student.lunchVenue || 'Food Court 02'
   const attendeeRegistration = isPrimaryStudent ? student.registerNumber : passId
   const attendeeProgramOrRelation = isPrimaryStudent
     ? `${student.degree} — ${student.program || 'Business Administration'}`
@@ -110,6 +112,14 @@ function PersonPass({ name, label, relationship, index, photoUrl, student, guest
             <div>
               <span>KIT COUNTER</span>
               <strong>{student.kitCounter || 'Counter 04 (Ground Floor)'}</strong>
+            </div>
+            <div>
+              <span>PARKING VENUE</span>
+              <strong>{parkingVenue}</strong>
+            </div>
+            <div>
+              <span>LUNCH VENUE</span>
+              <strong>{lunchVenue}</strong>
             </div>
           </footer>
         </div>

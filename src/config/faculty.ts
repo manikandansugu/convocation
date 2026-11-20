@@ -1,13 +1,19 @@
 import type { FacultyMember } from '../types/faculty'
 
+export interface FacultyLoginCredential {
+  netId: string
+  password: string
+  facultyId: string
+}
+
 export const DEFAULT_FACULTY: FacultyMember = {
-  id: 'fac-1',
-  employeeId: 'EMP-FAC-401',
-  name: 'Dr. Meena Krishnan',
-  designation: 'Professor & Head',
-  department: 'School of Management',
-  email: 'meena.krishnan@srmist.edu.in',
-  mobile: '+91 94440 12345',
+  id: 'fac-mca',
+  employeeId: 'FACMCA01',
+  name: 'Dr. Kavitha Raman',
+  designation: 'Associate Professor',
+  department: 'MCA',
+  email: 'kavitha.raman@srmist.edu.in',
+  mobile: '+91 94440 12001',
   assignedRows: ['A', 'B'],
   assignedBlock: 'Front Block',
   status: 'Approved',
@@ -17,43 +23,37 @@ export const DEFAULT_FACULTY: FacultyMember = {
 export const INITIAL_FACULTY_LIST: FacultyMember[] = [
   DEFAULT_FACULTY,
   {
-    id: 'fac-2',
-    employeeId: 'EMP-FAC-402',
-    name: 'Dr. S. Prakash',
+    id: 'fac-mcom',
+    employeeId: 'FACMCOM01',
+    name: 'Dr. Arvind Narayanan',
     designation: 'Associate Professor',
-    department: 'Computer Applications',
-    email: 'prakash.s@srmist.edu.in',
-    mobile: '+91 94441 54321',
-    assignedRows: ['B'],
+    department: 'M.Com',
+    email: 'arvind.narayanan@srmist.edu.in',
+    mobile: '+91 94440 12002',
+    assignedRows: ['C', 'D'],
     assignedBlock: 'Front Block',
     status: 'Approved',
     registeredAt: '26 September 2026',
   },
   {
-    id: 'fac-3',
-    employeeId: 'EMP-FAC-403',
-    name: 'Dr. Vivek Nair',
-    designation: 'Associate Professor',
-    department: 'School of Management',
-    email: 'vivek.nair@srmist.edu.in',
-    mobile: '+91 98840 88776',
-    assignedRows: ['C'],
+    id: 'fac-bca',
+    employeeId: 'FACBCA01',
+    name: 'Dr. Nandhini Iyer',
+    designation: 'Assistant Professor',
+    department: 'BCA',
+    email: 'nandhini.iyer@srmist.edu.in',
+    mobile: '+91 94440 12003',
+    assignedRows: ['E', 'F'],
     assignedBlock: 'Front Block',
     status: 'Approved',
     registeredAt: '27 September 2026',
   },
-  {
-    id: 'fac-4',
-    employeeId: 'EMP-FAC-404',
-    name: 'Dr. Lakshmi Rao',
-    designation: 'Professor',
-    department: 'Commerce',
-    email: 'lakshmi.rao@srmist.edu.in',
-    mobile: '+91 97900 11223',
-    assignedRows: ['D'],
-    assignedBlock: 'Front Block',
-    status: 'Approved',
-    registeredAt: '28 September 2026',
-  },
+]
+
+// Fixed prototype credentials requested for the three faculty desks.
+export const FACULTY_LOGIN_CREDENTIALS: FacultyLoginCredential[] = [
+  { netId: 'FACMCA01', password: 'Mca@2026', facultyId: 'fac-mca' },
+  { netId: 'FACMCOM01', password: 'Mcom@2026', facultyId: 'fac-mcom' },
+  { netId: 'FACBCA01', password: 'Bca@2026', facultyId: 'fac-bca' },
 ]
 

@@ -81,6 +81,7 @@ export interface StudentRosterRecord {
   lunchTokenIssued?: boolean
   lunchTokenRedeemed?: boolean
   lunchTime?: string
+  photoIndex: number
 }
 
 const CONVOCATION_DETAILS = {
@@ -96,7 +97,7 @@ const CONVOCATION_DETAILS = {
   gownPaidAt: '18 September 2026, 10:34 AM',
 } as const
 
-export const INITIAL_ROSTER: StudentRosterRecord[] = [
+const LEGACY_ROSTER: Omit<StudentRosterRecord, 'photoIndex'>[] = [
   {
     id: 'student-1',
     registrationId: 'CONV-2026-10245',
@@ -722,3 +723,76 @@ export const INITIAL_ROSTER: StudentRosterRecord[] = [
     lunchTokenRedeemed: false,
   },
 ]
+
+const FACULTY_STUDENT_GROUPS = [
+  {
+    facultyId: 'fac-mca',
+    facultyName: 'Dr. Kavitha Raman',
+    degree: 'MCA',
+    program: 'Master of Computer Applications',
+    department: 'MCA',
+    rows: ['A', 'B'],
+    names: [
+      'Aadhithya Raj', 'Aishwarya Nair', 'Akash Kumar', 'Anjali Menon', 'Arjun Reddy',
+      'Bhavya Iyer', 'Deepak Suresh', 'Divya Krishnan', 'Gokul Raj', 'Harini Prasad',
+      'Karthik Subramanian', 'Keerthana Ravi', 'Manoj Varma',
+    ],
+  },
+  {
+    facultyId: 'fac-mcom',
+    facultyName: 'Dr. Arvind Narayanan',
+    degree: 'M.Com',
+    program: 'Master of Commerce',
+    department: 'M.Com',
+    rows: ['C', 'D'],
+    names: [
+      'Meera Nair', 'Nithin Joseph', 'Pooja Sharma', 'Pranav Bhat', 'Radhika Rao',
+      'Rahul Suresh', 'Reshma Pillai', 'Rohit Kulkarni', 'Sanjana Bose', 'Shreya Gupta',
+      'Siddharth Jain', 'Sneha Kapoor', 'Surya Narayanan',
+    ],
+  },
+  {
+    facultyId: 'fac-bca',
+    facultyName: 'Dr. Nandhini Iyer',
+    degree: 'BCA',
+    program: 'Bachelor of Computer Applications',
+    department: 'BCA',
+    rows: ['E', 'F'],
+    names: [
+      'Tanya Singh', 'Varun Kumar', 'Vidya Lakshmi', 'Vijay Anand', 'Vishal Patel',
+      'Yamini Reddy', 'Zoya Khan', 'Abhinav Menon', 'Ananya Iyer', 'Ashwin Raj',
+      'Deepa Nair', 'Farhan Ali', 'Gayathri Srinivasan',
+    ],
+  },
+] as const
+
+export const INITIAL_ROSTER: StudentRosterRecord[] = FACULTY_STUDENT_GROUPS.flatMap((group, groupIndex) =>
+  group.names.map((name, studentIndex) => {
+    const template = LEGACY_ROSTER[studentIndex]
+    const globalIndex = groupIndex * 13 + studentIndex
+    const emailName = name.toLowerCase().replace(/[^a-z]+/g, '.').replace(/^\.|\.$/g, '')
+    const row = studentIndex < 7 ? group.rows[0] : group.rows[1]
+    const seat = studentIndex < 7 ? studentIndex + 1 : studentIndex - 6
+
+    return {
+      ...template,
+      id: `${group.facultyId}-student-${studentIndex + 1}`,
+      registrationId: `CONV-2026-${12001 + globalIndex}`,
+      registerNumber: `RA2026${String(groupIndex + 1).padStart(2, '0')}${String(studentIndex + 1).padStart(4, '0')}`,
+      name,
+      degree: group.degree,
+      program: group.program,
+      department: group.department,
+      officialEmail: `${emailName}@srmist.edu.in`,
+      personalEmail: `${emailName}@gmail.com`,
+      bundleId: `BND-2026-${12001 + globalIndex}`,
+      facultyName: group.facultyName,
+      assignedFacultyId: group.facultyId,
+      block: 'Front',
+      row,
+      seat,
+      gate: groupIndex === 0 ? 'Gate 01' : groupIndex === 1 ? 'Gate 02' : 'Gate 03',
+      photoIndex: globalIndex,
+    }
+  }),
+)

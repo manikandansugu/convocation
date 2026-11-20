@@ -58,6 +58,7 @@ export function StudentInformationPage({ student = STUDENT, onContinue, onUpdate
           <div className="readable-contact">
             <span><Icon name="mail" size={16}/> Email address</span>
             <strong>{student.email}</strong>
+            <strong>{"arunmenon@srmap.edu.in"}</strong>
             <small>DODE registration confirmation sent here</small>
           </div>
 

@@ -110,6 +110,10 @@ function App() {
           onPhotoCaptured={(url) => setCapturedPhotoUrl(url)}
           onBack={() => navigateTo('Student Information')}
           onContinue={() => navigateTo('Payment')}
+          onNavigateToQueries={() => {
+            setQueryFormOpen(true)
+            navigateTo('Queries & Support')
+          }}
         />
       )
     }

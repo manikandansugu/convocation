@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Icon } from '../components/ui/Icon'
 import { COE_APPROVED_STUDENTS } from '../config/student'
 import { DEFAULT_STAFF, type StaffMember } from '../config/staff'
-import { INITIAL_FACULTY_LIST } from '../config/faculty'
+import { FACULTY_LOGIN_CREDENTIALS, INITIAL_FACULTY_LIST } from '../config/faculty'
 import type { FacultyMember } from '../types/faculty'
 import type { COEStudent } from '../types/registration'
 
@@ -32,8 +32,8 @@ export function LoginPage({ onLogin }: LoginPageProps) {
   const [inAbsentiaStudent, setInAbsentiaStudent] = useState<COEStudent | null>(null)
 
   // Faculty and staff sign-in state
-  const [operationsNetId, setOperationsNetId] = useState('EMP9041')
-  const [operationsPassword, setOperationsPassword] = useState('123456')
+  const [operationsNetId, setOperationsNetId] = useState('FACMCA01')
+  const [operationsPassword, setOperationsPassword] = useState('Mca@2026')
   const [operationsError, setOperationsError] = useState('')
 
   const [showPassword, setShowPassword] = useState(false)
@@ -100,16 +100,37 @@ export function LoginPage({ onLogin }: LoginPageProps) {
     }
 
     const normalizedNetId = operationsNetId.trim().toUpperCase()
-    const faculty = INITIAL_FACULTY_LIST.find(
-      (member) => member.employeeId.toUpperCase() === normalizedNetId,
+    const facultyLogin = FACULTY_LOGIN_CREDENTIALS.find(
+      (credential) => credential.netId.toUpperCase() === normalizedNetId,
     )
+    const faculty = facultyLogin
+      ? INITIAL_FACULTY_LIST.find((member) => member.id === facultyLogin.facultyId)
+      : undefined
 
-    if (faculty) {
+    if (facultyLogin && facultyLogin.password !== operationsPassword) {
+      setOperationsError('Invalid password for this Faculty NetID.')
+      return
+    }
+
+    if (facultyLogin && faculty) {
+      const facultyStaff: StaffMember = {
+        name: faculty.name,
+        employeeId: faculty.employeeId,
+        role: faculty.designation,
+        department: faculty.department,
+        counter: `${faculty.department} Faculty Desk`,
+        gate: 'Auditorium',
+      }
       setIsSubmitting(true)
       window.setTimeout(() => {
         setIsSubmitting(false)
-        onLogin('staff', { faculty, initialTab: 'instructions' })
+        onLogin('staff', { faculty, staff: facultyStaff, initialTab: 'instructions' })
       }, 600)
+      return
+    }
+
+    if (normalizedNetId !== DEFAULT_STAFF.employeeId || operationsPassword !== '123456') {
+      setOperationsError('Invalid User NetID or password.')
       return
     }
 
@@ -136,16 +157,12 @@ export function LoginPage({ onLogin }: LoginPageProps) {
           <h1>
             {role === 'student' ? <>Your Gateway<br />to Graduation Day 2026!</> : <>Faculty & Staff<br />Operations Desk</>}
           </h1>
-          <p>
+          {/* <p>
             {role === 'student'
               ? 'Restricted registration for COE-approved graduates. Confirm attendance, verify live photo ID, and generate your Graduation Day Pass.'
               : 'Unified operations workspace for campus arrival check-in, kit distribution, faculty registration, and auditorium degree certificate distribution.'}
-          </p>
+          </p> */}
 
-          <div className="preparatory-notice-box">
-            <strong><Icon name="check" size={15} /> Preparatory Process Check</strong>
-            <span>COE Approved List · DODE Presentee Verification · In-Person Access Only</span>
-          </div>
         </div>
       </section>
 

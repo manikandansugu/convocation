@@ -19,6 +19,8 @@ export interface Student {
   seatNumber?: string
   venue?: string
   kitCounter?: string
+  parkingVenue?: string
+  lunchVenue?: string
   graduationDate?: string
   attendanceMode?: 'in_person' | 'in_absentia'
   coeApproved?: boolean

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Icon } from '../ui/Icon'
+import studentPortraitGrid from '../../assets/indian-student-portraits-grid.jpg'
 import {
   AUDITORIUM_ROWS,
   TOTAL_SEAT_COUNT,
@@ -24,6 +25,8 @@ export interface SeatAllocation {
   email?: string
   assignedStudentCount?: number
   studentCapacity?: number
+  degreeDistributed?: boolean
+  photoIndex?: number
 }
 
 interface SeatingLayoutProps {
@@ -54,6 +57,7 @@ interface TooltipData {
   tierName: string
   blockName: string
   status: string
+  statusType?: 'issued' | 'awaiting' | 'staff' | 'occupied' | 'available'
   attendeeName?: string
   x: number
   y: number
@@ -75,7 +79,8 @@ const GROUND_ROW_START_Y = 120
 const GROUND_ROW_PITCH_Y = 29
 
 const BALCONY_ONLY_ROW_START_Y = 120
-const ALL_BALCONY_ROW_START_Y = 1040
+const ALL_BALCONY_ROW_START_Y = 940
+const ALL_GATE_Y = 1750
 
 const GATES: Record<GateId, { x: number; y: number; label: string; sub: string }> = {
   '1': { x: LEFT_AISLE_X, y: 925, label: 'Gate 1', sub: 'Beside Car Parking Zone P1' },
@@ -85,6 +90,11 @@ const GATES: Record<GateId, { x: number; y: number; label: string; sub: string }
 const BALCONY_PORTALS: Record<GateId, { x: number; y: number; label: string; sub: string }> = {
   '1': { x: LEFT_AISLE_X, y: 925, label: 'Balcony Portal 1', sub: 'West Stairway & Lift' },
   '2': { x: RIGHT_AISLE_X, y: 925, label: 'Balcony Portal 2', sub: 'East Stairway & Foyer' },
+}
+
+const ALL_GATES: Record<GateId, { x: number; y: number; label: string; sub: string }> = {
+  '1': { x: LEFT_AISLE_X, y: ALL_GATE_Y, label: 'Gate 1', sub: 'Auditorium Entrance - West Wing' },
+  '2': { x: RIGHT_AISLE_X, y: ALL_GATE_Y, label: 'Gate 2', sub: 'Auditorium Entrance - East Wing' },
 }
 
 // Deterministic occupied checker for unassigned seats
@@ -230,7 +240,7 @@ export function SeatingLayout({
 
   // Canvas height depending on tier view
   const canvasHeight = useMemo(() => {
-    if (tierFilter === 'all') return 2040
+    if (tierFilter === 'all') return 1840
     return 1080
   }, [tierFilter])
 
@@ -239,16 +249,25 @@ export function SeatingLayout({
     if (!selectedPosition) return ''
     if (tierFilter !== 'all' && selectedPosition.tier !== tierFilter) return ''
 
-    const isBalcony = selectedPosition.tier === 'balcony' && tierFilter !== 'all'
-    const gate = isBalcony ? BALCONY_PORTALS[gateId] : GATES[gateId]
-    const aisle = selectedPosition.aisleX
-    const crossAisleY = tierFilter === 'all'
-      ? selectedPosition.tier === 'balcony' ? 1800 : 885
-      : 885
+    let gate: { x: number; y: number }
+    let crossAisleY: number
+    let gateY: number
 
-    const gateY = tierFilter === 'all'
-      ? selectedPosition.tier === 'balcony' ? 1845 : 925
-      : gate.y
+    if (tierFilter === 'all') {
+      gate = ALL_GATES[gateId]
+      gateY = ALL_GATE_Y
+      crossAisleY = 1705
+    } else if (tierFilter === 'balcony') {
+      gate = BALCONY_PORTALS[gateId]
+      gateY = gate.y
+      crossAisleY = 885
+    } else {
+      gate = GATES[gateId]
+      gateY = gate.y
+      crossAisleY = 885
+    }
+
+    const aisle = selectedPosition.aisleX
 
     const points = [
       [gate.x, gateY],
@@ -271,15 +290,20 @@ export function SeatingLayout({
     }
 
     const isBalcony = selectedPosition.tier === 'balcony'
-    const gate = isBalcony && tierFilter !== 'all' ? BALCONY_PORTALS[gateId] : GATES[gateId]
+    const gate =
+      tierFilter === 'all'
+        ? ALL_GATES[gateId]
+        : isBalcony
+        ? BALCONY_PORTALS[gateId]
+        : GATES[gateId]
     const aisle = selectedPosition.aisleX
     const aisleName = aisle === LEFT_AISLE_X ? 'Left Aisle' : 'Right Aisle'
     const side = selectedPosition.x > aisle ? 'right' : 'left'
-    const tierName = isBalcony ? 'Balcony Level (Upper Tier)' : 'Ground Floor (Lower Tier)'
+    const tierName = isBalcony ? 'Balcony Level (Rows AA–ZZ)' : 'Ground Floor (Rows A–Z)'
 
     const steps = [
       `Enter through ${gate.label} (${gate.sub}).`,
-      isBalcony
+      isBalcony && tierFilter !== 'all'
         ? `Proceed up to ${tierName} using the designated stairway or elevator.`
         : `Walk along the main cross-aisle towards the ${aisleName}.`,
       `Walk up the ${aisleName} towards the stage to Row ${selectedPosition.row}.`,
@@ -378,6 +402,12 @@ export function SeatingLayout({
                   .slice(0, 2)
                 const isActive = allocation.id === selected?.id
                 const isFaculty = allocation.type === 'faculty' || allocation.type === 'staff'
+                const portraitStyle = allocation.photoIndex === undefined
+                  ? undefined
+                  : {
+                      backgroundImage: `url(${studentPortraitGrid})`,
+                      backgroundPosition: `${((allocation.photoIndex % 7) / 6) * 100}% ${(Math.floor(allocation.photoIndex / 7) / 5) * 100}%`,
+                    }
 
                 return (
                   <button
@@ -386,7 +416,9 @@ export function SeatingLayout({
                     className={`${isActive ? 'active' : ''} ${isFaculty ? 'staff' : ''}`}
                     onClick={() => chooseAllocation(allocation)}
                   >
-                    <span className="seating-roster-avatar">{initials}</span>
+                    <span className={`seating-roster-avatar ${portraitStyle ? 'has-photo' : ''}`} style={portraitStyle}>
+                      {portraitStyle ? '' : initials}
+                    </span>
                     <span>
                       <strong>{allocation.name}</strong>
                       <small>
@@ -441,6 +473,7 @@ export function SeatingLayout({
 
         {/* Toolbar: Tiers, Zoom, Search */}
         <div className="seating-toolbar">
+          {/* Tier Filter Tabs */}
           <div className="seating-tier-tabs" role="tablist" aria-label="Auditorium Tier Selection">
             <button
               type="button"
@@ -448,9 +481,8 @@ export function SeatingLayout({
               aria-selected={tierFilter === 'ground'}
               className={tierFilter === 'ground' ? 'active' : ''}
               onClick={() => setTierFilter('ground')}
-              title="Ground Floor (Rows A–Z · 1,399 Seats)"
             >
-              Ground Floor (1,399 Seats)
+              Ground Floor (Rows A–Z · 1,399 Seats)
             </button>
             <button
               type="button"
@@ -458,9 +490,8 @@ export function SeatingLayout({
               aria-selected={tierFilter === 'balcony'}
               className={tierFilter === 'balcony' ? 'active' : ''}
               onClick={() => setTierFilter('balcony')}
-              title="Balcony Tier (Rows AA–ZZ · 1,453 Seats)"
             >
-              Balcony Tier (1,453 Seats)
+              Balcony Tier (Rows AA–ZZ · 1,453 Seats)
             </button>
             <button
               type="button"
@@ -468,9 +499,8 @@ export function SeatingLayout({
               aria-selected={tierFilter === 'all'}
               className={tierFilter === 'all' ? 'active' : ''}
               onClick={() => setTierFilter('all')}
-              title="Entire Auditorium (52 Rows · 2,852 Seats)"
             >
-              Entire Auditorium (2,852 Seats)
+              Entire Auditorium (52 Rows · 2,852 Seats)
             </button>
           </div>
 
@@ -531,6 +561,7 @@ export function SeatingLayout({
               transform: `scale(${zoomLevel})`,
               transformOrigin: 'top center',
               transition: 'transform 0.2s ease',
+              position: 'relative',
             }}
           >
             <svg
@@ -609,44 +640,6 @@ export function SeatingLayout({
                     letterSpacing="1.2px"
                   >
                     ELEVATED BALCONY VIEW OVERLOOKING AUDITORIUM GROUND FLOOR
-                  </text>
-                </g>
-              )}
-
-              {/* BALCONY PROMENADE DIVIDER (When All is selected) */}
-              {tierFilter === 'all' && (
-                <g className="seat-finder-balcony-divider" transform="translate(0, 960)">
-                  <rect
-                    x="65"
-                    y="0"
-                    width="1680"
-                    height="48"
-                    rx="9"
-                    fill="#0f172a"
-                    stroke="#334155"
-                    strokeWidth="1.5"
-                  />
-                  <text
-                    x="905"
-                    y="28"
-                    textAnchor="middle"
-                    fill="#f8fafc"
-                    fontSize="14"
-                    fontWeight="800"
-                    letterSpacing="1.5px"
-                  >
-                    ▲ BALCONY LEVEL (UPPER TIER) — ROWS AA TO ZZ (1,453 SEATS) ▲
-                  </text>
-                  <text
-                    x="905"
-                    y="41"
-                    textAnchor="middle"
-                    fill="#94a3b8"
-                    fontSize="14"
-                    fontWeight="600"
-                    letterSpacing="1px"
-                  >
-                    ACCESSIBLE VIA MEZZANINE FOYER · STAIRS &amp; LIFTS AT BOTH WINGS
                   </text>
                 </g>
               )}
@@ -745,16 +738,24 @@ export function SeatingLayout({
                     {/* Seat rects */}
                     {seatsList.map(({ seatNumber, seatId, x, y }) => {
                       const allocation = allocationBySeat.get(seatId)
-                      const isMine = displayedSeatId === seatId
+                      const isMine = !isStaffView && displayedSeatId === seatId
                       const isTaken = allocation ? true : isDeterministicallyOccupied(rowConfig.row, seatNumber)
                       const isFacultyOrStaff = allocation?.type === 'faculty' || allocation?.type === 'staff'
                       const isStaffStudent = isStaffView && allocation?.type === 'student'
+                      const isCertificateIssued = isStaffView && allocation?.type === 'student' && Boolean(allocation?.degreeDistributed)
 
                       let className = 'seat-finder-seat'
-                      if (isMine) className += ' mine'
-                      else if (isStaffStudent) className += ' staff-student'
-                      else if (isFacultyOrStaff) className += ' staff'
-                      else if (isTaken) className += ' taken'
+                      if (isCertificateIssued) {
+                        className += ' certificate-issued'
+                      } else if (isStaffStudent) {
+                        className += ' staff-student'
+                      } else if (isMine) {
+                        className += ' mine'
+                      } else if (isFacultyOrStaff) {
+                        className += ' staff'
+                      } else if (isTaken) {
+                        className += ' taken'
+                      }
 
                       return (
                         <rect
@@ -776,9 +777,24 @@ export function SeatingLayout({
                           onMouseEnter={() => {
                             const bName = getBlockName(rowConfig.row, seatNumber) || 'Auditorium'
                             let statusText = 'Available'
-                            if (isMine) statusText = `Allocated to ${selected.name}`
-                            else if (allocation) statusText = `${allocation.name} (${allocation.role || allocation.type})`
-                            else if (isTaken) statusText = 'Occupied'
+                            let statusType: TooltipData['statusType'] = 'available'
+
+                            if (isStaffView && isCertificateIssued) {
+                              statusText = 'Certificate Issued'
+                              statusType = 'issued'
+                            } else if (isStaffView && isStaffStudent) {
+                              statusText = 'Awaiting Certificate'
+                              statusType = 'awaiting'
+                            } else if (isFacultyOrStaff) {
+                              statusText = allocation?.role || 'Faculty Coordinator'
+                              statusType = 'staff'
+                            } else if (allocation) {
+                              statusText = allocation.role || 'Allocated'
+                              statusType = 'occupied'
+                            } else if (isTaken) {
+                              statusText = 'Occupied'
+                              statusType = 'occupied'
+                            }
 
                             setHoveredTooltip({
                               seatId,
@@ -787,15 +803,16 @@ export function SeatingLayout({
                               tierName: isBalcony ? 'Balcony Level' : 'Ground Floor',
                               blockName: bName,
                               status: statusText,
+                              statusType,
                               attendeeName: allocation?.name,
                               x: x + SEAT_SIZE / 2,
-                              y: y - 8,
+                              y: y,
                             })
                           }}
                           onMouseLeave={() => setHoveredTooltip(null)}
                         >
                           <title>
-                            {seatId} · {allocation ? allocation.name : isTaken ? 'Occupied' : 'Available'} (
+                            {seatId} · {allocation ? allocation.name : isTaken ? 'Occupied' : 'Available'} {isCertificateIssued ? '(Certificate Issued)' : ''} (
                             {isBalcony ? 'Balcony' : 'Ground Floor'})
                           </title>
                         </rect>
@@ -818,8 +835,40 @@ export function SeatingLayout({
               {/* WALKING ROUTE POLYLINE */}
               {routePoints && <polyline className="seat-finder-route" points={routePoints} />}
 
-              {/* GATES & ENTRANCES (Ground or All) */}
-              {(tierFilter === 'ground' || tierFilter === 'all') && (
+              {/* GATES & ENTRANCES (Entire Auditorium: gates at bottom of balcony; Ground: gates + facilities; Balcony: portals + facilities) */}
+              {tierFilter === 'all' && (
+                <g className="seat-finder-gates-group">
+                  {(Object.entries(ALL_GATES) as Array<[GateId, (typeof ALL_GATES)[GateId]]>).map(([id, gate]) => (
+                    <g
+                      key={id}
+                      onClick={() => setGateId(id)}
+                      style={{ cursor: 'pointer' }}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setGateId(id)}
+                    >
+                      <rect
+                        className={`seat-finder-gate ${gateId === id ? 'active' : ''}`}
+                        x={gate.x - 55}
+                        y={gate.y - 17}
+                        width="110"
+                        height="34"
+                        rx="7"
+                      />
+                      <text
+                        className="seat-finder-gate-label"
+                        x={gate.x}
+                        y={gate.y + 5}
+                        textAnchor="middle"
+                      >
+                        {gate.label}
+                      </text>
+                    </g>
+                  ))}
+                </g>
+              )}
+
+              {tierFilter === 'ground' && (
                 <g className="seat-finder-gates-group">
                   {(Object.entries(GATES) as Array<[GateId, (typeof GATES)[GateId]]>).map(([id, gate]) => (
                     <g
@@ -849,30 +898,28 @@ export function SeatingLayout({
                     </g>
                   ))}
 
-                  {/* CAR PARKING & REFRESHMENT FACILITIES */}
                   <g className="seat-finder-facility parking" aria-label="Car Parking Zone P1">
-                    <rect x="120" y="990" width="480" height="48" rx="9" />
+                    <rect x="100" y="990" width="520" height="52" rx="10" />
                     <text x="360" y="1011" textAnchor="middle">
                       CAR PARKING — ZONE P1
                     </text>
-                    <text className="seat-finder-facility-subtitle" x="360" y="1027" textAnchor="middle">
+                    <text className="seat-finder-facility-subtitle" x="360" y="1029" textAnchor="middle">
                       LOCATED BESIDE MAIN GATE 1 · DEDICATED STUDENT &amp; GUEST PARKING
                     </text>
                   </g>
 
                   <g className="seat-finder-facility refreshment" aria-label="Refreshment Food Court 02">
-                    <rect x="1210" y="990" width="480" height="48" rx="9" />
+                    <rect x="1190" y="990" width="520" height="52" rx="10" />
                     <text x="1450" y="1011" textAnchor="middle">
                       REFRESHMENT — FOOD COURT 02
                     </text>
-                    <text className="seat-finder-facility-subtitle" x="1450" y="1027" textAnchor="middle">
+                    <text className="seat-finder-facility-subtitle" x="1450" y="1029" textAnchor="middle">
                       BREAKFAST &amp; LUNCH COUNTERS BESIDE GATE 2
                     </text>
                   </g>
                 </g>
               )}
 
-              {/* BALCONY PORTALS & AMENITIES (Balcony Only) */}
               {tierFilter === 'balcony' && (
                 <g className="seat-finder-gates-group">
                   {(Object.entries(BALCONY_PORTALS) as Array<[GateId, (typeof BALCONY_PORTALS)[GateId]]>).map(
@@ -906,46 +953,54 @@ export function SeatingLayout({
                   )}
 
                   <g className="seat-finder-facility parking">
-                    <rect x="120" y="990" width="480" height="48" rx="9" />
+                    <rect x="100" y="990" width="520" height="52" rx="10" />
                     <text x="360" y="1011" textAnchor="middle">
                       WEST BALCONY FOYER &amp; RESTROOMS
                     </text>
-                    <text className="seat-finder-facility-subtitle" x="360" y="1027" textAnchor="middle">
+                    <text className="seat-finder-facility-subtitle" x="360" y="1029" textAnchor="middle">
                       ACCESSIBLE VIA WEST STAIRWAY · BESIDE BALCONY PORTAL 1
                     </text>
                   </g>
 
                   <g className="seat-finder-facility refreshment">
-                    <rect x="1210" y="990" width="480" height="48" rx="9" />
+                    <rect x="1190" y="990" width="520" height="52" rx="10" />
                     <text x="1450" y="1011" textAnchor="middle">
                       EAST BALCONY REFRESHMENT KIOSK
                     </text>
-                    <text className="seat-finder-facility-subtitle" x="1450" y="1027" textAnchor="middle">
+                    <text className="seat-finder-facility-subtitle" x="1450" y="1029" textAnchor="middle">
                       SNACKS &amp; WATER COUNTER BESIDE BALCONY PORTAL 2
                     </text>
                   </g>
                 </g>
               )}
             </svg>
-          </div>
 
-          {/* Floating Hover Tooltip */}
-          {hoveredTooltip && (
-            <div
-              className="seating-hover-tooltip"
-              style={{
-                left: `${(hoveredTooltip.x / CANVAS_WIDTH) * 100}%`,
-                top: `${hoveredTooltip.y}px`,
-                transform: 'translate(-50%, -100%)',
-              }}
-            >
-              <strong>{hoveredTooltip.seatId}</strong>
-              <span>
-                {hoveredTooltip.tierName} · {hoveredTooltip.blockName}
-              </span>
-              <small>{hoveredTooltip.status}</small>
-            </div>
-          )}
+            {/* Floating Hover Popover — positioned right above the seat with an arrow, never disturbing or obscuring the pointed seat */}
+            {hoveredTooltip && (
+              <div
+                className="seating-hover-tooltip"
+                style={{
+                  left: `${(hoveredTooltip.x / CANVAS_WIDTH) * 100}%`,
+                  top: `${(hoveredTooltip.y / canvasHeight) * 100}%`,
+                }}
+              >
+                <div className="tooltip-top-row">
+                  <span className="tooltip-seat-badge">{hoveredTooltip.seatId}</span>
+                  {hoveredTooltip.attendeeName && (
+                    <strong className="tooltip-name">{hoveredTooltip.attendeeName}</strong>
+                  )}
+                </div>
+                <div className="tooltip-sub-row">
+                  <span className="tooltip-meta">
+                    {hoveredTooltip.tierName} · {hoveredTooltip.blockName}
+                  </span>
+                  <span className={`tooltip-status-pill ${hoveredTooltip.statusType || 'available'}`}>
+                    {hoveredTooltip.status}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Legend */}
@@ -962,16 +1017,23 @@ export function SeatingLayout({
             <i className="staff" />
             Faculty / Staff Coordinator
           </span>
-          {isStaffView && (
+          {isStaffView ? (
+            <>
+              <span>
+                <i className="staff-student" />
+                Awaiting Certificate (Rows A–B)
+              </span>
+              <span>
+                <i className="certificate-issued" />
+                Certificate Issued
+              </span>
+            </>
+          ) : (
             <span>
-              <i className="staff-student" />
-              Assigned Graduates (Rows A–B)
+              <i className="mine" />
+              Your Seat ({displayedSeatId})
             </span>
           )}
-          <span>
-            <i className="mine" />
-            {isStaffView ? 'Selected Attendee' : 'Your Seat (A-6)'}
-          </span>
           <span>
             <i className="route" />
             Walking Route
@@ -1005,13 +1067,21 @@ export function SeatingLayout({
             }`}
           >
             <div className="seating-attendee-heading">
-              <span>
-                {selected.name
-                  .split(' ')
-                  .filter(Boolean)
-                  .map((part) => part[0])
-                  .join('')
-                  .slice(0, 2)}
+              <span
+                className={selected.photoIndex === undefined ? '' : 'has-photo'}
+                style={selected.photoIndex === undefined ? undefined : {
+                  backgroundImage: `url(${studentPortraitGrid})`,
+                  backgroundPosition: `${((selected.photoIndex % 7) / 6) * 100}% ${(Math.floor(selected.photoIndex / 7) / 5) * 100}%`,
+                }}
+              >
+                {selected.photoIndex === undefined
+                  ? selected.name
+                      .split(' ')
+                      .filter(Boolean)
+                      .map((part) => part[0])
+                      .join('')
+                      .slice(0, 2)
+                  : ''}
               </span>
               <div>
                 <p>
@@ -1030,6 +1100,14 @@ export function SeatingLayout({
                 <dt>Role</dt>
                 <dd>{selected.role || 'Graduate Attendee'}</dd>
               </div>
+              {isStaffView && selected.type === 'student' && (
+                <div>
+                  <dt>Certificate Status</dt>
+                  <dd style={{ color: selected.degreeDistributed ? '#15803d' : '#2563eb', fontWeight: 700 }}>
+                    {selected.degreeDistributed ? '✓ Certificate Issued' : '⏳ Awaiting Handover'}
+                  </dd>
+                </div>
+              )}
               <div>
                 <dt>Department</dt>
                 <dd>{selected.department || 'Student'}</dd>

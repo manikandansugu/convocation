@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
+import JSZip from 'jszip'
 import { Icon } from '../components/ui/Icon'
 import { DEFAULT_STAFF, INITIAL_ROSTER, type StaffMember, type StudentRosterRecord } from '../config/staff'
 import { DEFAULT_FACULTY } from '../config/faculty'
 import { FACULTY_STAFF_ALLOCATIONS } from '../config/seating'
 import type { FacultyMember } from '../types/faculty'
-import studentPhoto from '../assets/student-verification.png'
+import studentPortraitGrid from '../assets/indian-student-portraits-grid.jpg'
 import { SeatingLayout, type SeatAllocation } from '../components/seating/SeatingLayout'
 import { StaffInstructionsPage } from './StaffInstructionsPage'
 
@@ -17,23 +18,153 @@ interface StaffPortalPageProps {
   onLogout: () => void
 }
 
+const getKitIssuedCount = (student: StudentRosterRecord) =>
+  Number(Boolean(student.attendanceRecorded)) +
+  Number(Boolean(student.gownIssued)) +
+  Number(Boolean(student.robeIssued)) +
+  Number(Boolean(student.breakfastTokenIssued)) +
+  Number(Boolean(student.lunchTokenIssued))
+
+function StudentPortrait({ student, className = '' }: { student: StudentRosterRecord; className?: string }) {
+  const column = student.photoIndex % 7
+  const row = Math.floor(student.photoIndex / 7)
+
+  return (
+    <span
+      className={`student-portrait-sprite ${className}`.trim()}
+      role="img"
+      aria-label={`${student.name} profile photo`}
+      style={{
+        backgroundImage: `url(${studentPortraitGrid})`,
+        backgroundPosition: `${(column / 6) * 100}% ${(row / 5) * 100}%`,
+      }}
+    />
+  )
+}
+
+const escapeExcelXml = (value: string | number) => String(value)
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;')
+  .replace(/'/g, '&apos;')
+
+const excelColumnName = (index: number) => {
+  let value = index + 1
+  let name = ''
+  while (value > 0) {
+    value -= 1
+    name = String.fromCharCode(65 + (value % 26)) + name
+    value = Math.floor(value / 26)
+  }
+  return name
+}
+
+async function exportDegreeDistributionWorkbook(faculty: FacultyMember, students: StudentRosterRecord[]) {
+  const headers = [
+    'S.No', 'Student Name', 'Register Number', 'Registration ID', 'Degree', 'Program',
+    'Department', 'Block', 'Row', 'Seat', 'Faculty', 'Distribution Status',
+    'Distributed At', 'Official Email', 'Mobile Number',
+  ]
+  const rows: Array<Array<string | number>> = [
+    headers,
+    ...students.map((student, index) => [
+      index + 1,
+      student.name,
+      student.registerNumber,
+      student.registrationId,
+      student.degree,
+      student.program,
+      student.department,
+      student.block,
+      student.row,
+      student.seat,
+      faculty.name,
+      student.degreeDistributed ? 'Distributed' : 'Pending',
+      student.degreeDistributedAt || '',
+      student.officialEmail,
+      student.mobileNumber,
+    ]),
+  ]
+  const lastColumn = excelColumnName(headers.length - 1)
+  const sheetRows = rows.map((row, rowIndex) => {
+    const cells = row.map((value, columnIndex) => {
+      const reference = `${excelColumnName(columnIndex)}${rowIndex + 1}`
+      return `<c r="${reference}" t="inlineStr"${rowIndex === 0 ? ' s="1"' : ''}><is><t>${escapeExcelXml(value)}</t></is></c>`
+    }).join('')
+    return `<row r="${rowIndex + 1}">${cells}</row>`
+  }).join('')
+
+  const zip = new JSZip()
+  zip.file('[Content_Types].xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+  <Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
+</Types>`)
+  zip.folder('_rels')?.file('.rels', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+</Relationships>`)
+  zip.folder('xl')?.file('workbook.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheets><sheet name="Degree Distribution" sheetId="1" r:id="rId1"/></sheets>
+</workbook>`)
+  zip.folder('xl')?.folder('_rels')?.file('workbook.xml.rels', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+</Relationships>`)
+  zip.folder('xl')?.file('styles.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <fonts count="2"><font><sz val="11"/><name val="DM Sans"/></font><font><b/><color rgb="FFFFFFFF"/><sz val="11"/><name val="DM Sans"/></font></fonts>
+  <fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF155BC3"/><bgColor indexed="64"/></patternFill></fill></fills>
+  <borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>
+  <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
+  <cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/></cellXfs>
+</styleSheet>`)
+  zip.folder('xl')?.folder('worksheets')?.file('sheet1.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <dimension ref="A1:${lastColumn}${rows.length}"/>
+  <sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>
+  <cols>${headers.map((header, index) => `<col min="${index + 1}" max="${index + 1}" width="${Math.max(10, Math.min(32, header.length + 6))}" customWidth="1"/>`).join('')}</cols>
+  <sheetData>${sheetRows}</sheetData>
+  <autoFilter ref="A1:${lastColumn}${rows.length}"/>
+</worksheet>`)
+
+  const workbook = await zip.generateAsync({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+  const url = URL.createObjectURL(workbook)
+  const link = document.createElement('a')
+  const department = faculty.department.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').toLowerCase()
+  link.href = url
+  link.download = `${department}-degree-distribution-29-nov-2026.xlsx`
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  URL.revokeObjectURL(url)
+}
+
 export function StaffPortalPage({
   staff = DEFAULT_STAFF,
   faculty = DEFAULT_FACULTY,
   initialTab = 'instructions',
   onLogout,
 }: StaffPortalPageProps) {
+  const initialFacultyRoster = INITIAL_ROSTER.filter((student) => student.assignedFacultyId === faculty.id)
+  const initialStudentId = initialFacultyRoster[0]?.id || INITIAL_ROSTER[0].id
   const [activeTab, setActiveTab] = useState<StaffTab>(initialTab)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
-  const [roster, setRoster] = useState<StudentRosterRecord[]>(INITIAL_ROSTER)
-  const [selectedStudentId, setSelectedStudentId] = useState<string>('student-1')
-  const [selectedSeatAllocationId, setSelectedSeatAllocationId] = useState<string>('student-1')
+  const [roster, setRoster] = useState<StudentRosterRecord[]>(initialFacultyRoster)
+  const [selectedStudentId, setSelectedStudentId] = useState<string>(initialStudentId)
+  const [selectedSeatAllocationId, setSelectedSeatAllocationId] = useState<string>(initialStudentId)
   const [drawerStudentId, setDrawerStudentId] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [rosterPage, setRosterPage] = useState(1)
-  const [rosterPageSize, setRosterPageSize] = useState(5)
+  const [rosterPageSize, setRosterPageSize] = useState(10)
 
   // Faculty Certificate Distribution State
   const [currentFaculty, setCurrentFaculty] = useState<FacultyMember>(faculty)
@@ -68,10 +199,10 @@ export function StaffPortalPage({
     instructions: 'Staff Instructions',
   }
 
-  // Filter students assigned to this faculty member (by faculty ID, name, or assigned rows)
+  // Every generated record has a faculty ID; use legacy matching only for older records.
   const assignedStudents = roster.filter((student) => {
+    if (student.assignedFacultyId) return student.assignedFacultyId === currentFaculty.id
     return (
-      student.assignedFacultyId === currentFaculty.id ||
       student.facultyName.toLowerCase().includes(currentFaculty.name.toLowerCase()) ||
       currentFaculty.assignedRows.includes(student.row)
     )
@@ -122,6 +253,16 @@ export function StaffPortalPage({
     window.setTimeout(() => setFacultySuccessToast(''), 3000)
   }
 
+  const handleDegreeDistributionExport = async () => {
+    try {
+      await exportDegreeDistributionWorkbook(currentFaculty, assignedStudents)
+      setFacultySuccessToast(`Excel export downloaded for ${currentFaculty.department} (${assignedStudents.length} graduates).`)
+    } catch {
+      setFacultySuccessToast('Unable to generate the Excel export. Please try again.')
+    }
+    window.setTimeout(() => setFacultySuccessToast(''), 3500)
+  }
+
   const selectedStudent = roster.find((s) => s.id === selectedStudentId) || roster[0]
   const drawerStudent = roster.find((s) => s.id === drawerStudentId)
   const seatingAllocations: SeatAllocation[] = [
@@ -136,6 +277,8 @@ export function StaffPortalPage({
       department: student.department,
       role: student.degree ? `${student.degree} Graduate` : 'Graduate attendee',
       email: student.officialEmail || student.personalEmail,
+      degreeDistributed: Boolean(student.degreeDistributed),
+      photoIndex: student.photoIndex,
     })),
     ...FACULTY_STAFF_ALLOCATIONS,
   ]
@@ -241,6 +384,17 @@ export function StaffPortalPage({
       s.department.toLowerCase().includes(q)
     )
   })
+
+  // Keep every incomplete student at the top; fully issued students move to the bottom.
+  const counterQueueRoster = useMemo(() => {
+    return [...filteredRoster].sort((a, b) => {
+      const aFullyIssued = getKitIssuedCount(a) === 5
+      const bFullyIssued = getKitIssuedCount(b) === 5
+
+      if (aFullyIssued !== bFullyIssued) return aFullyIssued ? 1 : -1
+      return 0
+    })
+  }, [filteredRoster])
 
   const rosterPageCount = Math.max(1, Math.ceil(filteredRoster.length / rosterPageSize))
   const activeRosterPage = Math.min(rosterPage, rosterPageCount)
@@ -441,14 +595,9 @@ export function StaffPortalPage({
               </div>
 
               <div className="staff-student-list">
-                {filteredRoster.map((student) => {
+                {counterQueueRoster.map((student) => {
                   const isSelected = student.id === selectedStudent.id
-                  const doneCount =
-                    (student.attendanceRecorded ? 1 : 0) +
-                    (student.gownIssued ? 1 : 0) +
-                    (student.robeIssued ? 1 : 0) +
-                    (student.breakfastTokenIssued ? 1 : 0) +
-                    (student.lunchTokenIssued ? 1 : 0)
+                  const doneCount = getKitIssuedCount(student)
                   return (
                     <button
                       key={student.id}
@@ -456,9 +605,7 @@ export function StaffPortalPage({
                       className={`staff-student-row ${isSelected ? 'active' : ''}`}
                       onClick={() => setSelectedStudentId(student.id)}
                     >
-                      <div className="student-row-avatar">
-                        {student.name.split(' ').map((p) => p[0]).join('').slice(0, 2)}
-                      </div>
+                      <StudentPortrait student={student} className="student-row-avatar" />
                       <div className="student-row-details">
                         <strong>{student.name}</strong>
                         <span>{student.registerNumber} · {student.block}-{student.seat}</span>
@@ -478,7 +625,7 @@ export function StaffPortalPage({
             <section className="panel staff-clearance-panel">
               <div className="clearance-header-card">
                 <div className="student-face-preview">
-                  <img src={studentPhoto} alt={selectedStudent.name} />
+                  <StudentPortrait student={selectedStudent} className="student-face-photo" />
                   <span className="face-verified-pill">
                     <Icon name="check" size={12} /> Verified
                   </span>
@@ -795,7 +942,7 @@ export function StaffPortalPage({
               <div className="operation-card-list">
                 {filteredRoster.map((student) => (
                   <article className="operation-graduate-card" key={student.id}>
-                    <img src={studentPhoto} alt="" />
+                    <StudentPortrait student={student} className="operation-graduate-photo" />
                     <div className="operation-graduate-identity">
                       <strong>{student.name}</strong>
                       <span>{student.registerNumber} · Seat {student.row}-{student.seat}</span>
@@ -863,8 +1010,8 @@ export function StaffPortalPage({
                   return (
                     <article className={`auditorium-entry-card ${student.admittedAtGate ? 'admitted' : ''}`} key={student.id}>
                       <div className="auditorium-student-photo">
-                        <img src={studentPhoto} alt={student.name} />
-                        {student.auditoriumFaceVerified && <span><Icon name="check" size={13} /></span>}
+                        <StudentPortrait student={student} />
+                        {student.auditoriumFaceVerified && <span className="auditorium-verified-icon"><Icon name="check" size={13} /></span>}
                       </div>
                       <div className="auditorium-student-info">
                         <div><strong>{student.name}</strong><span>{student.registerNumber}</span></div>
@@ -1058,9 +1205,15 @@ export function StaffPortalPage({
             {/* Degree Distribution List */}
             <section className="panel faculty-roster-panel">
               <div className="faculty-roster-controls">
-                <div>
-                  <h2>Assigned Graduates & Seat Identification</h2>
-                  <p>Identify each graduate by allotted seat number and record certificate distribution</p>
+                <div className="faculty-roster-title-row">
+                  <div>
+                    <h2>Assigned Graduates & Seat Identification</h2>
+                    <p>Identify each graduate by allotted seat number and record certificate distribution</p>
+                  </div>
+                  <button type="button" className="faculty-export-button" onClick={handleDegreeDistributionExport}>
+                    <Icon name="download" size={16} />
+                    Export Excel
+                  </button>
                 </div>
 
                 <div className="faculty-filter-group">
@@ -1134,11 +1287,7 @@ export function StaffPortalPage({
                         </div>
 
                         <div className="graduate-info-row">
-                          <img
-                            src={studentPhoto}
-                            alt={student.name}
-                            className="graduate-avatar-img"
-                          />
+                          <StudentPortrait student={student} className="graduate-avatar-img" />
                           <div className="graduate-text-details">
                             <h3>{student.name}</h3>
                             <p className="reg-no">{student.registerNumber}</p>
@@ -1226,7 +1375,10 @@ export function StaffPortalPage({
                               <strong>{student.name}</strong>
                             </div>
                           </td>
-                          <td data-label="Register No."><code>{student.registerNumber}</code></td>
+                          <td data-label="Register No." style={{ cursor: 'pointer' }} onClick={() => {
+                                setSelectedStudentId(student.id)
+                                setDrawerStudentId(student.id)
+                              }}><code>{student.registerNumber}</code></td>
                           <td data-label="Academic Year">{student.academicYear}</td>
                           <td data-label="Mobile No.">{student.mobileNumber}</td>
                           <td data-label="Personal Email">{student.personalEmail}</td>
@@ -1266,7 +1418,6 @@ export function StaffPortalPage({
                         setRosterPage(1)
                       }}
                     >
-                      <option value={5}>5</option>
                       <option value={10}>10</option>
                       <option value={20}>20</option>
                     </select>

@@ -6,9 +6,10 @@ interface IdentityVerificationPageProps {
   onBack: () => void
   onContinue: () => void
   onPhotoCaptured?: (photoUrl: string) => void
+  onNavigateToQueries?: () => void
 }
 
-export function IdentityVerificationPage({ onBack, onContinue, onPhotoCaptured }: IdentityVerificationPageProps) {
+export function IdentityVerificationPage({ onBack, onContinue, onPhotoCaptured, onNavigateToQueries }: IdentityVerificationPageProps) {
   const [captured, setCaptured] = useState(false)
 
   const handleCapture = () => {
@@ -21,37 +22,98 @@ export function IdentityVerificationPage({ onBack, onContinue, onPhotoCaptured }
 
   return (
     <div className="page prototype-page identity-page">
-      <div className="five-step-progress"><span className="done"><Icon name="check" size={16}/></span><i className="done"/><span className="active">2</span><i/><span>3</span><i/><span>4</span><i/><span>5</span></div>
+      <div className="five-step-progress">
+        <span className="done">
+          <Icon name="check" size={16} />
+        </span>
+        <i className="done" />
+        <span className="active">2</span>
+        <i />
+        <span>3</span>
+        <i />
+        <span>4</span>
+        <i />
+        <span>5</span>
+      </div>
       <section className="panel identity-card">
-        <div className={'camera-preview ' + (captured ? 'captured' : '')}>
+        <div className={"camera-preview " + (captured ? "captured" : "")}>
           <div className="face-guide-wrap">
             <div className="face-guide">
-              <img src={studentPhoto} alt="Student face captured for identity verification" />
+              <img
+                src={studentPhoto}
+                alt="Student face captured for identity verification"
+              />
             </div>
-            {captured && <span className="capture-success-mark"><Icon name="check" size={24}/></span>}
+            {captured && (
+              <span className="capture-success-mark">
+                <Icon name="check" size={24} />
+              </span>
+            )}
           </div>
-          <div className="camera-status"><span className={captured ? 'success' : ''}/>{captured ? 'Live photo captured & registered for Face Recognition' : 'Position your face inside the guide'}</div>
+          <div className="camera-status">
+            <span className={captured ? "success" : ""} />
+            {captured
+              ? "Live photo captured & registered for Face Recognition"
+              : "Position your face inside the guide"}
+          </div>
         </div>
         <div className="capture-instructions">
-          <p className="eyebrow">CAPTURE GUIDELINES</p><h2>Capture your live photo</h2>
+          <p className="eyebrow">CAPTURE GUIDELINES</p>
+          <h2>Capture your live photo</h2>
           <ul>
-            <li><Icon name="check" size={15}/> This photo is required for event day campus check-in face recognition.</li>
-            <li><Icon name="check" size={15}/> Also used for auditorium entrance gate verification.</li>
-            <li><Icon name="check" size={15}/> Will be embossed directly on your official Graduation Day Pass.</li>
-            <li><Icon name="check" size={15}/> Ensure a well-lit area with a plain background.</li>
+            <li>
+              <Icon name="check" size={15} /> This photo is required for event
+              day campus check-in face recognition.
+            </li>
+            <li>
+              <Icon name="check" size={15} /> Also used for auditorium entrance
+              gate verification.
+            </li>
+            <li>
+              <Icon name="check" size={15} /> Will be embossed directly on your
+              official Graduation Day Pass.
+            </li>
+            <li>
+              <Icon name="check" size={15} /> Ensure a well-lit area with a
+              plain background.
+            </li>
           </ul>
           <button className="capture-button" onClick={handleCapture}>
-            <Icon name="camera" size={18}/>{captured ? 'Retake live photo' : 'Capture live photo'}
+            <Icon name="camera" size={18} />
+            {captured ? "Retake live photo" : "Capture live photo"}
           </button>
-          <div className="privacy-note">Secure facial recognition data is retained only for Graduation Day verification access.</div>
+          <div className="privacy-note">
+            Secure facial recognition data is retained only for Graduation Day
+            verification access.
+          </div>
         </div>
       </section>
+      <section className="panel identity-support-card">
+        <span className="identity-support-icon">
+          <Icon name="help" size={22} />
+        </span>
+        <div className="identity-support-copy">
+          <p className="eyebrow">FACE CAPTURE SUPPORT</p>
+          <h3>Having trouble capturing your live photo?</h3>
+          <p>Raise a support query and our team will assist you with the face-capture and verification process.</p>
+        </div>
+        <button type="button" className="identity-raise-query-button" onClick={onNavigateToQueries}>
+          <Icon name="help" size={16} />
+          Raise Query
+        </button>
+      </section>
       <div className="standalone-actions">
-        <button className="secondary-button" onClick={onBack}>Back</button>
-        <button className="flow-primary" onClick={onContinue} disabled={!captured}>
-          Continue to payment <Icon name="arrow" size={18}/>
+        <button className="secondary-button" onClick={onBack}>
+          Back
+        </button>
+        <button
+          className="flow-primary"
+          onClick={onContinue}
+          disabled={!captured}
+        >
+          Continue to payment <Icon name="arrow" size={18} />
         </button>
       </div>
     </div>
-  )
+  );
 }
