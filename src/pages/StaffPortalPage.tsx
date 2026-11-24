@@ -181,7 +181,7 @@ export function StaffPortalPage({
     .toUpperCase()
 
   const STAFF_NAV_ITEMS = [
-    { id: 'instructions' as const, label: 'Instructions', icon: 'file' as const },
+    { id: 'instructions' as const, label: 'Student Instructions', icon: 'file' as const },
     { id: 'roster' as const, label: 'Graduate List', icon: 'user' as const },
     { id: 'counter' as const, label: 'In-Person Check & Kit Desk', icon: 'tag' as const },
     { id: 'seating' as const, label: 'Seating & Faculty Allocation', icon: 'grid' as const },
@@ -194,7 +194,7 @@ export function StaffPortalPage({
     seating: 'Seating & Faculty Allocation',
     'faculty-distribution': 'Degree Certificate Distribution',
     roster: 'COE-Approved Graduate List',
-    instructions: 'Staff Instructions',
+    instructions: 'Student Instructions',
   }
 
   // Every generated record has a faculty ID; use legacy matching only for older records.
