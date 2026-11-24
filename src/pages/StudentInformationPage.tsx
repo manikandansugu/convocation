@@ -41,33 +41,56 @@ export function StudentInformationPage({ student = STUDENT, onContinue }: Studen
           </div>
         </div>
 
-        <div className="student-info-grid">
-          <div><span>Department</span><strong>{student.department}</strong></div>
-          <div><span>Degree</span><strong>{student.degree}</strong></div>
-          <div><span>Program</span><strong>{student.program || student.department}</strong></div>
-          <div><span>Graduation year</span><strong>{student.graduationYear}</strong></div>
-
-          <div className="readable-contact">
-            <span><Icon name="mail" size={16}/> Email address</span>
-            <strong>{student.email}</strong>
-            <small>DODE registration confirmation sent here</small>
+        <div className="student-information-overview">
+          <div className="student-information-column academic-column">
+            <div className="student-information-field">
+              <span className="student-information-icon"><Icon name="bank" size={18}/></span>
+              <div><span>Department</span><strong>{student.department}</strong></div>
+            </div>
+            <div className="student-information-field">
+              <span className="student-information-icon"><Icon name="cap" size={18}/></span>
+              <div><span>Degree</span><strong>{student.degree}</strong></div>
+            </div>
+            <div className="student-information-field">
+              <span className="student-information-icon"><Icon name="calendar" size={18}/></span>
+              <div><span>Program</span><strong>{student.program || student.department}</strong></div>
+            </div>
+            <div className="student-information-field">
+              <span className="student-information-icon"><Icon name="calendar" size={18}/></span>
+              <div><span>Graduation Year</span><strong>{student.graduationYear}</strong></div>
+            </div>
           </div>
 
-          <div className="readable-contact mobile-confirm-box">
-            <div className="mobile-header-row">
-              <span><Icon name="phone" size={16}/> Mobile number</span>
+          <div className="student-information-column contact-column">
+            <div className="student-information-field">
+              <span className="student-information-icon"><Icon name="mail" size={18}/></span>
+              <div>
+                <span>Email Address</span>
+                <strong className="student-information-link">{student.email}</strong>
+                <small>DODE registration confirmation sent here.</small>
+              </div>
             </div>
-            <div className="mobile-confirmed-row">
-              <strong>{student.mobile}</strong>
-              <span className="confirmed-pill"><Icon name="check" size={12}/> Confirmed for Event Day SMS</span>
+            <div className="student-information-field student-phone-field">
+              <span className="student-information-icon"><Icon name="phone" size={18}/></span>
+              <div>
+                <span>Phone Number</span>
+                <strong>{student.mobile}</strong>
+                <em className="confirmed-pill"><Icon name="check" size={12}/> Confirmed for Event Day SMS</em>
+                <small>Event day notifications, seat reminders, and token alerts will be sent to this number.</small>
+              </div>
             </div>
-            <small>Event day notifications, seat reminder, and token alert updates will be sent to this number.</small>
           </div>
-        </div>
 
-        <div className="student-address-grid">
-          <div><span><Icon name="location" size={16}/> Postal address</span><strong>{student.postalAddress}</strong></div>
-          <div><span><Icon name="location" size={16}/> Communication address</span><strong>{student.communicationAddress}</strong></div>
+          <div className="student-information-column address-column">
+            <div className="student-information-field">
+              <span className="student-information-icon"><Icon name="location" size={18}/></span>
+              <div><span>Postal Address</span><strong>{student.postalAddress}</strong></div>
+            </div>
+            <div className="student-information-field">
+              <span className="student-information-icon"><Icon name="location" size={18}/></span>
+              <div><span>Communication Address</span><strong>{student.communicationAddress}</strong></div>
+            </div>
+          </div>
         </div>
 
         <div className="information-note">
