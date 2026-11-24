@@ -3199,7 +3199,9 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
   /* search panel: compact height so kit panel is reachable */
   .staff-student-search-panel {
     position: static;
-    max-height: 260px;
+    min-height: 420px;
+    height: min(62svh, 520px);
+    max-height: 520px;
   }
   .staff-student-list {
     overflow-y: auto;
