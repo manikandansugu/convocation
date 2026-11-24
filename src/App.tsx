@@ -13,6 +13,7 @@ import { MapPage } from './pages/MapPage'
 import { PaymentPage } from './pages/PaymentPage'
 import { StudentInformationPage } from './pages/StudentInformationPage'
 import { KitDetailsPage } from './pages/KitDetailsPage'
+import { PhotoGalleryPage } from './pages/PhotoGalleryPage'
 import { LoginPage, type UserRole, type StaffTab } from './pages/LoginPage'
 import { StaffPortalPage } from './pages/StaffPortalPage'
 import type { Guest, Student } from './types/registration'
@@ -109,8 +110,11 @@ function App() {
         />
       )
     }
-    if (activePage === 'Kit Details') {
+    if (activePage === 'Graduation Kit Status') {
       return <KitDetailsPage student={studentInfo} photoUrl={capturedPhotoUrl} />
+    }
+    if (activePage === 'Photo Gallery') {
+      return <PhotoGalleryPage />
     }
     if (activePage === 'ID Verification') {
       return (
@@ -208,13 +212,21 @@ function App() {
           icon: 'user',
           status: { label: 'Step 1 of 5', tone: 'neutral' },
         }
-      case 'Kit Details':
+      case 'Graduation Kit Status':
         return {
-          title: 'Kit Details',
+          title: 'Graduation Kit Status',
           subtitle: 'View your attendance and issued graduation-kit items.',
           eyebrow: 'GRADUATION DAY 2026',
           icon: 'tag',
           status: { label: 'Kit Issued', icon: 'check', tone: 'success' },
+        }
+      case 'Photo Gallery':
+        return {
+          title: 'Photo Gallery',
+          subtitle: 'View and download official group photographs from Convocation 2026.',
+          eyebrow: 'CONVOCATION MEMORIES',
+          icon: 'camera',
+          status: { label: '3 photos available', icon: 'download', tone: 'info' },
         }
       case 'ID Verification':
         return {

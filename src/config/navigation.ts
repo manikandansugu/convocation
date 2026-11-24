@@ -8,11 +8,12 @@ export type PageId =
   | 'Seating Layout'
   | 'Map'
   | 'Student Information'
-  | 'Kit Details'
+  | 'Graduation Kit Status'
   | 'ID Verification'
   | 'Payment'
   | 'Guest Addition'
   | 'Convocation Pass'
+  | 'Photo Gallery'
 
 export interface NavigationItem {
   label: PageId
@@ -23,11 +24,12 @@ export const navigationItems: NavigationItem[] = [
   { label: 'Instructions', icon: 'file' },
   { label: 'Notifications', icon: 'bell' },
   { label: 'Student Information', icon: 'user' },
-  { label: 'Kit Details', icon: 'tag' },
+  { label: 'Graduation Kit Status', icon: 'tag' },
   { label: 'ID Verification', icon: 'camera' },
   { label: 'Payment', icon: 'wallet' },
   { label: 'Guest Addition', icon: 'user' },
   { label: 'Convocation Pass', icon: 'ticket' },
+  { label: 'Photo Gallery', icon: 'camera' },
   { label: 'Seating', icon: 'grid' },
   { label: 'Map', icon: 'map' },
   { label: 'Queries & Support', icon: 'help' },

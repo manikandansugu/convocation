@@ -524,7 +524,7 @@ export function ConvocationPassPage({ guests, photoUrl, student = STUDENT }: Con
         <span className="done"><Icon name="check" size={16}/></span><i className="done"/>
         <span className="done"><Icon name="check" size={16}/></span><i className="done"/>
         <span className="done"><Icon name="check" size={16}/></span><i className="done"/>
-        <span className="active">5</span>
+        <span className="done"><Icon name="check" size={16}/></span>
       </div>
 
       <div className="pass-success">

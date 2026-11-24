@@ -573,7 +573,10 @@ export function StaffPortalPage({
                       className={`staff-student-row ${isSelected ? 'active' : ''}`}
                       onClick={() => setSelectedStudentId(student.id)}
                     >
-                      <StudentPortrait student={student} className="student-row-avatar" />
+                      <StudentPortrait
+                        student={student}
+                        className={`student-row-avatar ${student.degreeDistributed ? 'certificate-handed-over' : 'certificate-pending'}`}
+                      />
                       <div className="student-row-details">
                         <strong>{student.name}</strong>
                         <span>{student.registerNumber} · {student.block}-{student.seat}</span>
@@ -710,6 +713,44 @@ export function StaffPortalPage({
                     </div>
                   </div>
 
+                </div>
+
+                <div className="certificate-handover-section">
+                  <div className="checklist-kicker">
+                    <h4>Degree Certificate Handover</h4>
+                    <span className={`overall-status-pill ${selectedStudent.degreeDistributed ? 'success' : 'pending'}`}>
+                      {selectedStudent.degreeDistributed ? 'Handover Complete' : 'Pending Handover'}
+                    </span>
+                  </div>
+                  <div className={`staff-kit-card certificate-handover-card ${selectedStudent.degreeDistributed ? 'issued' : 'pending'}`}>
+                    <div className="kit-card-icon">
+                      <Icon name={selectedStudent.degreeDistributed ? 'check' : 'award'} size={18} />
+                    </div>
+                    <div className="kit-card-content">
+                      <div className="kit-card-top">
+                        <strong>Degree Certificate</strong>
+                        <span className={`kit-pill ${selectedStudent.degreeDistributed ? 'success' : 'pending'}`}>
+                          {selectedStudent.degreeDistributed
+                            ? `Handed Over ${selectedStudent.degreeDistributedAt || ''}`
+                            : 'Awaiting Handover'}
+                        </span>
+                      </div>
+                      <p>Confirm only after the degree certificate is handed directly to the selected graduate.</p>
+                    </div>
+                    <button
+                      type="button"
+                      className={`btn-toggle-step ${selectedStudent.degreeDistributed ? 'done' : ''}`}
+                      onClick={() => updateTimedStep(
+                        selectedStudent.id,
+                        'degreeDistributed',
+                        !selectedStudent.degreeDistributed,
+                        'degreeDistributedAt',
+                      )}
+                    >
+                      <Icon name={selectedStudent.degreeDistributed ? 'x' : 'check'} size={14} />
+                      {selectedStudent.degreeDistributed ? 'Mark Pending' : 'Confirm Handover'}
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -1324,35 +1365,6 @@ export function StaffPortalPage({
                       <div><dt>Registered At</dt><dd>{drawerStudent.registeredAt || '—'}</dd></div>
                       <div><dt>Bundle ID</dt><dd>{drawerStudent.bundleId}</dd></div>
                     </dl>
-                  </section>
-
-                  <section className="roster-drawer-section drawer-degree-distribution">
-                    <h3><Icon name="award" size={15} /> Degree Distribution</h3>
-                    <div className="drawer-degree-status-row">
-                      <div>
-                        <span className={`drawer-status ${drawerStudent.degreeDistributed ? 'yes' : 'no'}`}>
-                          {drawerStudent.degreeDistributed ? 'Certificate Handed Over' : 'Pending Handover'}
-                        </span>
-                        <small>
-                          {drawerStudent.degreeDistributed
-                            ? `Distributed at ${drawerStudent.degreeDistributedAt || 'recorded time unavailable'}`
-                            : 'Confirm after handing the degree certificate to the graduate.'}
-                        </small>
-                      </div>
-                      <button
-                        type="button"
-                        className={`btn-toggle-step ${drawerStudent.degreeDistributed ? 'done' : ''}`}
-                        onClick={() => updateTimedStep(
-                          drawerStudent.id,
-                          'degreeDistributed',
-                          !drawerStudent.degreeDistributed,
-                          'degreeDistributedAt',
-                        )}
-                      >
-                        <Icon name={drawerStudent.degreeDistributed ? 'x' : 'check'} size={14} />
-                        {drawerStudent.degreeDistributed ? 'Mark Pending' : 'Confirm Handover'}
-                      </button>
-                    </div>
                   </section>
 
                   <section className="roster-drawer-section">

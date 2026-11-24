@@ -1006,7 +1006,7 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
 .student-information-card > header .eyebrow { margin-bottom: 7px; }
 .student-information-card h2 { font-size: 20px; font-weight: 800; }
 .student-information-card .header-status-group { align-items: center; gap: 14px; }
-.student-information-card .header-status-group::before { content: ''; order: 2; width: 1px; height: 34px; background: #d8e0ea; }
+.student-information-card .header-status-group::before { display: none; }
 .student-information-card .verified-label { min-height: 42px; padding: 0 18px; border: 1px solid #aee5cd; border-radius: 999px; color: #087a42; background: #effbf6; justify-content: center; gap: 8px; font-size: 14px; white-space: nowrap; }
 .student-information-card .verified-label:first-child { order: 1; }
 .student-information-card .verified-label:last-child { order: 3; }
@@ -2325,7 +2325,7 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
   display: grid;
   grid-template-columns: 360px 1fr;
   gap: 20px;
-  align-items: start;
+  align-items: stretch;
 }
 
 /* Search Panel */
@@ -2337,9 +2337,11 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
   display: flex;
   flex-direction: column;
   gap: 16px;
-  max-height: calc(100svh - 220px);
-  position: sticky;
-  top: 96px;
+  min-height: 0;
+  height: 100%;
+  max-height: none;
+  box-sizing: border-box;
+  position: static;
 }
 .panel-header {
   display: flex;
@@ -2386,6 +2388,8 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
   padding: 4px;
 }
 .staff-student-list {
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -2434,6 +2438,14 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
   font-size: 14px;
   font-weight: 800;
   flex-shrink: 0;
+  box-sizing: border-box;
+  box-shadow: 0 0 0 2px #fff;
+}
+.student-row-avatar.certificate-handed-over {
+  border: 3px solid #16a34a;
+}
+.student-row-avatar.certificate-pending {
+  border: 3px solid #dc2626;
 }
 .student-row-details {
   flex: 1;
@@ -2672,6 +2684,20 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
 .staff-checklist-grid {
   display: grid;
   gap: 10px;
+}
+.certificate-handover-section {
+  margin-top: 10px;
+  padding-top: 20px;
+  border-top: 1px solid #dfe7ef;
+  display: grid;
+  gap: 12px;
+}
+.certificate-handover-card .btn-toggle-step {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
 }
 .staff-kit-card {
   padding: 12px 16px;
@@ -4306,7 +4332,7 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
 }
 
 .seating-hover-tooltip {
-  position: absolute;
+  position: fixed;
   pointer-events: none !important;
   background: #0b1329;
   color: #fff;
@@ -4513,6 +4539,42 @@ h1 { margin: 0; font-family: var(--display); font-size: clamp(29px, 3vw, 39px); 
 .student-kit-item-title h4 { margin: 0; color: #111827; font-size: 16px; font-weight: 800; }
 .student-kit-item-title > span { padding: 5px 9px; border: 1px solid #9aefba; border-radius: 999px; color: #167c3c; background: #eafbf0; display: inline-flex; align-items: center; gap: 5px; font-size: 14px; font-weight: 800; }
 .student-kit-item p { margin: 7px 0 0; color: #64748b; font-size: 14px; line-height: 1.5; }
+
+/* Student convocation photo gallery */
+.photo-gallery-page { max-width: 1500px; padding-bottom: 64px; }
+.photo-gallery-panel { padding: clamp(22px, 3vw, 36px); border-radius: 16px; }
+.photo-gallery-heading { margin-bottom: 26px; display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; }
+.photo-gallery-heading h2 { margin: 7px 0 8px; color: #111827; font: 800 24px var(--display); }
+.photo-gallery-heading > div > p:last-child { margin: 0; color: #64748b; font-size: 14px; line-height: 1.5; }
+.photo-gallery-heading > span { min-height: 40px; padding: 0 14px; border: 1px solid #bfdbfe; border-radius: 999px; color: #1457b8; background: #eff6ff; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 800; white-space: nowrap; }
+.convocation-photo-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+.convocation-photo-card { min-width: 0; border: 1px solid #dbe4ef; border-radius: 15px; background: #fff; overflow: hidden; box-shadow: 0 8px 24px rgba(15, 40, 70, .07); transition: transform .2s ease, box-shadow .2s ease; }
+.convocation-photo-card:hover { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(15, 40, 70, .12); }
+.convocation-photo-card:first-child { grid-column: 1 / -1; }
+.convocation-photo-preview { position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: #e8eef6; }
+.convocation-photo-card:first-child .convocation-photo-preview { aspect-ratio: 2.2 / 1; }
+.convocation-photo-preview img { width: 100%; height: 100%; display: block; object-fit: cover; object-position: center; transition: transform .35s ease; }
+.convocation-photo-card:hover .convocation-photo-preview img { transform: scale(1.015); }
+.convocation-photo-preview > span { position: absolute; left: 16px; bottom: 14px; padding: 6px 10px; border-radius: 999px; color: #fff; background: rgba(8, 36, 67, .82); backdrop-filter: blur(6px); font-size: 13px; font-weight: 800; }
+.convocation-photo-details { padding: 18px 20px 20px; display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.convocation-photo-details > div { min-width: 0; }
+.convocation-photo-details h3 { margin: 0 0 6px; color: #172033; font-size: 16px; font-weight: 800; }
+.convocation-photo-details p { margin: 0; color: #64748b; font-size: 14px; line-height: 1.5; }
+.convocation-photo-details a { min-height: 42px; padding: 0 15px; border: 1px solid #9fc3fa; border-radius: 9px; color: #1769e8; background: #f7fbff; display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex: 0 0 auto; font-size: 14px; font-weight: 800; text-decoration: none; }
+.convocation-photo-details a:hover { color: #fff; border-color: #1769e8; background: #1769e8; }
+
+@media (max-width: 820px) {
+  .convocation-photo-grid { grid-template-columns: 1fr; }
+  .convocation-photo-card:first-child { grid-column: auto; }
+  .convocation-photo-card:first-child .convocation-photo-preview,
+  .convocation-photo-preview { aspect-ratio: 4 / 3; }
+}
+
+@media (max-width: 560px) {
+  .photo-gallery-heading, .convocation-photo-details { align-items: stretch; flex-direction: column; }
+  .photo-gallery-heading > span { align-self: flex-start; }
+  .convocation-photo-details a { width: 100%; box-sizing: border-box; }
+}
 
 @media (max-width: 700px) {
   .student-kit-panel { padding: 16px; }

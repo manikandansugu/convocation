@@ -65,7 +65,6 @@ export function KitDetailsPage({ student = STUDENT, photoUrl }: KitDetailsPagePr
               <span><strong>ROW</strong> {row}</span>
               <span><strong>SEAT</strong> {seat}</span>
               <span><strong>GATE</strong> Gate 01</span>
-              <span className="approved"><strong>COE</strong> Approved Presentee</span>
             </div>
           </div>
         </div>

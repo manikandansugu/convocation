@@ -16,11 +16,10 @@ export function StudentInformationPage({ student = STUDENT, onContinue }: Studen
       <section className="panel student-information-card">
         <header>
           <div>
-            <p className="eyebrow">COE APPROVED GRADUATE RECORD</p>
+            <p className="eyebrow">GRADUATE RECORD</p>
             <h2>Review & Confirm Student Details</h2>
           </div>
           <div className="header-status-group">
-            <span className="verified-label"><Icon name="check" size={14}/> COE Approved</span>
             <span className="verified-label in-person-badge"><Icon name="check" size={14}/> In-Person Attendee</span>
           </div>
         </header>

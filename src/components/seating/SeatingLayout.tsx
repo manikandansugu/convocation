@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Icon } from '../ui/Icon'
 import studentPortraitGrid from '../../assets/indian-student-portraits-grid.jpg'
 import {
@@ -774,7 +775,7 @@ export function SeatingLayout({
                               chooseAllocation(allocation)
                             }
                           }}
-                          onMouseEnter={() => {
+                          onMouseEnter={(event) => {
                             const bName = getBlockName(rowConfig.row, seatNumber) || 'Auditorium'
                             let statusText = 'Available'
                             let statusType: TooltipData['statusType'] = 'available'
@@ -805,17 +806,12 @@ export function SeatingLayout({
                               status: statusText,
                               statusType,
                               attendeeName: allocation?.name,
-                              x: x + SEAT_SIZE / 2,
-                              y: y,
+                              x: Math.min(Math.max(event.clientX, 190), window.innerWidth - 190),
+                              y: Math.max(event.clientY, 105),
                             })
                           }}
                           onMouseLeave={() => setHoveredTooltip(null)}
-                        >
-                          <title>
-                            {seatId} · {allocation ? allocation.name : isTaken ? 'Occupied' : 'Available'} {isCertificateIssued ? '(Certificate Issued)' : ''} (
-                            {isBalcony ? 'Balcony' : 'Ground Floor'})
-                          </title>
-                        </rect>
+                        />
                       )
                     })}
 
@@ -976,12 +972,12 @@ export function SeatingLayout({
             </svg>
 
             {/* Floating Hover Popover — positioned right above the seat with an arrow, never disturbing or obscuring the pointed seat */}
-            {hoveredTooltip && (
+            {hoveredTooltip && createPortal(
               <div
                 className="seating-hover-tooltip"
                 style={{
-                  left: `${(hoveredTooltip.x / CANVAS_WIDTH) * 100}%`,
-                  top: `${(hoveredTooltip.y / canvasHeight) * 100}%`,
+                  left: `${hoveredTooltip.x}px`,
+                  top: `${hoveredTooltip.y}px`,
                 }}
               >
                 <div className="tooltip-top-row">
@@ -998,7 +994,8 @@ export function SeatingLayout({
                     {hoveredTooltip.status}
                   </span>
                 </div>
-              </div>
+              </div>,
+              document.body,
             )}
           </div>
         </div>
