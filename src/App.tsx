@@ -12,6 +12,7 @@ import { SeatingLayoutPage } from './pages/SeatingLayoutPage'
 import { MapPage } from './pages/MapPage'
 import { PaymentPage } from './pages/PaymentPage'
 import { StudentInformationPage } from './pages/StudentInformationPage'
+import { KitDetailsPage } from './pages/KitDetailsPage'
 import { LoginPage, type UserRole, type StaffTab } from './pages/LoginPage'
 import { StaffPortalPage } from './pages/StaffPortalPage'
 import type { Guest, Student } from './types/registration'
@@ -64,8 +65,13 @@ function App() {
       return (
         <NotificationsPage
           notifications={notifications}
+          queries={queries}
           onMarkRead={(id) => setNotifications((items) => items.map((item) => item.id === id ? { ...item, read: true } : item))}
           onMarkAllRead={() => setNotifications((items) => items.map((item) => ({ ...item, read: true })))}
+          onOpenQueries={() => {
+            setQueryFormOpen(false)
+            navigateTo('Queries & Support')
+          }}
         />
       )
     }
@@ -99,14 +105,17 @@ function App() {
       return (
         <StudentInformationPage
           student={studentInfo}
-          onUpdateMobile={(mobile) => setStudentInfo((prev) => ({ ...prev, mobile }))}
           onContinue={() => navigateTo('ID Verification')}
         />
       )
     }
+    if (activePage === 'Kit Details') {
+      return <KitDetailsPage student={studentInfo} photoUrl={capturedPhotoUrl} />
+    }
     if (activePage === 'ID Verification') {
       return (
         <IdentityVerificationPage
+          photoUrl={studentInfo.photoUrl}
           onPhotoCaptured={(url) => setCapturedPhotoUrl(url)}
           onBack={() => navigateTo('Student Information')}
           onContinue={() => navigateTo('Payment')}
@@ -181,7 +190,7 @@ function App() {
           subtitle: 'Dr. T. P. Ganesan Auditorium Seating Layout (2,852 Seats · 52 Rows)',
           eyebrow: 'DR. T. P. GANESAN AUDITORIUM · CONVOCATION 2026',
           icon: 'grid',
-          status: { label: 'Seat allocated: A-6', icon: 'check', tone: 'success' },
+          status: { label: `Seat allocated: ${studentInfo.seatNumber || 'A-1'}`, icon: 'check', tone: 'success' },
         }
       case 'Map':
         return {
@@ -198,6 +207,14 @@ function App() {
           eyebrow: 'CAMPUS TRUST · CONVOCATION 2026',
           icon: 'user',
           status: { label: 'Step 1 of 5', tone: 'neutral' },
+        }
+      case 'Kit Details':
+        return {
+          title: 'Kit Details',
+          subtitle: 'View your attendance and issued graduation-kit items.',
+          eyebrow: 'GRADUATION DAY 2026',
+          icon: 'tag',
+          status: { label: 'Kit Issued', icon: 'check', tone: 'success' },
         }
       case 'ID Verification':
         return {

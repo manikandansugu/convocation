@@ -8,6 +8,7 @@ export type PageId =
   | 'Seating Layout'
   | 'Map'
   | 'Student Information'
+  | 'Kit Details'
   | 'ID Verification'
   | 'Payment'
   | 'Guest Addition'
@@ -22,6 +23,7 @@ export const navigationItems: NavigationItem[] = [
   { label: 'Instructions', icon: 'file' },
   { label: 'Notifications', icon: 'bell' },
   { label: 'Student Information', icon: 'user' },
+  { label: 'Kit Details', icon: 'tag' },
   { label: 'ID Verification', icon: 'camera' },
   { label: 'Payment', icon: 'wallet' },
   { label: 'Guest Addition', icon: 'user' },

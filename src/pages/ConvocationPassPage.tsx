@@ -5,7 +5,7 @@ import { QRCodeSVG } from 'qrcode.react'
 import { Icon } from '../components/ui/Icon'
 import { REGISTRATION_ID, STUDENT } from '../config/student'
 import type { Guest, Student } from '../types/registration'
-import studentPhoto from '../assets/student-verification.png'
+import studentPhoto from '../assets/aadhithya-raj.jpg'
 import guestPhoto from '../assets/guest-male-portrait.png'
 import convocationLogo from '../assets/srm-convocation-logo.png'
 
@@ -37,7 +37,7 @@ function PersonPass({ name, label, relationship, index, photoUrl, student, guest
   const elementId = 'convocation-pass-' + index
   const isPrimaryStudent = index === 0
 
-  const activePhoto = photoUrl || studentPhoto
+  const activePhoto = photoUrl || student.photoUrl || studentPhoto
   const seatId = student.seatNumber || 'A-25'
   const guestHallNumber = 'Hall 01'
   const parkingVenue = isPrimaryStudent ? student.parkingVenue || 'Parking Zone P1' : 'Parking Zone P2'
@@ -171,7 +171,7 @@ interface GraduationDayFlowProps {
   onNavigateToMap?: () => void
 }
 
-function GraduationDayLifecyclePanel({ onNavigateToSeating, onNavigateToMap }: GraduationDayFlowProps) {
+export function GraduationDayLifecyclePanel({ onNavigateToSeating, onNavigateToMap }: GraduationDayFlowProps) {
   // Graduation Day lifecycle stages state
   const [faceCheckinDone] = useState(true)
   const [kitReceived] = useState(true)
@@ -421,7 +421,7 @@ function GraduationDayLifecyclePanel({ onNavigateToSeating, onNavigateToMap }: G
   )
 }
 
-export function ConvocationPassPage({ guests, photoUrl, student = STUDENT, onNavigateToSeating, onNavigateToMap }: ConvocationPassPageProps) {
+export function ConvocationPassPage({ guests, photoUrl, student = STUDENT }: ConvocationPassPageProps) {
   const [downloadStatus, setDownloadStatus] = useState<'idle' | 'working' | 'error'>('idle')
 
   const filenameFor = (personName: string) =>
@@ -540,8 +540,7 @@ export function ConvocationPassPage({ guests, photoUrl, student = STUDENT, onNav
 
       <section className="pass-group student-pass-group">
         <div className="pass-group-heading">
-          <div><h2>Official Graduation Day Pass</h2></div>
-          <span>Primary Attendee</span>
+          <div><h2>Student Pass</h2></div>
         </div>
         <div className="passes-row student-pass-row">
           <PersonPass
@@ -556,19 +555,9 @@ export function ConvocationPassPage({ guests, photoUrl, student = STUDENT, onNav
         </div>
       </section>
 
-      {/* Graduation Day Lifecycle & Clearance Panel */}
-      <section className="pass-group event-day-flow-group">
-        <div className="pass-group-heading">
-          <div><h2>Event Day Process Flow & Token Clearance</h2></div>
-          <span>Campus Check-in to Lunch</span>
-        </div>
-        <GraduationDayLifecyclePanel onNavigateToSeating={onNavigateToSeating} onNavigateToMap={onNavigateToMap} />
-      </section>
-
       <section className="pass-group guest-pass-group">
         <div className="pass-group-heading">
-          <div><h2>Accompanying Guest Passes</h2></div>
-          <span>{guests.length} guest{guests.length === 1 ? '' : 's'}</span>
+          <div><h2>Guest Pass</h2></div>
         </div>
         {guests.length ? (
           <div className="passes-row guest-pass-row">

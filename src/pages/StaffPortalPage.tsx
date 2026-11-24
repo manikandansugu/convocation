@@ -21,7 +21,6 @@ interface StaffPortalPageProps {
 const getKitIssuedCount = (student: StudentRosterRecord) =>
   Number(Boolean(student.attendanceRecorded)) +
   Number(Boolean(student.gownIssued)) +
-  Number(Boolean(student.robeIssued)) +
   Number(Boolean(student.breakfastTokenIssued)) +
   Number(Boolean(student.lunchTokenIssued))
 
@@ -186,7 +185,6 @@ export function StaffPortalPage({
     { id: 'roster' as const, label: 'Graduate List', icon: 'user' as const },
     { id: 'counter' as const, label: 'In-Person Check & Kit Desk', icon: 'tag' as const },
     { id: 'seating' as const, label: 'Seating & Faculty Allocation', icon: 'grid' as const },
-    ...(faculty && faculty.employeeId ? [{ id: 'faculty-distribution' as const, label: 'Degree Distribution', icon: 'award' as const }] : []),
   ]
 
   const TAB_TITLES: Record<StaffTab, string> = {
@@ -297,42 +295,6 @@ export function StaffPortalPage({
     )))
   }
 
-  const recordAttendance = (studentId: string, value: boolean) => {
-    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    setRoster((prev) => prev.map((student) => student.id === studentId ? {
-      ...student,
-      attendanceRecorded: value,
-      faceVerifiedAtCheckin: value,
-      checkinTime: value ? time : undefined,
-      tagIssued: value,
-    } : student))
-  }
-
-  const issueAllKit = (studentId: string) => {
-    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    setRoster((prev) =>
-      prev.map((s) =>
-        s.id === studentId
-          ? {
-              ...s,
-              attendanceRecorded: true,
-              faceVerifiedAtCheckin: true,
-              checkinTime: s.checkinTime || time,
-              gownIssued: true,
-              robeIssued: true,
-              breakfastTokenIssued: true,
-              lunchTokenIssued: true,
-              tagIssued: true,
-              gownReceived: true,
-              capIssued: true,
-              refreshmentReady: true,
-              kitIssued: true,
-            }
-          : s
-      )
-    )
-  }
-
   const resetStudentKit = (studentId: string) => {
     setRoster((prev) =>
       prev.map((s) =>
@@ -353,6 +315,18 @@ export function StaffPortalPage({
               kitIssued: false,
               gownReturned: false,
               gownReturnTime: undefined,
+              degreeDistributed: false,
+              degreeDistributedAt: undefined,
+              breakfastTokenRedeemed: false,
+              breakfastTime: undefined,
+              lunchTokenRedeemed: false,
+              lunchTime: undefined,
+              photoSessionCompleted: false,
+              photoSessionAt: undefined,
+              admittedAtGate: false,
+              auditoriumFaceVerified: false,
+              auditoriumEntryTime: undefined,
+              admittedTime: undefined,
             }
           : s
       )
@@ -388,8 +362,8 @@ export function StaffPortalPage({
   // Keep every incomplete student at the top; fully issued students move to the bottom.
   const counterQueueRoster = useMemo(() => {
     return [...filteredRoster].sort((a, b) => {
-      const aFullyIssued = getKitIssuedCount(a) === 5
-      const bFullyIssued = getKitIssuedCount(b) === 5
+      const aFullyIssued = getKitIssuedCount(a) === 4
+      const bFullyIssued = getKitIssuedCount(b) === 4
 
       if (aFullyIssued !== bFullyIssued) return aFullyIssued ? 1 : -1
       return 0
@@ -405,14 +379,8 @@ export function StaffPortalPage({
   const completedStepsCount =
     (selectedStudent.attendanceRecorded ? 1 : 0) +
     (selectedStudent.gownIssued ? 1 : 0) +
-    (selectedStudent.robeIssued ? 1 : 0) +
     (selectedStudent.breakfastTokenIssued ? 1 : 0) +
     (selectedStudent.lunchTokenIssued ? 1 : 0)
-  const selectedKitComplete = completedStepsCount === 5
-  const eventAccessStepsCount =
-    (selectedStudent.breakfastTokenRedeemed ? 1 : 0) +
-    (selectedStudent.lunchTokenRedeemed ? 1 : 0) +
-    (selectedStudent.admittedAtGate ? 1 : 0)
 
   return (
     <div className="app-shell staff-app-shell">
@@ -611,8 +579,8 @@ export function StaffPortalPage({
                         <span>{student.registerNumber} · {student.block}-{student.seat}</span>
                       </div>
                       <div className="student-row-status">
-                        <span className={`roster-pill ${doneCount === 5 ? 'success' : doneCount > 0 ? 'warning' : 'pending'}`}>
-                          {doneCount === 5 ? 'All 5 Issued' : `${doneCount}/5 Issued`}
+                        <span className={`roster-pill ${doneCount === 4 ? 'success' : doneCount > 0 ? 'warning' : 'pending'}`}>
+                          {doneCount === 4 ? 'Kit Issued' : `${doneCount}/4 Issued`}
                         </span>
                       </div>
                     </button>
@@ -648,10 +616,6 @@ export function StaffPortalPage({
                 </div>
 
                 <div className="clearance-header-actions">
-                  <button type="button" className="btn-issue-all" onClick={() => issueAllKit(selectedStudent.id)}>
-                    <Icon name="check" size={16} />
-                    <span>Issue All Items</span>
-                  </button>
                   <button
                     type="button"
                     className="btn-go-seat"
@@ -675,9 +639,9 @@ export function StaffPortalPage({
               {/* Graduation Day Step 8: In-person check and graduation kit */}
               <div className="staff-kit-checklist">
                 <div className="checklist-kicker">
-                  <h4>Attendance & Graduation Kit Status ({completedStepsCount}/5 Completed)</h4>
-                  <span className={`overall-status-pill ${completedStepsCount === 5 ? 'success' : 'pending'}`}>
-                    {completedStepsCount === 5 ? 'Clearance Complete' : 'Pending Items'}
+                  <h4>Attendance & Graduation Kit Status ({completedStepsCount}/4 Completed)</h4>
+                  <span className={`overall-status-pill ${completedStepsCount === 4 ? 'success' : 'pending'}`}>
+                    {completedStepsCount === 4 ? 'Clearance Complete' : 'Pending Items'}
                   </span>
                 </div>
 
@@ -696,13 +660,6 @@ export function StaffPortalPage({
                       </div>
                       <p>Campus entrance facial recognition check · No paper registration needed</p>
                     </div>
-                    <button
-                      type="button"
-                      className={`btn-toggle-step ${selectedStudent.attendanceRecorded ? 'done' : ''}`}
-                      onClick={() => recordAttendance(selectedStudent.id, !selectedStudent.attendanceRecorded)}
-                    >
-                      {selectedStudent.attendanceRecorded ? 'Undo Check-in' : 'Scan Face & Record'}
-                    </button>
                   </div>
 
                   {/* Item 2: Gown */}
@@ -719,39 +676,9 @@ export function StaffPortalPage({
                       </div>
                       <p>Academic regalia gown (Size 40 / L) for ceremony procession</p>
                     </div>
-                    <button
-                      type="button"
-                      className={`btn-toggle-step ${selectedStudent.gownIssued ? 'done' : ''}`}
-                      onClick={() => updateTimedStep(selectedStudent.id, 'gownIssued', !selectedStudent.gownIssued, 'gownReceivedAt')}
-                    >
-                      {selectedStudent.gownIssued ? 'Mark Pending' : 'Issue Gown'}
-                    </button>
                   </div>
 
-                  {/* Item 3: Robe */}
-                  <div className={`staff-kit-card ${selectedStudent.robeIssued ? 'issued' : 'pending'}`}>
-                    <div className="kit-card-icon">
-                      <Icon name={selectedStudent.robeIssued ? 'check' : 'award'} size={18} />
-                    </div>
-                    <div className="kit-card-content">
-                      <div className="kit-card-top">
-                        <strong>Ceremony Robe & Stole</strong>
-                        <span className={`kit-pill ${selectedStudent.robeIssued ? 'success' : 'pending'}`}>
-                          {selectedStudent.robeIssued ? 'Robe Issued' : 'Pending'}
-                        </span>
-                      </div>
-                      <p>{selectedStudent.department} discipline stole & ceremonial hood</p>
-                    </div>
-                    <button
-                      type="button"
-                      className={`btn-toggle-step ${selectedStudent.robeIssued ? 'done' : ''}`}
-                      onClick={() => updateTimedStep(selectedStudent.id, 'robeIssued', !selectedStudent.robeIssued)}
-                    >
-                      {selectedStudent.robeIssued ? 'Mark Pending' : 'Issue Robe'}
-                    </button>
-                  </div>
-
-                  {/* Item 4: Breakfast Token */}
+                  {/* Item 3: Breakfast Token */}
                   <div className={`staff-kit-card ${selectedStudent.breakfastTokenIssued ? 'issued' : 'pending'}`}>
                     <div className="kit-card-icon">
                       <Icon name={selectedStudent.breakfastTokenIssued ? 'check' : 'clock'} size={18} />
@@ -765,16 +692,9 @@ export function StaffPortalPage({
                       </div>
                       <p>Token #BF-10245 · Valid for student & guests at Food Court 02</p>
                     </div>
-                    <button
-                      type="button"
-                      className={`btn-toggle-step ${selectedStudent.breakfastTokenIssued ? 'done' : ''}`}
-                      onClick={() => updateTimedStep(selectedStudent.id, 'breakfastTokenIssued', !selectedStudent.breakfastTokenIssued)}
-                    >
-                      {selectedStudent.breakfastTokenIssued ? 'Mark Pending' : 'Issue Breakfast Token'}
-                    </button>
                   </div>
 
-                  {/* Item 5: Lunch Token */}
+                  {/* Item 4: Lunch Token */}
                   <div className={`staff-kit-card ${selectedStudent.lunchTokenIssued ? 'issued' : 'pending'}`}>
                     <div className="kit-card-icon">
                       <Icon name={selectedStudent.lunchTokenIssued ? 'check' : 'ticket'} size={18} />
@@ -788,127 +708,8 @@ export function StaffPortalPage({
                       </div>
                       <p>Token #LN-10245 · Valid post-ceremony & photo session at Food Court 02</p>
                     </div>
-                    <button
-                      type="button"
-                      className={`btn-toggle-step ${selectedStudent.lunchTokenIssued ? 'done' : ''}`}
-                      onClick={() => updateTimedStep(selectedStudent.id, 'lunchTokenIssued', !selectedStudent.lunchTokenIssued)}
-                    >
-                      {selectedStudent.lunchTokenIssued ? 'Mark Pending' : 'Issue Lunch Token'}
-                    </button>
                   </div>
 
-                  {/* Degree Certificate Status */}
-                  <div className={`staff-kit-card ${selectedStudent.degreeDistributed ? 'issued' : 'pending'}`}>
-                    <div className="kit-card-icon">
-                      <Icon name={selectedStudent.degreeDistributed ? 'check' : 'award'} size={18} />
-                    </div>
-                    <div className="kit-card-content">
-                      <div className="kit-card-top">
-                        <strong>Degree Certificate</strong>
-                        <span className={`kit-pill ${selectedStudent.degreeDistributed ? 'success' : 'pending'}`}>
-                          {selectedStudent.degreeDistributed
-                            ? `Handed Over ${selectedStudent.degreeDistributedAt || ''}`
-                            : 'Pending Handover'}
-                        </span>
-                      </div>
-                      <p>Degree certificate distribution status for the selected graduate</p>
-                    </div>
-                    <button
-                      type="button"
-                      className={`btn-toggle-step ${selectedStudent.degreeDistributed ? 'done' : ''}`}
-                      onClick={() => updateTimedStep(
-                        selectedStudent.id,
-                        'degreeDistributed',
-                        !selectedStudent.degreeDistributed,
-                        'degreeDistributedAt',
-                      )}
-                    >
-                      {selectedStudent.degreeDistributed ? 'Mark Pending' : 'Confirm Handover'}
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="staff-kit-checklist integrated-desk-actions">
-                <div className="checklist-kicker">
-                  <h4>Token Validation & Auditorium Entry ({eventAccessStepsCount}/3 Completed)</h4>
-                  <span className={`overall-status-pill ${eventAccessStepsCount === 3 ? 'success' : 'pending'}`}>
-                    {eventAccessStepsCount === 3 ? 'Event Access Complete' : 'Pending Actions'}
-                  </span>
-                </div>
-
-                <div className="staff-checklist-grid">
-                  <div className={`staff-kit-card ${selectedStudent.breakfastTokenRedeemed ? 'issued' : 'pending'}`}>
-                    <div className="kit-card-icon"><Icon name={selectedStudent.breakfastTokenRedeemed ? 'check' : 'ticket'} size={18} /></div>
-                    <div className="kit-card-content">
-                      <div className="kit-card-top">
-                        <strong>Breakfast Token Validation</strong>
-                        <span className={`kit-pill ${selectedStudent.breakfastTokenRedeemed ? 'success' : 'pending'}`}>
-                          {selectedStudent.breakfastTokenRedeemed
-                            ? `Served ${selectedStudent.breakfastTime || ''}`
-                            : selectedStudent.breakfastTokenIssued ? 'Ready to Redeem' : 'Token Not Issued'}
-                        </span>
-                      </div>
-                      <p>Validate the issued breakfast token before serving the graduate.</p>
-                    </div>
-                    <button
-                      type="button"
-                      className={`btn-toggle-step ${selectedStudent.breakfastTokenRedeemed ? 'done' : ''}`}
-                      disabled={!selectedStudent.breakfastTokenIssued}
-                      onClick={() => updateTimedStep(selectedStudent.id, 'breakfastTokenRedeemed', !selectedStudent.breakfastTokenRedeemed, 'breakfastTime')}
-                    >
-                      {selectedStudent.breakfastTokenRedeemed ? 'Undo' : 'Redeem Breakfast'}
-                    </button>
-                  </div>
-
-                  <div className={`staff-kit-card ${selectedStudent.lunchTokenRedeemed ? 'issued' : 'pending'}`}>
-                    <div className="kit-card-icon"><Icon name={selectedStudent.lunchTokenRedeemed ? 'check' : 'ticket'} size={18} /></div>
-                    <div className="kit-card-content">
-                      <div className="kit-card-top">
-                        <strong>Lunch Token Validation</strong>
-                        <span className={`kit-pill ${selectedStudent.lunchTokenRedeemed ? 'success' : 'pending'}`}>
-                          {selectedStudent.lunchTokenRedeemed
-                            ? `Served ${selectedStudent.lunchTime || ''}`
-                            : selectedStudent.degreeDistributed ? 'Ready After Photo' : 'Awaiting Certificate'}
-                        </span>
-                      </div>
-                      <p>Confirm the certificate and photo-session milestone before serving lunch.</p>
-                    </div>
-                    <button
-                      type="button"
-                      className={`btn-toggle-step ${selectedStudent.lunchTokenRedeemed ? 'done' : ''}`}
-                      disabled={!selectedStudent.lunchTokenIssued || !selectedStudent.degreeDistributed}
-                      onClick={() => {
-                        updateTimedStep(selectedStudent.id, 'lunchTokenRedeemed', !selectedStudent.lunchTokenRedeemed, 'lunchTime')
-                        if (!selectedStudent.lunchTokenRedeemed) updateTimedStep(selectedStudent.id, 'photoSessionCompleted', true, 'photoSessionAt')
-                      }}
-                    >
-                      {selectedStudent.lunchTokenRedeemed ? 'Undo' : 'Confirm Photo & Redeem'}
-                    </button>
-                  </div>
-
-                  <div className={`staff-kit-card ${selectedStudent.admittedAtGate ? 'issued' : 'pending'}`}>
-                    <div className="kit-card-icon"><Icon name={selectedStudent.admittedAtGate ? 'check' : 'shield'} size={18} /></div>
-                    <div className="kit-card-content">
-                      <div className="kit-card-top">
-                        <strong>Auditorium Entry</strong>
-                        <span className={`kit-pill ${selectedStudent.admittedAtGate ? 'success' : 'pending'}`}>
-                          {selectedStudent.admittedAtGate
-                            ? `Admitted ${selectedStudent.auditoriumEntryTime || selectedStudent.admittedTime || ''}`
-                            : selectedKitComplete ? 'Ready for Face Scan' : 'Complete Kit First'}
-                        </span>
-                      </div>
-                      <p>Run the second face-recognition check before auditorium admission.</p>
-                    </div>
-                    <button
-                      type="button"
-                      className={`btn-toggle-step ${selectedStudent.admittedAtGate ? 'done' : ''}`}
-                      disabled={!selectedKitComplete || selectedStudent.admittedAtGate}
-                      onClick={() => handleAuditoriumAdmission(selectedStudent.id)}
-                    >
-                      {selectedStudent.admittedAtGate ? 'Admitted' : 'Scan Face & Admit'}
-                    </button>
-                  </div>
                 </div>
               </div>
 
@@ -1006,7 +807,7 @@ export function StaffPortalPage({
               </div>
               <div className="auditorium-entry-grid">
                 {filteredRoster.map((student) => {
-                  const kitComplete = Boolean(student.attendanceRecorded && student.gownIssued && student.robeIssued && student.breakfastTokenIssued && student.lunchTokenIssued)
+                  const kitComplete = Boolean(student.attendanceRecorded && student.gownIssued && student.breakfastTokenIssued && student.lunchTokenIssued)
                   return (
                     <article className={`auditorium-entry-card ${student.admittedAtGate ? 'admitted' : ''}`} key={student.id}>
                       <div className="auditorium-student-photo">
@@ -1336,16 +1137,22 @@ export function StaffPortalPage({
                   <p className="eyebrow">EVENT OPERATIONS</p>
                   <h3>Student List</h3>
                 </div>
-                <div className="roster-search">
-                  <Icon name="search" size={16} />
-                  <input
-                    placeholder="Filter students by name, reg id, department…"
-                    value={searchQuery}
-                    onChange={(e) => {
-                      setSearchQuery(e.target.value)
-                      setRosterPage(1)
-                    }}
-                  />
+                <div className="roster-header-actions">
+                  <button type="button" className="faculty-export-button" onClick={handleDegreeDistributionExport}>
+                    <Icon name="download" size={16} />
+                    Export Distribution
+                  </button>
+                  <div className="roster-search">
+                    <Icon name="search" size={16} />
+                    <input
+                      placeholder="Filter students by name, reg id, department…"
+                      value={searchQuery}
+                      onChange={(e) => {
+                        setSearchQuery(e.target.value)
+                        setRosterPage(1)
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -1517,6 +1324,35 @@ export function StaffPortalPage({
                       <div><dt>Registered At</dt><dd>{drawerStudent.registeredAt || '—'}</dd></div>
                       <div><dt>Bundle ID</dt><dd>{drawerStudent.bundleId}</dd></div>
                     </dl>
+                  </section>
+
+                  <section className="roster-drawer-section drawer-degree-distribution">
+                    <h3><Icon name="award" size={15} /> Degree Distribution</h3>
+                    <div className="drawer-degree-status-row">
+                      <div>
+                        <span className={`drawer-status ${drawerStudent.degreeDistributed ? 'yes' : 'no'}`}>
+                          {drawerStudent.degreeDistributed ? 'Certificate Handed Over' : 'Pending Handover'}
+                        </span>
+                        <small>
+                          {drawerStudent.degreeDistributed
+                            ? `Distributed at ${drawerStudent.degreeDistributedAt || 'recorded time unavailable'}`
+                            : 'Confirm after handing the degree certificate to the graduate.'}
+                        </small>
+                      </div>
+                      <button
+                        type="button"
+                        className={`btn-toggle-step ${drawerStudent.degreeDistributed ? 'done' : ''}`}
+                        onClick={() => updateTimedStep(
+                          drawerStudent.id,
+                          'degreeDistributed',
+                          !drawerStudent.degreeDistributed,
+                          'degreeDistributedAt',
+                        )}
+                      >
+                        <Icon name={drawerStudent.degreeDistributed ? 'x' : 'check'} size={14} />
+                        {drawerStudent.degreeDistributed ? 'Mark Pending' : 'Confirm Handover'}
+                      </button>
+                    </div>
                   </section>
 
                   <section className="roster-drawer-section">

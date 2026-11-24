@@ -64,14 +64,14 @@ export function Sidebar({ activePage, isOpen, isCollapsed, student = STUDENT, on
             <button type="button" onClick={() => setProfileOpen(false)} aria-label="Close profile"><Icon name="x" size={16} /></button>
           </div>
           <div className="profile-popup-user">
-            <div className="avatar">{initials}</div>
+            <div className="avatar">{student.photoUrl ? <img src={student.photoUrl} alt={student.name} /> : initials}</div>
             <div><strong>{student.name}</strong><span>{student.registerNumber}</span></div>
           </div>
           <div className="profile-popup-detail"><span>Programme</span><strong>{student.degree} — {student.program}</strong></div>
           <button type="button" className="profile-signout" onClick={logout}><Icon name="logout" size={17} /><span>Sign out</span></button>
         </div>}
         <button type="button" className="student-card profile-trigger" onClick={() => setProfileOpen((open) => !open)} aria-expanded={profileOpen} aria-haspopup="dialog">
-          <div className="avatar">{initials}</div><div><strong>{student.name}</strong><span>{student.registerNumber}</span></div><Icon name="chevron" size={17} />
+          <div className="avatar">{student.photoUrl ? <img src={student.photoUrl} alt={student.name} /> : initials}</div><div><strong>{student.name}</strong><span>{student.registerNumber}</span></div><Icon name="chevron" size={17} />
         </button>
       </div>
     </aside>

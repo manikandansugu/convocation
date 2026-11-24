@@ -1,22 +1,24 @@
 import { useState } from 'react'
 import { Icon } from '../components/ui/Icon'
-import studentPhoto from '../assets/student-verification.png'
+import studentPhoto from '../assets/aadhithya-raj.jpg'
 
 interface IdentityVerificationPageProps {
   onBack: () => void
   onContinue: () => void
   onPhotoCaptured?: (photoUrl: string) => void
   onNavigateToQueries?: () => void
+  photoUrl?: string
 }
 
-export function IdentityVerificationPage({ onBack, onContinue, onPhotoCaptured, onNavigateToQueries }: IdentityVerificationPageProps) {
+export function IdentityVerificationPage({ onBack, onContinue, onPhotoCaptured, onNavigateToQueries, photoUrl }: IdentityVerificationPageProps) {
   const [captured, setCaptured] = useState(false)
+  const activePhoto = photoUrl || studentPhoto
 
   const handleCapture = () => {
     const nextState = !captured
     setCaptured(nextState)
     if (nextState) {
-      onPhotoCaptured?.(studentPhoto)
+      onPhotoCaptured?.(activePhoto)
     }
   }
 
@@ -40,7 +42,7 @@ export function IdentityVerificationPage({ onBack, onContinue, onPhotoCaptured, 
           <div className="face-guide-wrap">
             <div className="face-guide">
               <img
-                src={studentPhoto}
+                src={activePhoto}
                 alt="Student face captured for identity verification"
               />
             </div>

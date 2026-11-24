@@ -1,15 +1,16 @@
 import type { COEStudent, Student } from '../types/registration'
+import aadhithyaPhoto from '../assets/aadhithya-raj.jpg'
 
 export const COE_APPROVED_STUDENTS: COEStudent[] = [
   {
     netId: 'C10001',
-    registerNumber: 'RA2011003010245',
-    name: 'Arun Menon',
-    degree: 'BBA',
-    program: 'Business Administration',
-    department: 'School of Management',
+    registerNumber: 'EA2026010001',
+    name: 'Aadhithya Raj',
+    degree: 'MCA',
+    program: 'Master of Computer Applications',
+    department: 'MCA',
     graduationYear: '2026',
-    email: 'arun.menon@gmail.com',
+    email: 'aadhithya.raj@srmist.edu.in',
     mobile: '+91 98765 43210',
     coeApproved: true,
     attendanceMode: 'in_person',
@@ -74,18 +75,18 @@ export const COE_APPROVED_STUDENTS: COEStudent[] = [
 ]
 
 export const STUDENT: Student = {
-  name: 'Arun Menon',
-  registerNumber: 'RA2011003010245',
+  name: 'Aadhithya Raj',
+  registerNumber: 'EA2026010001',
   netId: 'C10001',
-  department: 'School of Management',
-  degree: 'BBA',
-  program: 'Business Administration',
+  department: 'MCA',
+  degree: 'MCA',
+  program: 'Master of Computer Applications',
   graduationYear: '2026',
-  email: 'arun.menon@gmail.com',
+  email: 'aadhithya.raj@srmist.edu.in',
   mobile: '+91 98765 43210',
   postalAddress: '14, Lake View Road, Anna Nagar, Chennai, Tamil Nadu — 600040',
   communicationAddress: 'SRM Student Residence, Potheri, Kattankulathur, Tamil Nadu — 603203',
-  seatNumber: 'A-6',
+  seatNumber: 'A-1',
   venue: 'Dr. T. P. Ganesan Auditorium',
   kitCounter: 'Counter 01 (Ground Floor)',
   parkingVenue: 'Parking Zone P1',
@@ -93,8 +94,9 @@ export const STUDENT: Student = {
   graduationDate: '29 November 2026 · 09:30 AM',
   attendanceMode: 'in_person',
   coeApproved: true,
+  photoUrl: aadhithyaPhoto,
 }
 
-export const REGISTRATION_ID = 'CONV-2026-10245'
+export const REGISTRATION_ID = 'CONV-2026-12001'
 export const GRADUATION_REGALIA_AMOUNT = 500
 export const REGISTRATION_AMOUNT = GRADUATION_REGALIA_AMOUNT
