@@ -440,7 +440,7 @@ export function SeatingLayout({
               <strong>{GROUND_SEAT_COUNT.toLocaleString()} seats</strong>
             </div>
             <div>
-              <small>Balcony Tier</small>
+              <small>Balcony<br />Tier</small>
               <strong>{BALCONY_SEAT_COUNT.toLocaleString()} seats</strong>
             </div>
             <div>
