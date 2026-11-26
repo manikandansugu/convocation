@@ -1,6 +1,6 @@
 import { Icon } from '../components/ui/Icon'
 
-export function StaffInstructionsPage() {
+export function StaffInstructionsPage({ guestEnabled = true }: { guestEnabled?: boolean }) {
   return (
     <div className="page instructions-page staff-instructions-content">
       {/* 00 | Hero Event Banner */}
@@ -248,20 +248,20 @@ export function StaffInstructionsPage() {
         </div>
 
         <ul className="instructions-items-list">
-          <li className="instructions-item-row">
+          {guestEnabled && <li className="instructions-item-row">
             <span className="instructions-item-badge">1</span>
             <div className="instructions-item-content">
               <strong>Guest Entry Restriction:</strong> Guests and accompanying family members are <strong>STRICTLY NOT PERMITTED</strong> inside the auditorium. Staff at entry security must direct family members to outside waiting areas.
             </div>
-          </li>
-          <li className="instructions-item-row">
+          </li>}
+          {guestEnabled && <li className="instructions-item-row">
             <span className="instructions-item-badge">2</span>
             <div className="instructions-item-content">
               <strong>Guest Expenses:</strong> Any expenses incurred for accompanying guests must be borne by the students themselves. The Directorate of Online Education (DODE) will not provide or reimburse guest-related expenses.
             </div>
-          </li>
+          </li>}
           <li className="instructions-item-row">
-            <span className="instructions-item-badge">3</span>
+            <span className="instructions-item-badge">{guestEnabled ? 3 : 1}</span>
             <div className="instructions-item-content">
               <strong>Withholding Original Marksheets:</strong> Graduands with pending tuition or examination fee dues must NOT be handed original marksheets. Only a marksheet photocopy is provided, and they must be directed to accounts clearance.
             </div>

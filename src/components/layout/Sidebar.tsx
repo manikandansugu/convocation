@@ -13,9 +13,11 @@ interface SidebarProps {
   onToggleCollapse: () => void
   onNavigate: (page: PageId) => void
   onLogout: () => void
+  guestEnabled: boolean
+  onGuestEnabledChange: (enabled: boolean) => void
 }
 
-export function Sidebar({ activePage, isOpen, isCollapsed, student = STUDENT, onClose, onToggleCollapse, onNavigate, onLogout }: SidebarProps) {
+export function Sidebar({ activePage, isOpen, isCollapsed, student = STUDENT, onClose, onToggleCollapse, onNavigate, onLogout, guestEnabled, onGuestEnabledChange }: SidebarProps) {
   const [profileOpen, setProfileOpen] = useState(false)
 
   const logout = () => {
@@ -55,7 +57,7 @@ export function Sidebar({ activePage, isOpen, isCollapsed, student = STUDENT, on
       </button>
       <nav className="main-nav" aria-label="Main navigation">
         {/* <p className="nav-label">MAIN MENU</p> */}
-        {navigationItems.map((item) => <button key={item.label} className={activePage === item.label ? 'active' : ''} onClick={() => onNavigate(item.label)} title={isCollapsed ? item.label : undefined}><Icon name={item.icon} /><span>{item.label}</span></button>)}
+        {navigationItems.filter((item) => guestEnabled || item.label !== 'Guest Addition').map((item) => <button key={item.label} className={activePage === item.label ? 'active' : ''} onClick={() => onNavigate(item.label)} title={isCollapsed ? item.label : undefined}><Icon name={item.icon} /><span>{item.label}</span></button>)}
       </nav>
       <div className="sidebar-footer">
         {profileOpen && <div className="profile-popup" role="dialog" aria-label="Student profile">
@@ -68,6 +70,13 @@ export function Sidebar({ activePage, isOpen, isCollapsed, student = STUDENT, on
             <div><strong>{student.name}</strong><span>{student.registerNumber}</span></div>
           </div>
           <div className="profile-popup-detail"><span>Programme</span><strong>{student.degree} — {student.program}</strong></div>
+          <div className="profile-guest-toggle">
+            <div><strong>Guest access</strong><span>{guestEnabled ? 'Guest features are visible' : 'Guest features are hidden'}</span></div>
+            <button type="button" role="switch" aria-checked={guestEnabled} className={guestEnabled ? 'enabled' : ''} onClick={() => onGuestEnabledChange(!guestEnabled)}>
+              <span className="profile-toggle-track"><i /></span>
+              <span className="profile-toggle-state">{guestEnabled ? 'On' : 'Off'}</span>
+            </button>
+          </div>
           <button type="button" className="profile-signout" onClick={logout}><Icon name="logout" size={17} /><span>Sign out</span></button>
         </div>}
         <button type="button" className="student-card profile-trigger" onClick={() => setProfileOpen((open) => !open)} aria-expanded={profileOpen} aria-haspopup="dialog">

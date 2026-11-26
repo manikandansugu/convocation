@@ -2,9 +2,10 @@ import { Icon } from '../components/ui/Icon'
 
 interface InstructionsPageProps {
   onStartRegistration?: () => void
+  guestEnabled?: boolean
 }
 
-export function InstructionsPage({ onStartRegistration }: InstructionsPageProps) {
+export function InstructionsPage({ onStartRegistration, guestEnabled = true }: InstructionsPageProps) {
   return (
     <div className="page instructions-page prototype-page">
       {/* 00 | Hero Event Banner */}
@@ -272,20 +273,20 @@ export function InstructionsPage({ onStartRegistration }: InstructionsPageProps)
         </div>
 
         <ul className="instructions-items-list">
-          <li className="instructions-item-row">
+          {guestEnabled && <li className="instructions-item-row">
             <span className="instructions-item-badge">1</span>
             <div className="instructions-item-content">
               <strong>Guest Entry:</strong> Guests and accompanying family members will not be permitted inside the auditorium.
             </div>
-          </li>
-          <li className="instructions-item-row">
+          </li>}
+          {guestEnabled && <li className="instructions-item-row">
             <span className="instructions-item-badge">2</span>
             <div className="instructions-item-content">
               <strong>Guest Expenses:</strong> Any expenses incurred for accompanying guests must be borne by the students themselves. The Directorate of Online Education (DODE) will not provide or reimburse guest-related expenses.
             </div>
-          </li>
+          </li>}
           <li className="instructions-item-row">
-            <span className="instructions-item-badge">3</span>
+            <span className="instructions-item-badge">{guestEnabled ? 3 : 1}</span>
             <div className="instructions-item-content">
               <strong>Original Marksheet:</strong> Students who have not paid their applicable tuition fees and/or examination fees will receive only a photocopy of their marksheet. The original marksheet will not be issued to such students.
             </div>

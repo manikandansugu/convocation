@@ -121,6 +121,18 @@ label textarea,
 .profile-popup-detail { padding: 1px 2px 13px; display: grid; gap: 3px; }
 .profile-popup-detail span { color: #98a2b3; font-size: 14px; text-transform: uppercase; letter-spacing: .8px; }
 .profile-popup-detail strong { color: #485467; font-size: 14px; font-weight: 650; }
+.profile-guest-toggle { margin: 0 0 12px; padding: 12px 2px; border-top: 1px solid #e6ebf1; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.profile-guest-toggle > div { min-width: 0; display: grid; gap: 2px; }
+.profile-guest-toggle > div strong { color: #344054; font-size: 14px; }
+.profile-guest-toggle > div span { color: #7a8798; font-size: 13px; }
+.profile-guest-toggle > button { padding: 0; border: 0; color: #687588; background: transparent; display: flex; align-items: center; gap: 7px; cursor: pointer; font: 750 13px var(--sans); }
+.profile-toggle-track { position: relative; width: 48px; height: 28px; flex: 0 0 auto; border: 1px solid #cbd4df; border-radius: 16px; background: #e4e9ef; transition: border-color .2s ease, background-color .2s ease; }
+.profile-toggle-track i { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 4px rgba(16, 24, 40, .25); transition: transform .2s ease; }
+.profile-toggle-state { min-width: 20px; text-align: left; }
+.profile-guest-toggle > button.enabled { color: #087a4f; }
+.profile-guest-toggle > button.enabled .profile-toggle-track { border-color: #25a46f; background: #25a46f; }
+.profile-guest-toggle > button.enabled .profile-toggle-track i { transform: translateX(20px); }
+.profile-guest-toggle > button:focus-visible { outline: 2px solid #1769e8; outline-offset: 3px; border-radius: 5px; }
 .sidebar-footer .profile-signout { width: 100%; min-height: 38px; margin: 0; padding: 9px 11px; border: 0; border-radius: 8px; color: #b13e46; background: #fff1f2; display: flex; align-items: center; gap: 9px; cursor: pointer; font-size: 14px; font-weight: 700; text-align: left; }
 .sidebar-footer .profile-signout:hover { color: #96323a; background: #ffe5e7; }
 .main-content { min-height: 100svh; margin-left: 272px; }

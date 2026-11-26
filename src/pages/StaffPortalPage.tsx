@@ -16,6 +16,8 @@ interface StaffPortalPageProps {
   faculty?: FacultyMember
   initialTab?: StaffTab
   onLogout: () => void
+  guestEnabled?: boolean
+  onGuestEnabledChange?: (enabled: boolean) => void
 }
 
 const getKitIssuedCount = (student: StudentRosterRecord) =>
@@ -150,6 +152,8 @@ export function StaffPortalPage({
   faculty = DEFAULT_FACULTY,
   initialTab = 'instructions',
   onLogout,
+  guestEnabled = true,
+  onGuestEnabledChange,
 }: StaffPortalPageProps) {
   const initialFacultyRoster = INITIAL_ROSTER.filter((student) => student.assignedFacultyId === faculty.id)
   const initialStudentId = initialFacultyRoster[0]?.id || INITIAL_ROSTER[0].id
@@ -476,6 +480,13 @@ export function StaffPortalPage({
               <div className="profile-popup-detail">
                 <span>Department</span>
                 <strong>{currentFaculty.department}</strong>
+              </div>
+              <div className="profile-guest-toggle">
+                <div><strong>Guest access</strong><span>{guestEnabled ? 'Guest features are visible' : 'Guest features are hidden'}</span></div>
+                <button type="button" role="switch" aria-checked={guestEnabled} className={guestEnabled ? 'enabled' : ''} onClick={() => onGuestEnabledChange?.(!guestEnabled)}>
+                  <span className="profile-toggle-track"><i /></span>
+                  <span className="profile-toggle-state">{guestEnabled ? 'On' : 'Off'}</span>
+                </button>
               </div>
               <button
                 type="button"
@@ -1361,7 +1372,7 @@ export function StaffPortalPage({
                       <div><dt>Degree Registered</dt><dd><span className={`drawer-status ${drawerStudent.registered ? 'yes' : 'no'}`}>{drawerStudent.registered ? 'Yes' : 'No'}</span></dd></div>
                       <div><dt>Convocation Registered</dt><dd><span className={`drawer-status ${drawerStudent.registered ? 'yes' : 'no'}`}>{drawerStudent.registered ? 'Yes' : 'No'}</span></dd></div>
                       <div><dt>Allocated Seat No.</dt><dd>{drawerStudent.block}-{drawerStudent.row}-{drawerStudent.seat}</dd></div>
-                      <div><dt>Guest Count</dt><dd>{drawerStudent.guestCount}</dd></div>
+                      {guestEnabled && <div><dt>Guest Count</dt><dd>{drawerStudent.guestCount}</dd></div>}
                       <div><dt>Registered At</dt><dd>{drawerStudent.registeredAt || '—'}</dd></div>
                       <div><dt>Bundle ID</dt><dd>{drawerStudent.bundleId}</dd></div>
                     </dl>
@@ -1404,7 +1415,7 @@ export function StaffPortalPage({
         {/* TAB 5: INSTRUCTIONS */}
         {activeTab === 'instructions' && (
           <div className="staff-instructions-view">
-            <StaffInstructionsPage />
+            <StaffInstructionsPage guestEnabled={guestEnabled} />
           </div>
         )}
 

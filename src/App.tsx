@@ -42,19 +42,20 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [guests, setGuests] = useState<Guest[]>(DEFAULT_GUESTS)
+  const [guestEnabled, setGuestEnabled] = useState(() => window.localStorage.getItem('convocation-guest-enabled') !== 'false')
   const [notifications, setNotifications] = useState<ConvocationNotification[]>(INITIAL_NOTIFICATIONS)
   const [queries, setQueries] = useState<StudentQuery[]>(INITIAL_QUERIES)
   const [queryFormOpen, setQueryFormOpen] = useState(false)
 
   const navigateTo = (page: PageId) => {
-    setActivePage(page)
+    setActivePage(!guestEnabled && page === 'Guest Addition' ? 'Convocation Pass' : page)
     setSidebarOpen(false)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const renderPage = () => {
     if (activePage === 'Instructions') {
-      return <InstructionsPage onStartRegistration={() => navigateTo('Student Information')} />
+      return <InstructionsPage guestEnabled={guestEnabled} onStartRegistration={() => navigateTo('Student Information')} />
     }
     if (activePage === 'Seating' || activePage === 'Seating Layout') {
       return <SeatingLayoutPage />
@@ -98,6 +99,7 @@ function App() {
               : query
           )))}
           showQueryForm={queryFormOpen}
+          guestEnabled={guestEnabled}
           onCloseQueryForm={() => setQueryFormOpen(false)}
         />
       )
@@ -111,7 +113,7 @@ function App() {
       )
     }
     if (activePage === 'Graduation Kit Status') {
-      return <KitDetailsPage student={studentInfo} photoUrl={capturedPhotoUrl} />
+      return <KitDetailsPage student={studentInfo} photoUrl={capturedPhotoUrl} guestEnabled={guestEnabled} />
     }
     if (activePage === 'Photo Gallery') {
       return <PhotoGalleryPage />
@@ -131,14 +133,15 @@ function App() {
       )
     }
     if (activePage === 'Payment') {
-      return <PaymentPage onBack={() => navigateTo('ID Verification')} onSuccess={() => navigateTo('Guest Addition')} />
+      return <PaymentPage onBack={() => navigateTo('ID Verification')} onSuccess={() => navigateTo(guestEnabled ? 'Guest Addition' : 'Convocation Pass')} />
     }
     if (activePage === 'Guest Addition') {
       return <GuestAdditionPage initialGuests={guests} onBack={() => navigateTo('Payment')} onContinue={(updatedGuests) => { setGuests(updatedGuests); navigateTo('Convocation Pass') }} />
     }
     return (
       <ConvocationPassPage
-        guests={guests}
+        guests={guestEnabled ? guests : []}
+        guestEnabled={guestEnabled}
         photoUrl={capturedPhotoUrl}
         student={studentInfo}
         onNavigateToSeating={() => navigateTo('Seating')}
@@ -154,6 +157,12 @@ function App() {
     setStaffInitialTab('instructions')
     setSidebarOpen(false)
     setSidebarCollapsed(false)
+  }
+
+  const updateGuestAccess = (enabled: boolean) => {
+    setGuestEnabled(enabled)
+    window.localStorage.setItem('convocation-guest-enabled', String(enabled))
+    if (!enabled && activePage === 'Guest Addition') setActivePage('Convocation Pass')
   }
 
   const unreadNotificationCount = notifications.filter((notification) => !notification.read).length
@@ -210,7 +219,7 @@ function App() {
           subtitle: 'Review the prefilled details provided by your college.',
           eyebrow: 'CAMPUS TRUST · CONVOCATION 2026',
           icon: 'user',
-          status: { label: 'Step 1 of 5', tone: 'neutral' },
+          status: { label: `Step 1 of ${guestEnabled ? 5 : 4}`, tone: 'neutral' },
         }
       case 'Graduation Kit Status':
         return {
@@ -234,7 +243,7 @@ function App() {
           subtitle: 'Capture a clear live photo for secure campus and auditorium face recognition entry.',
           eyebrow: 'FACIAL RECOGNITION SERVICE',
           icon: 'camera',
-          status: { label: 'Step 2 of 5', tone: 'neutral' },
+          status: { label: `Step 2 of ${guestEnabled ? 5 : 4}`, tone: 'neutral' },
         }
       case 'Payment':
         return {
@@ -242,7 +251,7 @@ function App() {
           subtitle: 'Complete your payment to confirm your convocation registration.',
           eyebrow: 'SECURE CHECKOUT',
           icon: 'wallet',
-          status: { label: 'Step 3 of 5', tone: 'neutral' },
+          status: { label: `Step 3 of ${guestEnabled ? 5 : 4}`, tone: 'neutral' },
         }
       case 'Guest Addition':
         return {
@@ -255,10 +264,10 @@ function App() {
       case 'Convocation Pass':
         return {
           title: 'Graduation Day Passes',
-          subtitle: `${guests.length + 1} individual QR pass${guests.length ? 'es' : ''} generated with complete event day milestones.`,
+          subtitle: `${guestEnabled ? guests.length + 1 : 1} individual QR pass${guestEnabled && guests.length ? 'es' : ''} generated with complete event day milestones.`,
           eyebrow: 'REGISTRATION COMPLETE',
           icon: 'ticket',
-          status: { label: 'Step 5 of 5', icon: 'check', tone: 'success' },
+          status: { label: guestEnabled ? 'Step 5 of 5' : 'Step 4 of 4', icon: 'check', tone: 'success' },
         }
     }
   })()
@@ -297,6 +306,8 @@ function App() {
         staff={currentStaff}
         faculty={currentFaculty}
         initialTab={staffInitialTab}
+        guestEnabled={guestEnabled}
+        onGuestEnabledChange={updateGuestAccess}
         onLogout={logout}
       />
     )
@@ -313,6 +324,8 @@ function App() {
         onToggleCollapse={() => setSidebarCollapsed((collapsed) => !collapsed)}
         onNavigate={navigateTo}
         onLogout={logout}
+        guestEnabled={guestEnabled}
+        onGuestEnabledChange={updateGuestAccess}
       />
       <main className={`main-content ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
         <Header

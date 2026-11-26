@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { toPng } from 'html-to-image'
 import JSZip from 'jszip'
 import { QRCodeSVG } from 'qrcode.react'
@@ -19,6 +19,7 @@ interface ConvocationPassPageProps {
   student?: Student
   onNavigateToSeating?: () => void
   onNavigateToMap?: () => void
+  guestEnabled?: boolean
 }
 
 interface PersonPassProps {
@@ -30,9 +31,10 @@ interface PersonPassProps {
   student: Student
   guests: Guest[]
   onDownload: (elementId: string, personName: string) => Promise<void>
+  guestEnabled: boolean
 }
 
-function PersonPass({ name, label, relationship, index, photoUrl, student, guests, onDownload }: PersonPassProps) {
+function PersonPass({ name, label, relationship, index, photoUrl, student, guests, onDownload, guestEnabled }: PersonPassProps) {
   const passId = index === 0 ? REGISTRATION_ID : REGISTRATION_ID + '-G' + index
   const elementId = 'convocation-pass-' + index
   const isPrimaryStudent = index === 0
@@ -82,10 +84,10 @@ function PersonPass({ name, label, relationship, index, photoUrl, student, guest
                 <span>{isPrimaryStudent ? 'PROGRAM' : 'RELATION'}</span>
                 <strong>{attendeeProgramOrRelation}</strong>
               </div>
-              <div className="ceremonial-detail">
+              {guestEnabled && <div className="ceremonial-detail">
                 <span>ACCOMPANYING GUEST(S)</span>
                 <strong>{isPrimaryStudent ? guests.length : '—'}</strong>
-              </div>
+              </div>}
               <div className="ceremonial-detail">
                 <span>DATE</span>
                 <strong>{student.graduationDate || '29 November 2026'}</strong>
@@ -421,7 +423,7 @@ export function GraduationDayLifecyclePanel({ onNavigateToSeating, onNavigateToM
   )
 }
 
-export function ConvocationPassPage({ guests, photoUrl, student = STUDENT }: ConvocationPassPageProps) {
+export function ConvocationPassPage({ guests, photoUrl, student = STUDENT, guestEnabled = true }: ConvocationPassPageProps) {
   const [downloadStatus, setDownloadStatus] = useState<'idle' | 'working' | 'error'>('idle')
 
   const filenameFor = (personName: string) =>
@@ -520,11 +522,12 @@ export function ConvocationPassPage({ guests, photoUrl, student = STUDENT }: Con
   return (
     <div className="page passes-page prototype-page">
       <div className="five-step-progress">
-        <span className="done"><Icon name="check" size={16}/></span><i className="done"/>
-        <span className="done"><Icon name="check" size={16}/></span><i className="done"/>
-        <span className="done"><Icon name="check" size={16}/></span><i className="done"/>
-        <span className="done"><Icon name="check" size={16}/></span><i className="done"/>
-        <span className="done"><Icon name="check" size={16}/></span>
+        {Array.from({ length: guestEnabled ? 5 : 4 }, (_, index) => (
+          <Fragment key={index}>
+            <span className="done"><Icon name="check" size={16}/></span>
+            {index < (guestEnabled ? 5 : 4) - 1 && <i className="done"/>}
+          </Fragment>
+        ))}
       </div>
 
       <div className="pass-success">
@@ -550,12 +553,13 @@ export function ConvocationPassPage({ guests, photoUrl, student = STUDENT }: Con
             photoUrl={photoUrl}
             student={student}
             guests={guests}
+            guestEnabled={guestEnabled}
             onDownload={downloadPass}
           />
         </div>
       </section>
 
-      <section className="pass-group guest-pass-group">
+      {guestEnabled && <section className="pass-group guest-pass-group">
         <div className="pass-group-heading">
           <div><h2>Guest Pass</h2></div>
         </div>
@@ -570,6 +574,7 @@ export function ConvocationPassPage({ guests, photoUrl, student = STUDENT }: Con
                 index={index + 1}
                 student={student}
                 guests={guests}
+                guestEnabled={guestEnabled}
                 onDownload={downloadPass}
               />
             ))}
@@ -577,11 +582,11 @@ export function ConvocationPassPage({ guests, photoUrl, student = STUDENT }: Con
         ) : (
           <div className="no-guest-passes">No accompanying guest passes were requested.</div>
         )}
-      </section>
+      </section>}
 
       <div className="pass-download-options">
         <button className="download-pass-button" onClick={downloadAllPasses} disabled={downloadStatus === 'working'}>
-          <Icon name="download" size={19}/> {downloadStatus === 'working' ? 'Preparing Download…' : 'Download All Passes'}
+          <Icon name="download" size={19}/> {downloadStatus === 'working' ? 'Preparing Download…' : guestEnabled ? 'Download All Passes' : 'Download Student Pass'}
         </button>
         <button className="print-pass-button" onClick={() => window.print()}>
           <Icon name="file" size={18}/> Print / Save as PDF
@@ -592,7 +597,9 @@ export function ConvocationPassPage({ guests, photoUrl, student = STUDENT }: Con
         <p className="download-error">The download could not be prepared. Please try Print / Save as PDF.</p>
       )}
       <p className="download-hint">
-        Each pass contains all 10 verified fields: Photo, Name, Register Number, Program, Accompanying Guest details, Graduation Date, Venue, Seat Number, Kit Counter, and QR code.
+        {guestEnabled
+          ? 'Each pass contains all 10 verified fields: Photo, Name, Register Number, Program, Accompanying Guest details, Graduation Date, Venue, Seat Number, Kit Counter, and QR code.'
+          : 'The student pass contains verified photo, name, register number, program, graduation date, venue, seat number, kit counter, and QR code.'}
       </p>
     </div>
   )

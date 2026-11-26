@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Icon } from '../components/ui/Icon'
 import type { StudentQuery } from '../types/queries'
 
@@ -8,11 +8,12 @@ interface QueriesPageProps {
   onReplyQuery: (queryId: string, body: string, attachmentName?: string) => void
   showQueryForm: boolean
   onCloseQueryForm: () => void
+  guestEnabled?: boolean
 }
 
 const QUERY_CATEGORIES = ['Registration', 'Payment', 'ID Verification', 'Guest Pass', 'Seating', 'Convocation Pass', 'Other']
 
-export function QueriesPage({ queries, onSubmitQuery, onReplyQuery, showQueryForm, onCloseQueryForm }: QueriesPageProps) {
+export function QueriesPage({ queries, onSubmitQuery, onReplyQuery, showQueryForm, onCloseQueryForm, guestEnabled = true }: QueriesPageProps) {
   const [category, setCategory] = useState(QUERY_CATEGORIES[0])
   const [subject, setSubject] = useState('')
   const [message, setMessage] = useState('')
@@ -23,6 +24,11 @@ export function QueriesPage({ queries, onSubmitQuery, onReplyQuery, showQueryFor
   const [selectedQueryId, setSelectedQueryId] = useState<string | null>(null)
   const [replyAttachment, setReplyAttachment] = useState<File | null>(null)
   const [replyAttachmentInputKey, setReplyAttachmentInputKey] = useState(0)
+  const queryCategories = guestEnabled ? QUERY_CATEGORIES : QUERY_CATEGORIES.filter((item) => item !== 'Guest Pass')
+
+  useEffect(() => {
+    if (!guestEnabled && category === 'Guest Pass') setCategory(QUERY_CATEGORIES[0])
+  }, [category, guestEnabled])
 
   const selectedQuery = queries.find((query) => query.id === selectedQueryId)
 
@@ -80,7 +86,7 @@ export function QueriesPage({ queries, onSubmitQuery, onReplyQuery, showQueryFor
             <span className="query-response-time"><Icon name="clock" size={14} /> Response within 1 working day</span>
           </div>
           <div className="query-form-grid">
-            <label><span>Query category</span><select value={category} onChange={(event) => setCategory(event.target.value)}>{QUERY_CATEGORIES.map((item) => <option key={item}>{item}</option>)}</select></label>
+            <label><span>Query category</span><select value={category} onChange={(event) => setCategory(event.target.value)}>{queryCategories.map((item) => <option key={item}>{item}</option>)}</select></label>
             <label>
               <span>Attach photo or file (optional)</span>
               <div className="query-attachment-input">

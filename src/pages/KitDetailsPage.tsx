@@ -6,6 +6,7 @@ import type { Student } from '../types/registration'
 interface KitDetailsPageProps {
   student?: Student
   photoUrl?: string
+  guestEnabled?: boolean
 }
 
 interface IssuedKitItem {
@@ -42,7 +43,7 @@ const ISSUED_KIT_ITEMS: IssuedKitItem[] = [
   },
 ]
 
-export function KitDetailsPage({ student = STUDENT, photoUrl }: KitDetailsPageProps) {
+export function KitDetailsPage({ student = STUDENT, photoUrl, guestEnabled = true }: KitDetailsPageProps) {
   const [row = 'A', seat = '1'] = (student.seatNumber || 'A-1').split('-')
 
   return (
@@ -83,7 +84,7 @@ export function KitDetailsPage({ student = STUDENT, photoUrl }: KitDetailsPagePr
                   <h4>{item.title}</h4>
                   <span><Icon name={item.icon} size={13} /> {item.status}</span>
                 </div>
-                <p>{item.description}</p>
+                <p>{!guestEnabled && item.title === 'Breakfast Token' ? 'Token #BF-12001 · Valid for student at Food Court 02' : item.description}</p>
               </div>
             </article>
           ))}
